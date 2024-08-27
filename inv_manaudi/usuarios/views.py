@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import RegistroForm, EdicionUsuarioForm
 
 
+@login_required
 def inicio(request):
     return render(request, 'usuarios/inicio.html')
 
@@ -21,6 +22,10 @@ def registro(request):
     return render(request, 'usuarios/registro.html', {'form': form})
 
 def login_view(request):
+    # Si el usuario ya está autenticado, lo redirigimos al inicio
+    if request.user.is_authenticated:
+        return redirect('inicio')
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
