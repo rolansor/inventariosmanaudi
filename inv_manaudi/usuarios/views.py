@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import RegistroForm, EdicionUsuarioForm
@@ -7,19 +7,13 @@ from .forms import RegistroForm, EdicionUsuarioForm
 
 @login_required
 def inicio(request):
-    return render(request, 'usuarios/inicio.html')
+    return render(request, 'inicio.html')
 
 
-def registro(request):
-    if request.method == 'POST':
-        form = RegistroForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('admin')  # Redirige a la página principal
-    else:
-        form = RegistroForm()
-    return render(request, 'usuarios/registro.html', {'form': form})
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
 
 def login_view(request):
     # Si el usuario ya está autenticado, lo redirigimos al inicio
@@ -37,7 +31,20 @@ def login_view(request):
                 return redirect('inicio')
     else:
         form = AuthenticationForm()
-    return render(request, 'usuarios/login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
+
+
+def registro(request):
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('admin')  # Redirige a la página principal
+    else:
+        form = RegistroForm()
+    return render(request, 'registro.html', {'form': form})
+
 
 @login_required
 def editar_usuario(request):
@@ -48,4 +55,4 @@ def editar_usuario(request):
             return redirect('admin')
     else:
         form = EdicionUsuarioForm(instance=request.user)
-    return render(request, 'usuarios/editar.html', {'form': form})
+    return render(request, 'editar.html', {'form': form})

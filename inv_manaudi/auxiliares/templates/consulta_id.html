@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta RUC</title>
+</head>
+<body>
+    <h1>Consulta de RUC</h1>
+    <form id="consultaForm">
+        <label for="ruc">Ingrese el RUC:</label>
+        <input type="text" id="ruc" name="ruc" required>
+        <button type="submit">Consultar</button>
+    </form>
+
+    <div id="resultado"></div>
+
+    <script>
+        document.getElementById('consultaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ruc = document.getElementById('ruc').value;
+
+            try {
+                const response = await fetch('/auxiliares/consulta_id/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Incluye el token CSRF para proteger la solicitud
+                    },
+                    body: new URLSearchParams({
+                        'identification': ruc
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById('resultado').innerText = JSON.stringify(data, null, 2);
+
+            } catch (error) {
+                console.error('Error al realizar la consulta:', error);
+                document.getElementById('resultado').innerText = 'Error al realizar la consulta.';
+            }
+        });
+    </script>
+</body>
+</html>
