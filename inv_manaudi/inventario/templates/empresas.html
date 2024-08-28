@@ -49,6 +49,7 @@
                         <td>{{ empresa.email }}</td>
                         <td>
                             <button class="btn btn-primary edit-empresa" data-id="{{ empresa.pk }}">Editar</button>
+                            <a href="{% url 'sucursal_list' empresa.pk %}" class="btn btn-warning">Sucursales</a>
                             <button class="btn btn-danger delete-empresa" data-id="{{ empresa.pk }}">Eliminar</button>
                         </td>
                     </tr>

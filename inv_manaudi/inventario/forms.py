@@ -1,5 +1,7 @@
 from django import forms
 from .models import Empresa
+from .models import Sucursal
+
 
 class EmpresaForm(forms.ModelForm):
     class Meta:
@@ -11,3 +13,9 @@ class EmpresaForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
+
+
+class SucursalForm(forms.ModelForm):
+    class Meta:
+        model = Sucursal
+        fields = ['empresa', 'nombre', 'abreviatura', 'direccion', 'telefono']
