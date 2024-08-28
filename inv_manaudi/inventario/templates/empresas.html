@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Empresas{% endblock %}
+
+{% block contenido %}
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">UI Elements in Table</h4>
+            <div class="panel-heading-btn">
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
+                   data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-toggle="panel-reload"><i
+                        class="fa fa-redo"></i></a>
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-toggle="panel-remove"><i
+                        class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered" id="empresa-list">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for empresa in empresas %}
+                    <tr id="empresa-{{ empresa.pk }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ empresa.nombre }}</td>
+                        <td>{{ empresa.direccion }}</td>
+                        <td>{{ empresa.telefono }}</td>
+                        <td>{{ empresa.email }}</td>
+                        <td>
+                            <button class="btn btn-primary edit-empresa" data-id="{{ empresa.pk }}">Editar</button>
+                            <button class="btn btn-danger delete-empresa" data-id="{{ empresa.pk }}">Eliminar</button>
+                        </td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay empresas registradas.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <a href="{% url 'empresa_create' %}" class="btn btn-success">Nueva Empresa</a>
+        </div>
+    </div>
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Basic Form Validation</h4>
+            <div class="panel-heading-btn">
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
+                   data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-toggle="panel-reload"><i
+                        class="fa fa-redo"></i></a>
+                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-toggle="panel-remove"><i
+                        class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form method="POST" id="empresa-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ form.nombre.value }}"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" class="form-control" id="direccion" name="direccion"
+                           value="{{ form.direccion.value }}">
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono" value="{{ form.telefono.value }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ form.email.value }}"
+                           required>
+                </div>
+                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Crear o actualizar empresa con Ajax
+    $(document).ready(function () {
+        $('#empresa-form').on('submit', function (event) {
+            event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+
+            var formData = $(this).serialize(); // Recopilar los datos del formulario
+
+            $.ajax({
+                url: $('#submit-btn').data('url'), // Usar la URL correcta para creación/edición
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    // Actualizar la tabla de empresas
+                    $('#empresa-list').html($(response).find('#empresa-list').html());
+                    // Limpiar el formulario
+                    $('#empresa-form').trigger('reset');
+                    $('#submit-btn').text('Crear').data('url', '{% url "empresa_list" %}');
+                },
+                error: function (xhr, status, error) {
+                    alert('Error al procesar la solicitud: ' + error);
+                }
+            });
+        });
+
+        // Manejar la edición
+        $('.edit-empresa').on('click', function () {
+            var empresaId = $(this).data('id');
+            $.ajax({
+                url: '/empresas/editar/' + empresaId + '/', // URL de la vista de edición
+                type: 'GET',
+                success: function (response) {
+                    $('#nombre').val(response.nombre);
+                    $('#direccion').val(response.direccion);
+                    $('#telefono').val(response.telefono);
+                    $('#email').val(response.email);
+                    $('#submit-btn').text('Actualizar').data('url', '/empresas/editar/' + empresaId + '/');
+                },
+                error: function (xhr, status, error) {
+                    alert('Error al cargar la empresa: ' + error);
+                }
+            });
+        });
+
+        // Manejar la eliminación
+        $('.delete-empresa').on('click', function () {
+            var empresaId = $(this).data('id');
+            if (confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
+                $.ajax({
+                    url: '/empresas/eliminar/' + empresaId + '/', // URL de la vista de eliminación
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        $('#empresa-' + empresaId).remove(); // Eliminar la fila de la empresa eliminada
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error al eliminar la empresa: ' + error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
