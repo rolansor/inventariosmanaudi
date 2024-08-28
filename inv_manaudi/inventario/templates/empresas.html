@@ -1,11 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Lista de Empresas{% endblock %}
+{% block title %}Manejo Empresas{% endblock %}
+
+{% block encabezado %}
+<!-- BEGIN breadcrumb -->
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+    <li class="breadcrumb-item active">Manejo Empresas</li>
+</ol>
+<!-- END breadcrumb -->
+<!-- BEGIN page-header -->
+<h1 class="page-header">Página para administras las empresas.</h1>
+<!-- END page-header -->
+{% endblock %}
 
 {% block contenido %}
     <div class="panel panel-inverse">
         <div class="panel-heading">
-            <h4 class="panel-title">UI Elements in Table</h4>
+            <h4 class="panel-title">Lista de Empresas</h4>
             <div class="panel-heading-btn">
                 <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
                    data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
@@ -47,12 +59,11 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <a href="{% url 'empresa_create' %}" class="btn btn-success">Nueva Empresa</a>
         </div>
     </div>
     <div class="panel panel-inverse">
         <div class="panel-heading">
-            <h4 class="panel-title">Basic Form Validation</h4>
+            <h4 class="panel-title">Nueva Empresa</h4>
             <div class="panel-heading-btn">
                 <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
                    data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
@@ -67,23 +78,26 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ form.nombre.value }}"
+                    <input type="text" class="form-control" id="nombre" name="nombre" value=""
                            required>
                 </div>
+                <br>
                 <div class="form-group">
                     <label for="direccion">Dirección</label>
-                    <input type="text" class="form-control" id="direccion" name="direccion"
-                           value="{{ form.direccion.value }}">
+                    <input type="text" class="form-control" id="direccion" name="direccion" value="">
                 </div>
+                <br>
                 <div class="form-group">
                     <label for="telefono">Teléfono</label>
-                    <input type="text" class="form-control" id="telefono" name="telefono" value="{{ form.telefono.value }}">
+                    <input type="text" class="form-control" id="telefono" name="telefono" value="">
                 </div>
+                <br>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{ form.email.value }}"
+                    <input type="email" class="form-control" id="email" name="email" value=""
                            required>
                 </div>
+                <br>
                 <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
             </form>
         </div>
@@ -94,21 +108,28 @@
 <script>
     // Crear o actualizar empresa con Ajax
     $(document).ready(function () {
+        // Manejar la actualización
         $('#empresa-form').on('submit', function (event) {
             event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
 
             var formData = $(this).serialize(); // Recopilar los datos del formulario
+            var url = $('#submit-btn').data('url'); // Obtener la URL de edición/creación
 
             $.ajax({
-                url: $('#submit-btn').data('url'), // Usar la URL correcta para creación/edición
+                url: url,
                 type: 'POST',
                 data: formData,
                 success: function (response) {
-                    // Actualizar la tabla de empresas
-                    $('#empresa-list').html($(response).find('#empresa-list').html());
-                    // Limpiar el formulario
+                    // Actualizar la fila de la empresa en la tabla
+                    var row = $('#empresa-' + response.id);
+                    row.find('td:eq(1)').text(response.nombre);
+                    row.find('td:eq(2)').text(response.direccion);
+                    row.find('td:eq(3)').text(response.telefono);
+                    row.find('td:eq(4)').text(response.email);
+
+                    // Limpiar el formulario después de guardar
                     $('#empresa-form').trigger('reset');
-                    $('#submit-btn').text('Crear').data('url', '{% url "empresa_list" %}');
+                    $('#submit-btn').text('Crear').data('url', '/inventario/empresas/crear/');
                 },
                 error: function (xhr, status, error) {
                     alert('Error al procesar la solicitud: ' + error);
@@ -116,18 +137,19 @@
             });
         });
 
-        // Manejar la edición
+
         $('.edit-empresa').on('click', function () {
             var empresaId = $(this).data('id');
             $.ajax({
-                url: '/empresas/editar/' + empresaId + '/', // URL de la vista de edición
+                url: '/inventario/empresas/editar/' + empresaId + '/', // URL de la vista de edición
                 type: 'GET',
                 success: function (response) {
+                    // Precargar los datos en el formulario
                     $('#nombre').val(response.nombre);
                     $('#direccion').val(response.direccion);
                     $('#telefono').val(response.telefono);
                     $('#email').val(response.email);
-                    $('#submit-btn').text('Actualizar').data('url', '/empresas/editar/' + empresaId + '/');
+                    $('#submit-btn').text('Actualizar').data('url', '/inventario/empresas/editar/' + empresaId + '/');
                 },
                 error: function (xhr, status, error) {
                     alert('Error al cargar la empresa: ' + error);
@@ -135,12 +157,13 @@
             });
         });
 
+
         // Manejar la eliminación
         $('.delete-empresa').on('click', function () {
             var empresaId = $(this).data('id');
             if (confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
                 $.ajax({
-                    url: '/empresas/eliminar/' + empresaId + '/', // URL de la vista de eliminación
+                    url: '/inventario/empresas/eliminar/' + empresaId + '/', // URL de la vista de eliminación
                     type: 'POST',
                     data: {
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
