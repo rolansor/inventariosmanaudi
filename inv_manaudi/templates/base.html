@@ -50,7 +50,7 @@
                 </div>
                 <div class="navbar-item navbar-user dropdown">
                     <a href="#" class="navbar-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
-                        <img src="{% static 'img/user/user-13.jpg' %}" alt="" /> 
+                        <img src="{% static 'img/user/user-13.jpg' %}" alt="" />
                         <span>
                             <span class="d-none d-md-inline">{{ request.user.first_name }} {{ request.user.last_name }}</span>
                             <b class="caret"></b>
@@ -83,7 +83,7 @@
                     </a>
                     <div class="menu-submenu">
                         <div class="menu-item active">
-                            <a href="#" class="menu-link">
+                            <a href="{% url 'consulta_id' %}" class="menu-link">
                                 <div class="menu-text">Cédula</div>
                             </a>
                         </div>
@@ -104,7 +104,7 @@
                     </a>
                     <div class="menu-submenu">
                         <div class="menu-item active">
-                            <a href="#" class="menu-link">
+                            <a href="{% url 'empresa_list' %}" class="menu-link">
                                 <div class="menu-text">Empresas</div>
                             </a>
                         </div>
@@ -114,6 +114,40 @@
                             </a>
                         </div>
                     </div>
+                </div>
+                <div class="menu-item has-sub">
+                    <a href="javascript:;" class="menu-link">
+                        <div class="menu-icon">
+                            <i class="fa fa-clipboard-list"></i>
+                        </div>
+                        <div class="menu-text">Manejo Inventarios</div>
+                        <div class="menu-caret"></div>
+                    </a>
+                    <div class="menu-submenu">
+                        <div class="menu-item active">
+                            <a href="#" class="menu-link">
+                                <div class="menu-text">Categorias</div>
+                            </a>
+                        </div>
+                        <div class="menu-item active">
+                            <a href="#" class="menu-link">
+                                <div class="menu-text">Productos</div>
+                            </a>
+                        </div>
+                        <div class="menu-item active">
+                            <a href="#" class="menu-link">
+                                <div class="menu-text">Movimientos</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <a href="/" class="menu-link">
+                        <div class="menu-icon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <div class="menu-text">Calendario</div>
+                    </a>
                 </div>
             </div>
             <!-- END menu -->
