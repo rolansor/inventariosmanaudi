@@ -18,14 +18,6 @@
     <div class="panel panel-inverse">
         <div class="panel-heading">
             <h4 class="panel-title">Lista de Empresas</h4>
-            <div class="panel-heading-btn">
-                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default"
-                   data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
-                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-toggle="panel-reload"><i
-                        class="fa fa-redo"></i></a>
-                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-toggle="panel-remove"><i
-                        class="fa fa-times"></i></a>
-            </div>
         </div>
         <div class="panel-body">
             <table class="table table-striped table-bordered" id="empresa-list">
@@ -121,16 +113,35 @@
                 type: 'POST',
                 data: formData,
                 success: function (response) {
-                    // Actualizar la fila de la empresa en la tabla
-                    var row = $('#empresa-' + response.id);
-                    row.find('td:eq(1)').text(response.nombre);
-                    row.find('td:eq(2)').text(response.direccion);
-                    row.find('td:eq(3)').text(response.telefono);
-                    row.find('td:eq(4)').text(response.email);
+                    // Verifica si la sucursal ya existe en la tabla
+                        var row = $('#empresa-' + response.id);
+                        if (row.length) {
+                            // Si la sucursal ya existe, actualizamos los datos en la tabla
+                            row.find('td:eq(1)').text(response.nombre);
+                            row.find('td:eq(2)').text(response.direccion);
+                            row.find('td:eq(3)').text(response.telefono);
+                            row.find('td:eq(4)').text(response.email);
+                        } else {
+                            // Actualizar la fila de la empresa en la tabla
+                            $('#empresa-list tbody').append(`
+                                <tr id="empresa-${response.id}">
+                                    <td>${$('#empresa-list tbody tr').length + 1}</td>
+                                    <td>${response.nombre}</td>
+                                    <td>${response.direccion}</td>
+                                    <td>${response.telefono}</td>
+                                    <td>${response.email}</td>
+                                    <td>
+                                        <button class="btn btn-primary edit-empresa" data-id="${response.id}">Editar</button>
+                                        <a href="/inventario/sucursales/${response.id}" class="btn btn-warning">Sucursales</a>
+                                        <button class="btn btn-danger delete-empresa" data-id="${response.id}">Eliminar</button>
+                                    </td>
+                                </tr>
+                            `);
+                            }
 
                     // Limpiar el formulario después de guardar
                     $('#empresa-form').trigger('reset');
-                    $('#submit-btn').text('Crear').data('url', '/inventario/empresas/crear/');
+                    $('#submit-btn').text('Crear').data('url', '/inventario/empresas/');
                 },
                 error: function (xhr, status, error) {
                     alert('Error al procesar la solicitud: ' + error);
@@ -139,7 +150,7 @@
         });
 
 
-        $('.edit-empresa').on('click', function () {
+        $('#empresa-list').on('click', '.edit-empresa', function () {
             var empresaId = $(this).data('id');
             $.ajax({
                 url: '/inventario/empresas/editar/' + empresaId + '/', // URL de la vista de edición
@@ -160,7 +171,7 @@
 
 
         // Manejar la eliminación
-        $('.delete-empresa').on('click', function () {
+        $('#empresa-list').on('click', '.delete-empresa', function () {
             var empresaId = $(this).data('id');
             if (confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
                 $.ajax({
