@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Manejo de Subcategorías{% endblock %}
+
+{% block encabezado %}
+<!-- BEGIN breadcrumb -->
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+    <li class="breadcrumb-item active">Manejo de Subcategorías</li>
+</ol>
+<!-- END breadcrumb -->
+<!-- BEGIN page-header -->
+<h1 class="page-header">Subcategorías para {{ categoria.nombre }}</h1>
+<!-- END page-header -->
+{% endblock %}
+
+{% block contenido %}
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Lista de Subcategorías</h4>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered" id="subcategoria-list">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for subcategoria in subcategorias %}
+                    <tr id="subcategoria-{{ subcategoria.pk }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ subcategoria.nombre }}</td>
+                        <td>
+                            <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.pk }}">Editar</button>
+                            <button class="btn btn-danger delete-subcategoria" data-id="{{ subcategoria.pk }}">Eliminar</button>
+                        </td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No hay subcategorías registradas.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Nueva Subcategoría</h4>
+        </div>
+        <div class="panel-body">
+            <form method="POST" id="subcategoria-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value=""
+                           required>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Crear o actualizar subcategoría con Ajax
+    $('#subcategoria-form').on('submit', function (event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        var url = $('#submit-btn').data('url');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                var row = $('#subcategoria-' + response.id);
+                if (row.length) {
+                    row.find('td:eq(1)').text(response.nombre);
+                } else {
+                    $('#subcategoria-list tbody').append(`
+                        <tr id="subcategoria-${response.id}">
+                            <td>${$('#subcategoria-list tbody tr').length + 1}</td>
+                            <td>${response.nombre}</td>
+                            <td>
+                                <button class="btn btn-primary edit-subcategoria" data-id="${response.id}">Editar</button>
+                                <button class="btn btn-danger delete-subcategoria" data-id="${response.id}">Eliminar</button>
+                            </td>
+                        </tr>
+                    `);
+                }
+
+                $('#subcategoria-form').trigger('reset');
+                $('#submit-btn').text('Crear');
+            },
+            error: function (xhr, status, error) {
+                alert('Error al procesar la solicitud: ' + error);
+            }
+        });
+    });
+
+    // Editar subcategoría
+    $('#subcategoria-list').on('click', '.edit-categoria', function () {
+        var categoriaId = $(this).data('id');
+        $.ajax({
+            url: '/inventario/categorias/editar/' + categoriaId + '/',
+            type: 'GET',
+            success: function (response) {
+                $('#nombre').val(response.nombre);
+                $('#submit-btn').text('Actualizar').data('url', '/inventario/categorias/editar/' + categoriaId + '/');
+            },
+            error: function (xhr, status, error) {
+                alert('Error al cargar la categoría: ' + error);
+            }
+        });
+    });
+
+
+    // Eliminar subcategoría
+    $('subcategoria-list').on('click', '.delete-categoria', function () {
+        var categoriaId = $(this).data('id');
+        if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+            $.ajax({
+                url: '/inventario/categorias/eliminar/' + categoriaId + '/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    $('#categoria-' + categoriaId).remove();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error al eliminar la categoría: ' + error);
+                }
+            });
+        }
+    });
+
+</script>
+{% endblock %}
