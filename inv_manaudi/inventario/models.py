@@ -52,8 +52,7 @@ class Producto(models.Model):
     categoria = models.ForeignKey(Subcategoria, related_name='productos', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f'{self.nombre} - {self.get_tipo_producto_display()}'
-
+        return f'{self.codigo} - {self.nombre} ({self.get_tipo_producto_display()})'
 
 class Inventario(models.Model):
     sucursal = models.ForeignKey(Sucursal, related_name='inventarios', on_delete=models.CASCADE)

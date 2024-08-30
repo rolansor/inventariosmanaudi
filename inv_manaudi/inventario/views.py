@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from .models import Empresa, Sucursal, Categoria, Subcategoria, Producto
-from .forms import EmpresaForm, SucursalForm, CategoriaForm, SubcategoriaForm, ProductoForm
+from .models import Empresa, Sucursal, Categoria, Subcategoria, Producto, MovimientoInventario
+from .forms import EmpresaForm, SucursalForm, CategoriaForm, SubcategoriaForm, ProductoForm, MovimientoInventarioForm
 
 
 def empresa_list(request):
@@ -339,3 +339,26 @@ def producto_delete(request, pk):
             return JsonResponse({'id': pk})
         else:
             return redirect('producto_list')
+
+
+def movimiento_inventario(request):
+    if request.method == 'POST':
+        form = MovimientoInventarioForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                return redirect('movimiento_inventario')
+            except ValueError as e:
+                form.add_error(None, str(e))
+        else:
+            # Si el formulario no es válido, volvemos a renderizar la página con los errores.
+            print(form.errors)
+    else:
+        form = MovimientoInventarioForm()
+
+    movimientos = MovimientoInventario.objects.all().order_by('-fecha')
+
+    return render(request, 'movimiento_inventario.html', {
+        'form': form,
+        'movimientos': movimientos,
+    })
