@@ -40,7 +40,7 @@
                         <td>{{ producto.nombre }}</td>
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.get_tipo_producto_display }}</td>
-                        <td>{{ producto.categoria.nombre }}</td>
+                        <td>{{ producto.categoria.categoria.nombre }}/{{ producto.categoria.nombre }}</td>
                         <td>
                             <button class="btn btn-primary edit-producto" data-id="{{ producto.pk }}">Editar</button>
                             <button class="btn btn-danger delete-producto" data-id="{{ producto.pk }}">Eliminar</button>
