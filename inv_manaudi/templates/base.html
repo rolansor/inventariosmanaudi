@@ -1,4 +1,6 @@
 {% load static %}
+{% load tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,6 +75,7 @@
         {% block sidebar_menu %}
             <div class="menu">
                 <div class="menu-header">Navegación</div>
+                {% if request.user|pertenece_grupo:"Contabilidad" %}
                 <div class="menu-item has-sub active">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -94,6 +97,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">

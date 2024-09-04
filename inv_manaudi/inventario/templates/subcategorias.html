@@ -15,6 +15,7 @@
 {% endblock %}
 
 {% block contenido %}
+    {% if request.user|pertenece_grupo:"Contabilidad" %}
     <div class="panel panel-inverse">
         <div class="panel-heading">
             <h4 class="panel-title">Nueva Subcategoría</h4>
@@ -32,6 +33,7 @@
             </form>
         </div>
     </div>
+    {% endif %}
     <div class="panel panel-inverse">
         <div class="panel-heading">
             <h4 class="panel-title">Lista de Subcategorías</h4>
