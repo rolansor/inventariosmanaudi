@@ -71,6 +71,18 @@ DATABASES = {
     }
 }
 
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'rolansor$inv_manaudi',
+        'USER': 'rolansor',
+        'PASSWORD': 'f4d3s2a1',
+        'HOST': 'rolansor.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
+    }
+}
+'''
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -100,7 +112,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 

@@ -362,3 +362,34 @@ def movimiento_inventario(request):
         'form': form,
         'movimientos': movimientos,
     })
+
+
+def movimientos_producto(request, producto_id):
+    producto = get_object_or_404(Producto, pk=producto_id)
+    movimientos = MovimientoInventario.objects.filter(producto=producto).order_by('-fecha')
+
+    data = []
+    for movimiento in movimientos:
+        data.append({
+            'sucursal': movimiento.sucursal.nombre,
+            'sucursal_destino': movimiento.sucursal_destino.nombre if movimiento.sucursal_destino else 'N/A',
+            'tipo_movimiento': movimiento.get_tipo_movimiento_display(),
+            'cantidad': movimiento.cantidad,
+            'fecha': movimiento.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+            'comentario': movimiento.comentario,
+        })
+
+    return JsonResponse({'data': data})
+
+
+def consulta_producto(request):
+    productos = Producto.objects.all()
+    return render(request, 'consulta_producto.html', {'productos': productos})
+
+from django.shortcuts import render
+from .models import MovimientoInventario
+
+def lista_movimientos(request):
+    """Vista que muestra todos los movimientos en una tabla, sin usar Ajax."""
+    movimientos = MovimientoInventario.objects.all().order_by('-fecha')
+    return render(request, 'lista_movimientos.html', {'movimientos': movimientos})
