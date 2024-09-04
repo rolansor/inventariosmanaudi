@@ -1,1 +1,0 @@
-var TEST_SCRIPT_VAR = 1;

@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-mus*w*^jt@(xzz@_6crj=i=84#lic1b*u7h&-zv@@_@9_lh++k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['rolansor.pythonanywhere.com','localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -63,10 +63,10 @@ WSGI_APPLICATION = 'inv_manaudi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inv_manaudi',
-        'USER': 'root',
+        'NAME': 'rolansor$inv_manaudi',
+        'USER': 'rolansor',
         'PASSWORD': 'f4d3s2a1',
-        'HOST': 'localhost',
+        'HOST': 'rolansor.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }
@@ -100,10 +100,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 LOGIN_URL = 'login'
