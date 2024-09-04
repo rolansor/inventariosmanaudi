@@ -17,6 +17,22 @@
 {% block contenido %}
     <div class="panel panel-inverse">
         <div class="panel-heading">
+            <h4 class="panel-title">Nueva Categoría</h4>
+        </div>
+        <div class="panel-body">
+            <form method="POST" id="categoria-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="">
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
             <h4 class="panel-title">Lista de Categorías</h4>
         </div>
         <div class="panel-body">
@@ -46,23 +62,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-
-    <div class="panel panel-inverse">
-        <div class="panel-heading">
-            <h4 class="panel-title">Nueva Categoría</h4>
-        </div>
-        <div class="panel-body">
-            <form method="POST" id="categoria-form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" value="">
-                </div>
-                <br>
-                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
-            </form>
         </div>
     </div>
 {% endblock %}
