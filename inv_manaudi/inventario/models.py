@@ -92,6 +92,8 @@ class MovimientoInventario(models.Model):
     sucursal_destino = models.ForeignKey(Sucursal, related_name='movimientos_destino', on_delete=models.SET_NULL, null=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
     comentario = models.TextField(blank=True, null=True)
+    documento_respaldo = models.TextField(blank=True, null=True)
+    documento_traslado = models.FileField(upload_to='documentos_traslado/', blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):

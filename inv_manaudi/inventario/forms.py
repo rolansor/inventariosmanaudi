@@ -49,7 +49,7 @@ class ProductoForm(forms.ModelForm):
 class MovimientoInventarioForm(forms.ModelForm):
     class Meta:
         model = MovimientoInventario
-        fields = ['sucursal', 'producto', 'tipo_movimiento', 'cantidad', 'sucursal_destino', 'comentario']
+        fields = ['sucursal', 'producto', 'tipo_movimiento', 'cantidad', 'sucursal_destino', 'comentario', 'documento_respaldo', 'documento_traslado']
         widgets = {
             'sucursal': forms.Select(attrs={'class': 'form-control'}),
             'producto': forms.Select(attrs={'class': 'form-control'}),
@@ -57,6 +57,8 @@ class MovimientoInventarioForm(forms.ModelForm):
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'sucursal_destino': forms.Select(attrs={'class': 'form-control'}),
             'comentario': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
+            'documento_traslado': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def clean(self):

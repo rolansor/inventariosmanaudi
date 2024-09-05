@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Consulta de Productos por Sucursal{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'plugins/datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'plugins/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'plugins/select2/dist/css/select2.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'plugins/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Consulta de Productos por Sucursal</h1>
+
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Seleccionar Empresa, Sucursal y Producto</h4>
+        </div>
+        <div class="panel-body">
+            <!-- Selector de Empresa -->
+            <select id="empresa-select" class="form-control">
+                <option value="">Seleccione una empresa</option>
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}">{{ empresa.nombre }}</option>
+                {% endfor %}
+            </select>
+            
+            <!-- Selector de Sucursal (se llena dinámicamente) -->
+            <select id="sucursal-select" class="form-control" style="margin-top: 10px;">
+                <option value="">Seleccione una sucursal (opcional)</option>
+            </select>
+
+            <!-- Selector de Producto (se llena dinámicamente) -->
+            <select id="producto-select" class="form-control" style="margin-top: 10px;">
+                <option value="">Seleccione un producto (opcional)</option>
+            </select>
+
+            <!-- Botón de consultar -->
+            <button id="consultar-btn" class="btn btn-primary" style="margin-top: 10px;">Consultar</button>
+        </div>
+    </div>
+
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Productos en Sucursal</h4>
+        </div>
+        <div class="panel-body">
+            <table id="productos-table" class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Tipo</th>
+                    <th>Categoría</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Se llena dinámicamente con DataTables -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'plugins/datatables.net/js/dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/select2/dist/js/select2.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/dist/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/build/pdfmake.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/build/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Inicializar Select2 en los selectores
+            $('#empresa-select').select2({
+                placeholder: "Seleccione una empresa",
+                allowClear: true
+            });
+
+            $('#sucursal-select').select2({
+                placeholder: "Seleccione una sucursal (opcional)",
+                allowClear: true
+            });
+
+            $('#producto-select').select2({
+                placeholder: "Seleccione un producto (opcional)",
+                allowClear: true
+            });
+
+            // Cargar sucursales dinámicamente cuando se seleccione una empresa
+            $('#empresa-select').on('change', function () {
+                var empresaId = $(this).val();
+                if (empresaId) {
+                    $.ajax({
+                        url: "/inventario/sucursales_por_empresa/" + empresaId + "/",
+                        success: function (data) {
+                            $('#sucursal-select').empty().append('<option value="">Seleccione una sucursal (opcional)</option>');
+                            $.each(data.sucursales, function (key, sucursal) {
+                                $('#sucursal-select').append('<option value="' + sucursal.id + '">' + sucursal.nombre + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#sucursal-select').empty().append('<option value="">Seleccione una sucursal (opcional)</option>');
+                }
+            });
+
+            // Cargar productos dinámicamente cuando se seleccione una sucursal
+            $('#sucursal-select').on('change', function () {
+                var sucursalId = $(this).val();
+                if (sucursalId) {
+                    $.ajax({
+                        url: "/inventario/productos_por_sucursal/" + sucursalId + "/",
+                        success: function (data) {
+                            $('#producto-select').empty().append('<option value="">Seleccione un producto (opcional)</option>');
+                            $.each(data.productos, function (key, producto) {
+                                $('#producto-select').append('<option value="' + producto.id + '">' + producto.nombre + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#producto-select').empty().append('<option value="">Seleccione un producto (opcional)</option>');
+                }
+            });
+
+            // Inicializa DataTables con botones de exportación
+            var table = $('#productos-table').DataTable({
+                "processing": true,
+                "serverSide": false,
+                "responsive": true,
+                "dom": 'Bfrtip',  // Añadir botones de exportación
+                "buttons": [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                "ajax": {
+                    "url": "",  // Se actualizará dinámicamente
+                    "dataSrc": "data"
+                },
+                "columns": [
+                    {"data": "codigo"},
+                    {"data": "nombre"},
+                    {"data": "precio"},
+                    {"data": "cantidad"},
+                    {"data": "tipo_producto"},
+                    {"data": "categoria"}
+                ]
+            });
+
+            // Realizar la consulta solo cuando se presione el botón "Consultar"
+            $('#consultar-btn').on('click', function () {
+                var sucursalId = $('#sucursal-select').val();
+                var empresaId = $('#empresa-select').val();
+                var productoId = $('#producto-select').val();  // Filtro opcional por producto
+
+                if (empresaId) {
+                    var url = "/inventario/buscar_productos_por_sucursal/" + empresaId + "/";
+                    if (sucursalId) {
+                        url += sucursalId + "/";
+                    } else {
+                        url += "all/";  // Ruta para consultar todos los productos de la empresa si no hay sucursal
+                    }
+                    if (productoId) {
+                        url += "?producto_id=" + productoId;  // Añadir el filtro de producto si está seleccionado
+                    }
+                    table.ajax.url(url).load();
+                } else {
+                    alert("Debe seleccionar una empresa.");
+                }
+            });
+        });
+    </script>
+{% endblock %}
