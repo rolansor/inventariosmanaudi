@@ -1,2 +1,121 @@
-<!-- templates/about.html -->
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Inventario{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Definir los colores para cada tipo de movimiento */
+    .movimiento-entrada {
+        background-color: #98F5F9; /* Verde Agua */
+        color: #fff;
+    }
+    .movimiento-salida {
+        background-color: #f8b3c1; /* Rosa Palo */
+        color: #fff;
+    }
+    .movimiento-traslado {
+        background-color: #FFECA1; /* Amarillo */
+        color: #000;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div id="content" class="content">
+    <h1 class="page-header">Resumen de inventarios</h1>
+
+    <!-- Resumen general -->
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="widget widget-stats bg-blue">
+                <div class="stats-icon"><i class="fa fa-cubes"></i></div>
+                <div class="stats-info">
+                    <h4>Total de Productos</h4>
+                    <p>{{ total_productos }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="#">Ver detalle <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="widget widget-stats bg-teal">
+                <div class="stats-icon"><i class="fa fa-cube"></i></div>
+                <div class="stats-info">
+                    <h4>Total Stock Disponible</h4>
+                    <p>{{ total_stock }} unidades</p>
+                </div>
+                <div class="stats-link">
+                    <a href="#">Ver detalle <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="widget widget-stats bg-orange">
+                <div class="stats-icon"><i class="fa fa-exclamation-triangle"></i></div>
+                <div class="stats-info">
+                    <h4>Productos con Bajo Stock</h4>
+                    <p>{{ productos_bajo_stock }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="#">Ver detalle <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="widget widget-stats bg-red">
+                <div class="stats-icon"><i class="fa fa-ban"></i></div>
+                <div class="stats-info">
+                    <h4>Productos Agotados</h4>
+                    <p>{{ productos_agotados }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="#">Ver detalle <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movimientos recientes -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-inverse">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Ultimos 10 Movimientos</h4>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Codigo</th>
+                            <th>Producto</th>
+                            <th>Tipo de Movimiento</th>
+                            <th>Cantidad</th>
+                            <th>Responsable</th>
+                            <th>Fecha</th>
+                            <th>Comentario</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for movimiento in movimientos_recientes %}
+                        <tr class="{% if movimiento.tipo_movimiento == 'entrada' %}movimiento-entrada
+                            {% elif movimiento.tipo_movimiento == 'salida' %}movimiento-salida
+                            {% elif movimiento.tipo_movimiento == 'traslado' %}movimiento-traslado{% endif %}">
+                            <td>{{ movimiento.producto.codigo }}</td>
+                            <td>{{ movimiento.producto.nombre }}</td>
+                            <td>{{ movimiento.get_tipo_movimiento_display }}</td>
+                            <td>{{ movimiento.cantidad }}</td>
+                            <td>{{ movimiento.usuario.username }}</td>
+                            <td>{{ movimiento.fecha|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ movimiento.comentario }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

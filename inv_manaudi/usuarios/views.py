@@ -3,11 +3,31 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import RegistroForm, EdicionUsuarioForm
+from django.db.models import F, Sum
+from inventario.models import Producto, MovimientoInventario, Inventario
 
 
 @login_required
 def inicio(request):
-    return render(request, 'inicio.html')
+    total_productos = Producto.objects.count()
+    total_stock = Inventario.objects.aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+    productos_bajo_stock = Inventario.objects.filter(cantidad__lt=F('stock_minimo')).count()
+    productos_agotados = Inventario.objects.filter(cantidad=0).count()
+
+    movimientos_recientes = MovimientoInventario.objects.order_by('-fecha')[:10]
+
+    # Productos más movidos
+    productos_mas_movidos = MovimientoInventario.objects.values('producto__nombre').annotate(
+        total=Sum('cantidad')).order_by('-total')[:5]
+
+    return render(request, 'inicio.html', {
+        'total_productos': total_productos,
+        'total_stock': total_stock,
+        'productos_bajo_stock': productos_bajo_stock,
+        'productos_agotados': productos_agotados,
+        'movimientos_recientes': movimientos_recientes,
+        'productos_mas_movidos': productos_mas_movidos,
+    })
 
 
 def logout_view(request):

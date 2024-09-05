@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse
-from .models import Empresa, Sucursal, Categoria, Subcategoria, Producto, MovimientoInventario
+from .models import Empresa, Sucursal, Categoria, Subcategoria, Producto
 from .forms import EmpresaForm, SucursalForm, CategoriaForm, SubcategoriaForm, ProductoForm, MovimientoInventarioForm
 
 
@@ -346,7 +346,9 @@ def movimiento_inventario(request):
         form = MovimientoInventarioForm(request.POST)
         if form.is_valid():
             try:
-                form.save()
+                movimiento = form.save(commit=False)  # No guarda aún en la base de datos
+                movimiento.usuario = request.user  # Asigna el usuario actual
+                movimiento.save()  # Guarda en la base de datos
                 return redirect('movimiento_inventario')
             except ValueError as e:
                 form.add_error(None, str(e))
@@ -356,7 +358,7 @@ def movimiento_inventario(request):
     else:
         form = MovimientoInventarioForm()
 
-    movimientos = MovimientoInventario.objects.all().order_by('-fecha')
+    movimientos = MovimientoInventario.objects.all().order_by('-fecha')[:10]
 
     return render(request, 'movimiento_inventario.html', {
         'form': form,

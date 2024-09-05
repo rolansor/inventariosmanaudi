@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+from django.utils import timezone
 
 
 class Empresa(models.Model):
@@ -71,6 +73,10 @@ class Inventario(models.Model):
         """Verifica si el stock actual está por debajo del stock mínimo."""
         return self.cantidad < self.stock_minimo
 
+    def valor_inventario(self):
+        """Calcula el valor total de los productos en inventario."""
+        return self.cantidad * self.producto.precio
+
 
 class MovimientoInventario(models.Model):
     TIPO_MOVIMIENTO_CHOICES = [
@@ -86,6 +92,7 @@ class MovimientoInventario(models.Model):
     sucursal_destino = models.ForeignKey(Sucursal, related_name='movimientos_destino', on_delete=models.SET_NULL, null=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
     comentario = models.TextField(blank=True, null=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         if self.tipo_movimiento == 'traslado':
@@ -99,6 +106,8 @@ class MovimientoInventario(models.Model):
             inventario_origen.cantidad += self.cantidad
         elif self.tipo_movimiento == 'salida' and inventario_origen.cantidad >= self.cantidad:
             inventario_origen.cantidad -= self.cantidad
+        elif self.tipo_movimiento == 'salida' and inventario_origen.cantidad < self.cantidad:
+            raise ValueError('Stock insuficiente para la salida solicitada.')
         elif self.tipo_movimiento == 'traslado':
             if inventario_origen.cantidad >= self.cantidad:
                 inventario_origen.cantidad -= self.cantidad  # Disminuir en la sucursal origen
@@ -110,7 +119,8 @@ class MovimientoInventario(models.Model):
             else:
                 raise ValueError('No hay suficiente stock en la sucursal de origen para este traslado.')
         else:
-            raise ValueError('Movimiento inválido o sin stock suficiente.')
+            raise ValueError('Movimiento inválido.')
 
         inventario_origen.save()
         super(MovimientoInventario, self).save(*args, **kwargs)
+
