@@ -76,9 +76,13 @@
                         <td>{{ empresa.telefono }}</td>
                         <td>{{ empresa.email }}</td>
                         <td>
-                            <button class="btn btn-primary edit-empresa" data-id="{{ empresa.pk }}">Editar</button>
-                            <a href="{% url 'sucursal_list' empresa.pk %}" class="btn btn-warning">Sucursales</a>
-                            <button class="btn btn-danger delete-empresa" data-id="{{ empresa.pk }}">Eliminar</button>
+                            {% if request.user|pertenece_grupo:"Contabilidad" %}
+                                <a href="{% url 'sucursal_list' empresa.pk %}" class="btn btn-warning">Sucursales</a>
+                                <button class="btn btn-primary edit-empresa" data-id="{{ empresa.pk }}">Editar</button>
+                                <button class="btn btn-danger delete-empresa" data-id="{{ empresa.pk }}">Eliminar</button>
+                            {% else %}
+                                <a href="{% url 'sucursal_list' empresa.pk %}" class="btn btn-warning">Sucursales</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% empty %}

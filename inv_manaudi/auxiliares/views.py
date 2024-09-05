@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from bs4 import BeautifulSoup
 import requests
-from django.http import JsonResponse
 import re
+from django.http import JsonResponse
+from usuarios.templatetags.tags import control_acceso
 
+
+@control_acceso('contabilidad')
 def consulta_id(request):
     if request.method == 'POST':
         identification = request.POST.get('identification')

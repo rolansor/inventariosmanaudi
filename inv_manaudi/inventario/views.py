@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from .models import Empresa, Sucursal, Categoria, Subcategoria, Producto, Inventario
 from .forms import EmpresaForm, SucursalForm, CategoriaForm, SubcategoriaForm, ProductoForm, MovimientoInventarioForm, MovimientoInventario
+from usuarios.templatetags.tags import control_acceso
 
 
 def empresa_list(request):
@@ -33,8 +34,7 @@ def empresa_list(request):
 
     return render(request, 'empresas.html', {'empresas': empresas, 'form': form})
 
-
-# Editar una empresa existente (llamado con ajax u otro mecanismo)
+@control_acceso('contabilidad')
 def empresa_edit(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
 
@@ -67,7 +67,7 @@ def empresa_edit(request, pk):
             return JsonResponse(data)
 
 
-# Eliminar una empresa existente
+@control_acceso('contabilidad')
 def empresa_delete(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
     if request.method == 'POST':
