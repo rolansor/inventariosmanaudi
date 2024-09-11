@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block title %}Lista de Categorías{% endblock %}
+
+{% block encabezado %}
+<!-- BEGIN breadcrumb -->
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+    <li class="breadcrumb-item active">Lista de Categorías</li>
+</ol>
+<!-- END breadcrumb -->
+<!-- BEGIN page-header -->
+<h1 class="page-header">Lista de Categorías</h1>
+<!-- END page-header -->
+{% endblock %}
+
+{% block contenido %}
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Lista de Categorías</h4>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered" id="categoria-list">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for categoria in categorias %}
+                    <tr id="categoria-{{ categoria.pk }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ categoria.nombre }}</td>
+                        <td>
+                            {% if request.user|pertenece_grupo:"Contabilidad" %}
+                                <button class="btn btn-primary edit-categoria" data-id="{{ categoria.pk }}">Editar</button>
+                                <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
+                                <button class="btn btn-danger delete-categoria" data-id="{{ categoria.pk }}">Eliminar</button>
+                            {% else %}
+                                <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No hay categorías registradas.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para editar categoría -->
+    <div class="modal fade" id="editCategoriaModal" tabindex="-1" role="dialog" aria-labelledby="editCategoriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoriaModalLabel">Editar Categoría</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="edit-categoria-form" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="modal-nombre">Nombre</label>
+                            <input type="text" class="form-control" id="modal-nombre" name="nombre">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Manejar la edición de categoría abriendo el modal
+    $('#categoria-list').on('click', '.edit-categoria', function () {
+        var categoriaId = $(this).data('id');
+        $.ajax({
+            url: '/inventario/categorias/editar/' + categoriaId + '/',
+            type: 'GET',
+            success: function (response) {
+                $('#modal-nombre').val(response.nombre);
+                $('#edit-categoria-form').attr('action', '/inventario/categorias/editar/' + categoriaId + '/');
+                $('#editCategoriaModal').modal('show'); // Mostrar el modal
+            },
+            error: function (xhr, status, error) {
+                alert('Error al cargar la categoría: ' + error);
+            }
+        });
+    });
+
+    // Redirigir a la página después de la edición de categoría
+    $('#edit-categoria-form').on('submit', function (event) {
+        // El formulario se envía de manera estándar, por lo que no se usa Ajax aquí.
+        // La página se recargará automáticamente tras el envío.
+    });
+
+    // Manejar la eliminación de categoría con redirección
+    $('#categoria-list').on('click', '.delete-categoria', function () {
+        var categoriaId = $(this).data('id');
+        if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+            $.ajax({
+                url: '/inventario/categorias/eliminar/' + categoriaId + '/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    location.reload(); // Recargar la página después de eliminar
+                },
+                error: function (xhr, status, error) {
+                    alert('Error al eliminar la categoría: ' + error);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

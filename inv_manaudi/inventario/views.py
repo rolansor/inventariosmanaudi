@@ -34,7 +34,7 @@ def empresa_list(request):
 
     return render(request, 'empresas.html', {'empresas': empresas, 'form': form})
 
-@control_acceso('contabilidad')
+@control_acceso('Contabilidad')
 def empresa_edit(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
 
@@ -67,7 +67,7 @@ def empresa_edit(request, pk):
             return JsonResponse(data)
 
 
-@control_acceso('contabilidad')
+@control_acceso('Contabilidad')
 def empresa_delete(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
     if request.method == 'POST':
@@ -110,7 +110,7 @@ def sucursal_list(request, pk):
     return render(request, 'sucursales.html', {'sucursales': sucursales, 'empresa': empresa, 'form': form})
 
 
-# Editar una sucursal existente
+@control_acceso('Contabilidad')
 def sucursal_edit(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
 
@@ -143,7 +143,7 @@ def sucursal_edit(request, pk):
             return JsonResponse(data)
 
 
-# Eliminar una sucursal
+@control_acceso('Contabilidad')
 def sucursal_delete(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
     if request.method == 'POST':
@@ -152,9 +152,8 @@ def sucursal_delete(request, pk):
     return redirect('sucursal_list')
 
 
-def categoria_list(request):
-    categorias = Categoria.objects.all()
-
+@control_acceso('Contabilidad')
+def nueva_categoria(request):
     if request.method == 'POST':
         form = CategoriaForm(request.POST)
         if form.is_valid():
@@ -166,110 +165,113 @@ def categoria_list(request):
                 }
                 return JsonResponse(data)
             else:
-                return redirect('categoria_list')
+                return redirect('lista_categorias')
         else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     else:
         form = CategoriaForm()
 
-    return render(request, 'categorias.html', {'categorias': categorias, 'form': form})
+    return render(request, 'crear_categoria.html', {'form': form})
 
-def categoria_edit(request, pk):
+
+def lista_categorias(request):
+    categorias = Categoria.objects.all()
+    return render(request, 'lista_categorias.html', {'categorias': categorias})
+
+
+@control_acceso('Contabilidad')
+def editar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
 
     if request.method == 'POST':
         form = CategoriaForm(request.POST, instance=categoria)
         if form.is_valid():
             categoria = form.save()
-            if request.is_ajax():
-                data = {
-                    'id': categoria.id,
-                    'nombre': categoria.nombre,
-                }
-                return JsonResponse(data)
-        else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
-    else:
-        if request.is_ajax():
-            data = {
+            return JsonResponse({
+                'id': categoria.id,
                 'nombre': categoria.nombre,
-            }
-            return JsonResponse(data)
+                'success': True
+            })
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
-def categoria_delete(request, pk):
+    return JsonResponse({
+        'nombre': categoria.nombre,
+        'success': True
+    })
+
+
+@control_acceso('Contabilidad')
+def eliminar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
     if request.method == 'POST':
         categoria.delete()
-        if request.is_ajax():
-            return JsonResponse({'id': pk})
-        else:
-            return redirect('categoria_list')
+        return JsonResponse({'id': pk, 'success': True})
+
+    return redirect('lista_categorias')
 
 
-def subcategoria_list(request, pk):
-    categoria = get_object_or_404(Categoria, pk=pk)
-    subcategorias = Subcategoria.objects.filter(categoria=categoria)
-
+@control_acceso('Contabilidad')
+def nueva_subcategoria(request, pk):
+    categoria = get_object_or_404(Categoria, id=pk)
     if request.method == 'POST':
         form = SubcategoriaForm(request.POST)
         if form.is_valid():
             subcategoria = form.save(commit=False)
-            subcategoria.categoria = categoria  # Asignar la categoría antes de guardar
+            subcategoria.categoria = categoria
             subcategoria.save()
-
             if request.is_ajax():
                 data = {
                     'id': subcategoria.id,
                     'nombre': subcategoria.nombre,
-                    'categoria': subcategoria.categoria.nombre
+                    'categoria': categoria.nombre
                 }
                 return JsonResponse(data)
             else:
-                return redirect('subcategoria_list', pk=pk)
+                return redirect('lista_subcategorias', pk=pk)
         else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
-    else:
-        form = SubcategoriaForm()
-
-    return render(request, 'subcategorias.html', {'subcategorias': subcategorias, 'categoria': categoria, 'form': form})
+            if request.is_ajax():
+                # Enviar los errores del formulario como JSON
+                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
 
-def subcategoria_edit(request, pk):
+def lista_subcategorias(request, pk):
+    categoria = get_object_or_404(Categoria, id=pk)
+    subcategorias = Subcategoria.objects.filter(categoria=categoria)
+    return render(request, 'lista_subcategorias.html', {'subcategorias': subcategorias, 'categoria': categoria})
+
+
+@control_acceso('Contabilidad')
+def editar_subcategoria(request, pk):
     subcategoria = get_object_or_404(Subcategoria, pk=pk)
 
     if request.method == 'POST':
         form = SubcategoriaForm(request.POST, instance=subcategoria)
         if form.is_valid():
             subcategoria = form.save()
-            if request.is_ajax():
-                data = {
-                    'id': subcategoria.id,
-                    'nombre': subcategoria.nombre,
-                    'categoria': subcategoria.categoria.nombre
-                }
-                return JsonResponse(data)
-        else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
-    else:
-        if request.is_ajax():
-            data = {
+            return JsonResponse({
+                'id': subcategoria.id,
                 'nombre': subcategoria.nombre,
-            }
-            return JsonResponse(data)
+                'categoria': subcategoria.categoria.nombre,
+                'success': True
+            })
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    return JsonResponse({
+        'nombre': subcategoria.nombre,
+        'success': True
+    })
 
 
-def subcategoria_delete(request, pk):
+@control_acceso('Contabilidad')
+def eliminar_subcategoria(request, pk):
     subcategoria = get_object_or_404(Subcategoria, pk=pk)
     if request.method == 'POST':
         subcategoria.delete()
-        if request.is_ajax():
-            return JsonResponse({'id': pk})
-        else:
-            return redirect('subcategoria_list', pk=subcategoria.categoria.pk)
+        return JsonResponse({'id': pk, 'success': True})
+
+    return redirect('lista_subcategorias', categoria_pk=subcategoria.categoria.pk)
 
 
 def producto_list(request):

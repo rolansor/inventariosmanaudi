@@ -76,27 +76,27 @@
             <div class="menu">
                 <div class="menu-header">Navegación</div>
                 {% if request.user|pertenece_grupo:"Contabilidad" %}
-                <div class="menu-item has-sub active">
-                    <a href="javascript:;" class="menu-link">
-                        <div class="menu-icon">
-                            <i class="fa fa-search"></i>
-                        </div>
-                        <div class="menu-text">Consultas ID</div>
-                        <div class="menu-caret"></div>
-                    </a>
-                    <div class="menu-submenu">
-                        <div class="menu-item active">
-                            <a href="{% url 'consulta_id' %}" class="menu-link">
-                                <div class="menu-text">Cédula</div>
-                            </a>
-                        </div>
-                        <div class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div class="menu-text">RUC</div>
-                            </a>
+                    <div class="menu-item has-sub active">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-search"></i>
+                            </div>
+                            <div class="menu-text">Consultas ID</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item active">
+                                <a href="{% url 'consulta_id' %}" class="menu-link">
+                                    <div class="menu-text">Cédula</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="#" class="menu-link">
+                                    <div class="menu-text">RUC</div>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
                 {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
@@ -115,81 +115,123 @@
                     </div>
                 </div>
                 <div class="menu-item has-sub">
-                <a href="javascript:;" class="menu-link">
-                    <div class="menu-icon">
-                        <i class="fa fa-clipboard-list"></i>
+                    <a href="javascript:;" class="menu-link">
+                        <div class="menu-icon">
+                            <i class="fa fa-pen-ruler"></i>
+                        </div>
+                        <div class="menu-text">Categorias</div>
+                        <div class="menu-caret"></div>
+                    </a>
+                    <div class="menu-submenu">
+                        <div class="menu-item">
+                            <a href="{% url 'nueva_categoria' %}" class="menu-link">
+                                <div class="menu-text">Nueva Categoria</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'lista_categorias' %}" class="menu-link">
+                                <div class="menu-text">Lista Categoria</div>
+                            </a>
+                        </div>
                     </div>
-                    <div class="menu-text">Manejo Inventarios</div>
-                    <div class="menu-caret"></div>
-                </a>
-                <div class="menu-submenu">
-                    <div class="menu-item">
-                        <a href="{% url 'categoria_list' %}" class="menu-link">
-                            <div class="menu-text">Categorias</div>
-                        </a>
+                </div>
+                <div class="menu-item has-sub">
+                    <a href="javascript:;" class="menu-link">
+                        <div class="menu-icon">
+                            <i class="fa fa-pen-ruler"></i>
+                        </div>
+                        <div class="menu-text">Productos</div>
+                        <div class="menu-caret"></div>
+                    </a>
+                    <div class="menu-submenu">
+                        <div class="menu-item">
+                            <a href="" class="menu-link">
+                                <div class="menu-text">Nuevo Producto</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="" class="menu-link">
+                                <div class="menu-text">Busqueda Productos</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="" class="menu-link">
+                                <div class="menu-text">Lista Productos</div>
+                            </a>
+                        </div>
                     </div>
-                    <div class="menu-item">
-                        <a href="{% url 'producto_list' %}" class="menu-link">
-                            <div class="menu-text">Productos</div>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="{% url 'productos_sucursales' %}" class="menu-link">
-                            <div class="menu-text">Productos por Empresa</div>
-                        </a>
-                    </div>
-                    <div class="menu-item has-sub">
-                        <a href="javascript:;" class="menu-link">
-                            <div class="menu-text">Movimientos</div>
-                            <div class="menu-caret"></div>
-                        </a>
-                        <div class="menu-submenu">
-                            <div class="menu-item">
-                                <a href="{% url 'movimiento_inventario' %}" class="menu-link">
-                                    <div class="menu-text">Registrar Movimiento</div>
-                                    <div class="menu-caret"></div>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a href="{% url 'consulta_producto' %}" class="menu-link">
-                                    <div class="menu-text">Consulta Producto</div>
-                                    <div class="menu-caret"></div>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a href="{% url 'lista_movimientos' %}" class="menu-link">
-                                    <div class="menu-text">Lista Movimientos</div>
-                                    <div class="menu-caret"></div>
-                                </a>
+                </div>
+                <div class="menu-item has-sub">
+                    <a href="javascript:;" class="menu-link">
+                        <div class="menu-icon">
+                            <i class="fa fa-clipboard-list"></i>
+                        </div>
+                        <div class="menu-text">Manejo Inventarios</div>
+                        <div class="menu-caret"></div>
+                    </a>
+                    <div class="menu-submenu">
+                        <div class="menu-item">
+                            <a href="{% url 'producto_list' %}" class="menu-link">
+                                <div class="menu-text">Productos</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'productos_sucursales' %}" class="menu-link">
+                                <div class="menu-text">Productos por Empresa</div>
+                            </a>
+                        </div>
+                        <div class="menu-item has-sub">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-text">Movimientos</div>
+                                <div class="menu-caret"></div>
+                            </a>
+                            <div class="menu-submenu">
+                                <div class="menu-item">
+                                    <a href="{% url 'movimiento_inventario' %}" class="menu-link">
+                                        <div class="menu-text">Registrar Movimiento</div>
+                                        <div class="menu-caret"></div>
+                                    </a>
+                                </div>
+                                <div class="menu-item">
+                                    <a href="{% url 'consulta_producto' %}" class="menu-link">
+                                        <div class="menu-text">Consulta Producto</div>
+                                        <div class="menu-caret"></div>
+                                    </a>
+                                </div>
+                                <div class="menu-item">
+                                    <a href="{% url 'lista_movimientos' %}" class="menu-link">
+                                        <div class="menu-text">Lista Movimientos</div>
+                                        <div class="menu-caret"></div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
             <!-- END menu -->
         {% endblock %}
-</div>
+    </div>
 
     <div class="app-sidebar-bg" data-bs-theme="dark"></div>
-<!-- END #sidebar -->
+    <!-- END #sidebar -->
 
-<!-- BEGIN #content -->
-<div id="content" class="app-content">
-    {% block encabezado %}
-    {% endblock %}
+    <!-- BEGIN #content -->
+    <div id="content" class="app-content">
+        {% block encabezado %}
+        {% endblock %}
 
-    {% block contenido %}
-        <!-- BEGIN row -->
-        <!-- END row -->
-    {% endblock %}
-</div>
-<!-- END #content -->
+        {% block contenido %}
+            <!-- BEGIN row -->
+            <!-- END row -->
+        {% endblock %}
+    </div>
+    <!-- END #content -->
 
-<!-- BEGIN scroll-top-btn -->
-<a href="javascript:;" class="btn btn-icon btn-circle btn-theme btn-scroll-to-top" data-toggle="scroll-to-top"><i
-        class="fa fa-angle-up"></i></a>
-<!-- END scroll-top-btn -->
+    <!-- BEGIN scroll-top-btn -->
+    <a href="javascript:;" class="btn btn-icon btn-circle btn-theme btn-scroll-to-top" data-toggle="scroll-to-top"><i
+            class="fa fa-angle-up"></i></a>
+    <!-- END scroll-top-btn -->
 </div>
 <!-- END #app -->
 
