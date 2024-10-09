@@ -21,35 +21,16 @@
         <h4 class="panel-title">Nueva Categoría</h4>
     </div>
     <div class="panel-body">
-        <form method="POST" id="categoria-form">
+        <!-- Asigna la URL del formulario al action -->
+        <form method="POST" action="{% url 'nueva_categoria' %}">
             {% csrf_token %}
             <div class="form-group">
                 <label for="nombre">Nombre</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" value ="">
+                <input type="text" class="form-control" id="nombre" name="nombre" value="">
             </div>
             <br>
-            <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+            <button type="submit" class="btn btn-primary">Crear</button>
         </form>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    $('#categoria-form').on('submit', function (event) {
-        event.preventDefault();
-        var formData = $(this).serialize();
-        $.ajax({
-            url: '{% url "nueva_categoria" %}',
-            type: 'POST',
-            data: formData,
-            success: function (response) {
-                window.location.href = '{% url "lista_categorias" %}';
-            },
-            error: function (xhr, status, error) {
-                alert('Error al crear la categoría: ' + error);
-            }
-        });
-    });
-</script>
 {% endblock %}

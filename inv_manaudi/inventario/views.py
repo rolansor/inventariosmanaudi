@@ -157,17 +157,10 @@ def nueva_categoria(request):
     if request.method == 'POST':
         form = CategoriaForm(request.POST)
         if form.is_valid():
-            categoria = form.save()
-            if request.is_ajax():
-                data = {
-                    'id': categoria.id,
-                    'nombre': categoria.nombre,
-                }
-                return JsonResponse(data)
-            else:
-                return redirect('lista_categorias')
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+            categoria = form.save(commit=False)
+            categoria.empresa = request.user.perfil.empresa  # Asignar la empresa del usuario logueado
+            categoria.save()
+            return redirect('lista_categorias')  # Redirigir a la lista de categorías
     else:
         form = CategoriaForm()
 
