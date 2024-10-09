@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
 
 
 class Empresa(models.Model):
@@ -15,7 +14,7 @@ class Empresa(models.Model):
 
 
 class Sucursal(models.Model):
-    empresa = models.ForeignKey(Empresa, related_name='sucursales', on_delete=models.CASCADE)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='sucursales')
     nombre = models.CharField(max_length=255)
     abreviatura = models.CharField(max_length=3)
     direccion = models.CharField(max_length=255, blank=True, null=True)
@@ -27,13 +26,14 @@ class Sucursal(models.Model):
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=255)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='categorias')
 
     def __str__(self):
         return self.nombre
 
 
 class Subcategoria(models.Model):
-    categoria = models.ForeignKey(Categoria, related_name='subcategorias', on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias')
     nombre = models.CharField(max_length=255)
 
     def __str__(self):
@@ -52,6 +52,7 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     tipo_producto = models.CharField(max_length=10, choices=TIPO_PRODUCTO_CHOICES, default='unidad')
     categoria = models.ForeignKey(Subcategoria, related_name='productos', on_delete=models.SET_NULL, null=True)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
 
     def __str__(self):
         return f'{self.codigo} - {self.nombre} ({self.get_tipo_producto_display()})'

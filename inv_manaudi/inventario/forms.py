@@ -25,6 +25,18 @@ class CategoriaForm(forms.ModelForm):
         model = Categoria
         fields = ['nombre']
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(CategoriaForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        categoria = super(CategoriaForm, self).save(commit=False)
+        if not self.user.is_superuser:
+            categoria.empresa = self.user.perfil.empresa  # Asignar la empresa del usuario
+        if commit:
+            categoria.save()
+        return categoria
+
 
 class SubcategoriaForm(forms.ModelForm):
     class Meta:
@@ -44,6 +56,18 @@ class ProductoForm(forms.ModelForm):
             'tipo_producto': forms.Select(attrs={'class': 'form-control'}),
             'categoria': forms.Select(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ProductoForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        producto = super(ProductoForm, self).save(commit=False)
+        if not self.user.is_superuser:
+            producto.empresa = self.user.perfil.empresa  # Asignar la empresa del usuario
+        if commit:
+            producto.save()
+        return producto
 
 
 class MovimientoInventarioForm(forms.ModelForm):

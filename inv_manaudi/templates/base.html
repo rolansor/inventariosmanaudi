@@ -31,8 +31,7 @@
         {% block menu_navegacion %}
             <!-- BEGIN navbar-header -->
             <div class="navbar-header">
-                <a href="/" class="navbar-brand"><span class="navbar-logo"></span> <b class="me-3px">BenderClon</b>
-                    Developer</a>
+                <a href="/" class="navbar-brand"><span class="navbar-logo"></span>Empresa: <b class="me-3px"> {{ request.user.perfil.empresa.nombre }}</b></a>
                 <button type="button" class="navbar-mobile-toggler" data-toggle="app-sidebar-mobile">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -75,7 +74,7 @@
         {% block sidebar_menu %}
             <div class="menu">
                 <div class="menu-header">Navegación</div>
-                {% if request.user|pertenece_grupo:"Contabilidad" %}
+                {% if request.user|pertenece_grupo:"Administrador" %}
                     <div class="menu-item has-sub active">
                         <a href="javascript:;" class="menu-link">
                             <div class="menu-icon">
@@ -97,7 +96,6 @@
                             </div>
                         </div>
                     </div>
-                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -114,6 +112,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
