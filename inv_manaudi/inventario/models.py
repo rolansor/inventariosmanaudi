@@ -1,61 +1,8 @@
 from django.db import models
 from django.conf import settings
+from inv_manaudi.productos.models import Producto
+from inv_manaudi.usuarios.models import Empresa, Sucursal
 
-
-class Empresa(models.Model):
-    nombre = models.CharField(max_length=255)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.nombre
-
-
-class Sucursal(models.Model):
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='sucursales')
-    nombre = models.CharField(max_length=255)
-    abreviatura = models.CharField(max_length=3)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-
-    def __str__(self):
-        return f'{self.nombre} - {self.empresa.nombre}'
-
-
-class Categoria(models.Model):
-    nombre = models.CharField(max_length=255)
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='categorias')
-
-    def __str__(self):
-        return self.nombre
-
-
-class Subcategoria(models.Model):
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias')
-    nombre = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f'{self.nombre} (Categoría: {self.categoria.nombre})'
-
-
-class Producto(models.Model):
-    TIPO_PRODUCTO_CHOICES = [
-        ('unidad', 'Unidad'),
-        ('juego', 'Juego'),
-    ]
-
-    codigo = models.CharField(max_length=50, unique=True)
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField(blank=True, null=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-    tipo_producto = models.CharField(max_length=10, choices=TIPO_PRODUCTO_CHOICES, default='unidad')
-    categoria = models.ForeignKey(Subcategoria, related_name='productos', on_delete=models.SET_NULL, null=True)
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
-
-    def __str__(self):
-        return f'{self.codigo} - {self.nombre} ({self.get_tipo_producto_display()})'
 
 class Inventario(models.Model):
     sucursal = models.ForeignKey(Sucursal, related_name='inventarios', on_delete=models.CASCADE)
