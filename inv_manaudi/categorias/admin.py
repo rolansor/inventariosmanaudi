@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Categoria, Subcategoria
+from .models import Categoria, Subcategoria
 
 
 @admin.register(Categoria)

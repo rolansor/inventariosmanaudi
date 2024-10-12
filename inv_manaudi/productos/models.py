@@ -1,6 +1,6 @@
 from django.db import models
-from inv_manaudi.categorias.models import Subcategoria
-from inv_manaudi.usuarios.models import Empresa
+from categorias.models import Subcategoria
+from usuarios.models import Empresa
 
 
 class Producto(models.Model):

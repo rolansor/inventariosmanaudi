@@ -1,5 +1,5 @@
 from django import forms
-from models import MovimientoInventario
+from .models import MovimientoInventario
 
 
 class MovimientoInventarioForm(forms.ModelForm):

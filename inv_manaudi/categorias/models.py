@@ -1,5 +1,5 @@
 from django.db import models
-from inv_manaudi.usuarios.models import Empresa
+from usuarios.models import Empresa
 
 
 class Categoria(models.Model):

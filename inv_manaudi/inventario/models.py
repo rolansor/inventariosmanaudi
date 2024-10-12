@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
-from inv_manaudi.productos.models import Producto
-from inv_manaudi.usuarios.models import Empresa, Sucursal
+from productos.models import Producto
+from usuarios.models import Empresa, Sucursal
 
 
 class Inventario(models.Model):

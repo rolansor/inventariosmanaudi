@@ -4,10 +4,11 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import F, Sum
-from forms import RegistroForm, EdicionUsuarioForm, UsuarioPerfilForm, EmpresaForm, SucursalForm
-from templatetags.tags import control_acceso
-from inv_manaudi.inventario.models import MovimientoInventario, Inventario
-from models import Empresa, Sucursal
+from productos.models import Producto
+from .forms import RegistroForm, EdicionUsuarioForm, UsuarioPerfilForm, EmpresaForm, SucursalForm
+from .templatetags.tags import control_acceso
+from inventario.models import MovimientoInventario, Inventario
+from .models import Empresa, Sucursal
 
 
 @login_required

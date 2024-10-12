@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-
-from inv_manaudi.productos.models import Producto
-from inv_manaudi.usuarios.models import Empresa, Sucursal
-from models import MovimientoInventario
-from forms import MovimientoInventarioForm
+from productos.models import Producto
+from usuarios.models import Empresa, Sucursal
+from .models import MovimientoInventario
+from .forms import MovimientoInventarioForm
 
 
 def movimiento_inventario(request):

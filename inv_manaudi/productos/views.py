@@ -1,5 +1,8 @@
-from django.shortcuts import render
-from models import Producto
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from categorias.models import Subcategoria
+from .models import Producto
+from .forms import ProductoForm
 
 
 def producto_list(request):

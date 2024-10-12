@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from forms import CategoriaForm, SubcategoriaForm
-from models import Categoria, Subcategoria
-from inv_manaudi.usuarios.templatetags.tags import control_acceso
+from .forms import CategoriaForm, SubcategoriaForm
+from .models import Categoria, Subcategoria
+from usuarios.templatetags.tags import control_acceso
 
 
 @control_acceso('Contabilidad')
