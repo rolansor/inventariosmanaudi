@@ -130,8 +130,8 @@
                                     <td>${response.telefono}</td>
                                     <td>${response.email}</td>
                                     <td>
+                                        <a href="/usuarios/sucursales/${response.id}" class="btn btn-warning">Sucursales</a>
                                         <button class="btn btn-primary edit-empresa" data-id="${response.id}">Editar</button>
-                                        <a href="/inventario/sucursales/${response.id}" class="btn btn-warning">Sucursales</a>
                                         <button class="btn btn-danger delete-empresa" data-id="${response.id}">Eliminar</button>
                                     </td>
                                 </tr>
@@ -140,7 +140,7 @@
 
                     // Limpiar el formulario después de guardar
                     $('#empresa-form').trigger('reset');
-                    $('#submit-btn').text('Crear').data('url', '/inventario/empresas/');
+                    $('#submit-btn').text('Crear').data('url', '/usuarios/empresas/');
                 },
                 error: function (xhr, status, error) {
                     alert('Error al procesar la solicitud: ' + error);
@@ -152,7 +152,7 @@
         $('#empresa-list').on('click', '.edit-empresa', function () {
             var empresaId = $(this).data('id');
             $.ajax({
-                url: '/inventario/empresas/editar/' + empresaId + '/', // URL de la vista de edición
+                url: '/usuarios/empresas/editar/' + empresaId + '/', // URL de la vista de edición
                 type: 'GET',
                 success: function (response) {
                     // Precargar los datos en el formulario
@@ -160,7 +160,7 @@
                     $('#direccion').val(response.direccion);
                     $('#telefono').val(response.telefono);
                     $('#email').val(response.email);
-                    $('#submit-btn').text('Actualizar').data('url', '/inventario/empresas/editar/' + empresaId + '/');
+                    $('#submit-btn').text('Actualizar').data('url', '/usuarios/empresas/editar/' + empresaId + '/');
                 },
                 error: function (xhr, status, error) {
                     alert('Error al cargar la empresa: ' + error);
@@ -174,7 +174,7 @@
             var empresaId = $(this).data('id');
             if (confirm('¿Estás seguro de que deseas eliminar esta empresa?')) {
                 $.ajax({
-                    url: '/inventario/empresas/eliminar/' + empresaId + '/', // URL de la vista de eliminación
+                    url: '/usuarios/empresas/eliminar/' + empresaId + '/', // URL de la vista de eliminación
                     type: 'POST',
                     data: {
                         'csrfmiddlewaretoken': '{{ csrf_token }}'

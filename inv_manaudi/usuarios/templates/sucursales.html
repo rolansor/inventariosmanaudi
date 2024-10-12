@@ -152,7 +152,7 @@
             $('#sucursal-list').on('click', '.edit-sucursal', function () {
                 var sucursalId = $(this).data('id');
                 $.ajax({
-                    url: '/inventario/sucursales/editar/' + sucursalId + '/',
+                    url: '/usuarios/sucursales/editar/' + sucursalId + '/',
                     type: 'GET',
                     success: function (response) {
                         // Precargar los datos en el formulario
@@ -160,7 +160,7 @@
                         $('#abreviatura').val(response.abreviatura);
                         $('#direccion').val(response.direccion);
                         $('#telefono').val(response.telefono);
-                        $('#submit-btn').text('Actualizar').data('url', '/inventario/sucursales/editar/' + sucursalId + '/');
+                        $('#submit-btn').text('Actualizar').data('url', '/usuarios/sucursales/editar/' + sucursalId + '/');
                     },
                     error: function (xhr, status, error) {
                         alert('Error al cargar la sucursal: ' + error);
@@ -173,7 +173,7 @@
                 var sucursalId = $(this).data('id');
                 if (confirm('¿Estás seguro de que deseas eliminar esta sucursal?')) {
                     $.ajax({
-                        url: '/inventario/sucursales/eliminar/' + sucursalId + '/',
+                        url: '/usuarios/sucursales/eliminar/' + sucursalId + '/',
                         type: 'POST',
                         data: {
                             'csrfmiddlewaretoken': '{{ csrf_token }}'

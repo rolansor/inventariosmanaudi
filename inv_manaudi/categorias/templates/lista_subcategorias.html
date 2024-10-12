@@ -124,11 +124,11 @@
     $('#subcategoria-list').on('click', '.edit-subcategoria', function () {
         var subcategoriaId = $(this).data('id');
         $.ajax({
-            url: '/inventario/categorias/subcategorias/editar/' + subcategoriaId + '/',
+            url: '/categorias/subcategorias/editar/' + subcategoriaId + '/',
             type: 'GET',
             success: function (response) {
                 $('#modal-nombre-subcategoria').val(response.nombre);
-                $('#edit-subcategoria-form').attr('action', '/inventario/categorias/subcategorias/editar/' + subcategoriaId + '/');
+                $('#edit-subcategoria-form').attr('action', '/categorias/subcategorias/editar/' + subcategoriaId + '/');
                 $('#editSubcategoriaModal').modal('show'); // Mostrar el modal
             },
             error: function (xhr, status, error) {
@@ -147,7 +147,7 @@
         var subcategoriaId = $(this).data('id');
         if (confirm('¿Estás seguro de que deseas eliminar esta subcategoría?')) {
             $.ajax({
-                url: '/inventario/categorias/subcategorias/eliminar/' + subcategoriaId + '/',
+                url: '/categorias/subcategorias/eliminar/' + subcategoriaId + '/',
                 type: 'POST',
                 data: {
                     'csrfmiddlewaretoken': '{{ csrf_token }}'
