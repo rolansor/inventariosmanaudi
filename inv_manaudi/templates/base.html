@@ -96,7 +96,9 @@
                             </div>
                         </div>
                     </div>
-                <div class="menu-item has-sub">
+                {% endif %}
+                {% if request.user|pertenece_grupo:"Manaudi" %}
+                    <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
                             <i class="fa fa-industry"></i>
@@ -113,6 +115,7 @@
                     </div>
                 </div>
                 {% endif %}
+                {% if request.user|pertenece_grupo:"Encargado" %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -134,6 +137,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -144,18 +148,18 @@
                     </a>
                     <div class="menu-submenu">
                         <div class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="{% url 'crear_producto' %}" class="menu-link">
                                 <div class="menu-text">Nuevo Producto</div>
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="" class="menu-link">
-                                <div class="menu-text">Busqueda Productos</div>
+                            <a href="{% url 'lista_productos' %}" class="menu-link">
+                                <div class="menu-text">Lista Productos</div>
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="" class="menu-link">
-                                <div class="menu-text">Lista Productos</div>
+                            <a href="{% url 'busqueda_producto' %}" class="menu-link">
+                                <div class="menu-text">Busqueda Productos</div>
                             </a>
                         </div>
                     </div>

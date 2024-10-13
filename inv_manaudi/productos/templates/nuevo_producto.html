@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nuevo Producto{% endblock %}
+
+{% block encabezado %}
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Nuevo Producto</li>
+</ol>
+<h1 class="page-header">Nuevo Producto</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Nuevo Producto</h4>
+        </div>
+        <div class="panel-body">
+           <!-- Mostrar mensajes de éxito/error -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-dismissible fade show alert-{{ message.tags }} shadow-sm mb-4">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <strong>{{ message|capfirst }}</strong> <!-- Capitaliza el mensaje -->
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Formulario para creación de producto -->
+            <form method="POST" action="{% url 'crear_producto' %}" id="producto-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="codigo">Código</label>
+                    <input type="text" class="form-control" id="codigo" name="codigo" required>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="precio">Precio</label>
+                    <input type="text" class="form-control" id="precio" name="precio" r equired>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="tipo_producto">Tipo</label>
+                    <select class="form-control" id="tipo_producto" name="tipo_producto" required>
+                        <option value="unidad">Unidad</option>
+                        <option value="juego">Juego</option>
+                    </select>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="categoria">Subcategoría</label>
+                    <select class="form-control" id="categoria" name="categoria" required>
+                        {% for subcategoria in subcategorias %}
+                            <option value="{{ subcategoria.pk }}">{{ subcategoria.categoria.nombre }} - {{ subcategoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#precio').mask('00000000.00', {
+                reverse: true,
+                placeholder: "____.__"
+            });
+        });
+        document.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
+            input.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
+{% endblock %}
+

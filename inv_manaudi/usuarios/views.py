@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -77,7 +77,6 @@ def registro(request):
         form = RegistroForm()
         perfil_form = UsuarioPerfilForm()  # Formulario de perfil vacío
     return render(request, 'registro.html', {'form': form, 'perfil_form': perfil_form})
-
 
 
 @login_required
@@ -240,3 +239,29 @@ def sucursal_delete(request, pk):
         sucursal.delete()
         return JsonResponse({'success': True})
     return redirect('sucursal_list')
+
+
+def obtener_empresa(request: HttpRequest):
+    """
+    Retorna la empresa asociadas al usuario que hace el request.
+
+    :param request: HttpRequest objeto de Django
+    :return: empresa
+    """
+    usuario_perfil = request.user.perfil  # Accede al perfil del usuario
+    empresa = usuario_perfil.empresa  # Obtiene la empresa del perfil
+
+    return empresa
+
+
+def obtener_sucursal(request: HttpRequest):
+    """
+    Retorna la sucursal asociadas al usuario que hace el request.
+
+    :param request: HttpRequest objeto de Django
+    :return: sucursal
+    """
+    usuario_perfil = request.user.perfil  # Accede al perfil del usuario
+    sucursal = usuario_perfil.sucursal  # Obtiene la sucursal del perfil (puede ser None)
+
+    return sucursal
