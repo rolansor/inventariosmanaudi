@@ -133,33 +133,6 @@ def buscar_producto_por_codigo(request):
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
-def producto_list(request):
-    productos = Producto.objects.all()
-    subcategorias = Subcategoria.objects.all()
-
-    if request.method == 'POST':
-        form = ProductoForm(request.POST)
-        if form.is_valid():
-            producto = form.save()
-            if request.is_ajax():
-                data = {
-                    'id': producto.pk,
-                    'codigo': producto.codigo,
-                    'nombre': producto.nombre,
-                    'precio': producto.precio,
-                    'tipo_producto': producto.get_tipo_producto_display(),
-                    'categoria': producto.categoria.nombre if producto.categoria else 'Sin categoría',
-                }
-                return JsonResponse(data)
-            else:
-                print(form.errors)
-                return redirect('producto_list')
-    else:
-        form = ProductoForm()
-
-    return render(request, 'productos.html', {'productos': productos, 'subcategorias': subcategorias, 'form': form})
-
-
 @control_acceso('Encargado')
 def editar_producto(request, pk=None):
     """
@@ -243,13 +216,24 @@ def bsq_por_codigo(request):
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
-def producto_delete(request, pk):
+@control_acceso('Administrador')
+def desactivar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
-    if request.method == 'POST':
-        producto.delete()
-        if request.is_ajax():
-            return JsonResponse({'id': pk})
-        else:
-            return redirect('producto_list')
+    if request.method == 'GET':
+        producto.estado = 'inactivo'  # Cambiar el estado del producto
+        producto.save()
+        messages.success(request, 'Producto desactivado con éxito.')
+        return redirect('lista_productos')
+    return redirect('lista_productos')
 
+
+@control_acceso('Administrador')
+def activar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    if request.method == 'GET':
+        producto.estado = 'activo'  # Cambiar el estado del producto
+        producto.save()
+        messages.success(request, 'Producto desactivado con éxito.')
+        return redirect('lista_productos')
+    return redirect('lista_productos')
 
