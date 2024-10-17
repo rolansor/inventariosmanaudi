@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Producto{% endblock %}
+
+{% block encabezado %}
+    <ol class="breadcrumb float-xl-end">
+        <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item active">Editar Producto</li>
+    </ol>
+    <h1 class="page-header">Editar Producto</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Editar Producto</h4>
+        </div>
+        <div class="panel-body">
+            <!-- Formulario manual para edición de producto -->
+            <form method="POST" action="{% url 'editar_producto' %}" id="producto-form">
+                {% csrf_token %}
+            
+                 <!-- Campo oculto para el pk del producto -->
+                <input type="hidden" id="producto_id" name="producto_id" value="">
+
+                <!-- Campo Código -->
+                <div class="form-group">
+                    <label for="codigo">Código</label>
+                    <input type="text" class="form-control" id="codigo"
+                           name="codigo" placeholder="Ingrese el código del producto" required>
+                </div>
+                <br>
+
+                <!-- Campo Nombre -->
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre"
+                           name="nombre" value="" required>
+                </div>
+                <br>
+
+                <!-- Campo Descripción -->
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea class="form-control"
+                              id="descripcion"
+                              name="descripcion"></textarea>
+                </div>
+                <br>
+
+                <!-- Campo Precio -->
+                <div class="form-group">
+                    <label for="precio">Precio</label>
+                    <input type="text" class="form-control " id="precio"
+                           name="precio" value="" required>
+                </div>
+                <br>
+
+                <!-- Campo Tipo de Producto -->
+                <div class="form-group">
+                    <label for="tipo_producto">Tipo de Producto</label>
+                    <select class="form-control"
+                            id="tipo_producto" name="tipo_producto" required>
+                        <option value="unidad">Unidad</option>
+                        <option value="juego">Juego</option>
+                    </select>
+                </div>
+                <br>
+
+                <!-- Campo Subcategoría -->
+                <div class="form-group">
+                    <label for="categoria">Subcategoría</label>
+                    <select class="form-control" id="categoria" name="categoria" required>
+                        {% for subcategoria in subcategorias %}
+                            <option value="{{ subcategoria.pk }}">
+                                {{ subcategoria.categoria.nombre }} - {{ subcategoria.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+
+                <!-- Botón de actualización -->
+                <button type="submit" class="btn btn-primary" id="submit-btn">Actualizar</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#precio').mask('00000000.00', {
+                reverse: true,
+                placeholder: "____.__"
+            });
+            // Autocompletar los campos del formulario cuando se ingrese un código válido
+            $('#codigo').on('change', function () {
+                var codigo = $(this).val();
+
+                if (codigo !== '') {
+                    // Realizar la búsqueda AJAX
+                    $.ajax({
+                        url: "{% url 'bsq_por_codigo' %}",
+                        type: 'GET',
+                        data: {
+                            'codigo': codigo
+                        },
+                        success: function (data) {
+                            // Autocompletar los campos del formulario si el producto existe
+                                                    $('#producto_id').val(data.id);  // Asigna el id del producto al campo oculto
+                            $('#nombre').val(data.nombre);
+                            $('#descripcion').val(data.descripcion);
+                            $('#precio').val(data.precio);
+                            $('#tipo_producto').val(data.tipo_producto);
+                            $('#categoria').val(data.categoria_id);
+                        },
+                        error: function (xhr, status, error) {
+                            if (xhr.status === 404) {
+                                alert('Producto no encontrado');
+                                // Limpiar el formulario si el producto no se encuentra
+                                $('#nombre').val('');
+                                $('#descripcion').val('');
+                                $('#precio').val('');
+                                $('#tipo_producto').val('');
+                                $('#categoria').val('');
+                            }
+                        }
+                    });
+                }
+            });
+            document.querySelectorAll('input[type="text"], textarea').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    this.value = this.value.toUpperCase();
+                });
+            });
+        });
+    </script>
+{% endblock %}

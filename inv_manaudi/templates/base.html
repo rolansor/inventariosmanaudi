@@ -75,7 +75,7 @@
             <div class="menu">
                 <div class="menu-header">Navegación</div>
                 {% if request.user|pertenece_grupo:"Administrador" %}
-                    <div class="menu-item has-sub active">
+                    <div class="menu-item has-sub">
                         <a href="javascript:;" class="menu-link">
                             <div class="menu-icon">
                                 <i class="fa fa-search"></i>
@@ -84,7 +84,7 @@
                             <div class="menu-caret"></div>
                         </a>
                         <div class="menu-submenu">
-                            <div class="menu-item active">
+                            <div class="menu-item">
                                 <a href="{% url 'consulta_id' %}" class="menu-link">
                                     <div class="menu-text">Cédula</div>
                                 </a>
@@ -107,7 +107,7 @@
                         <div class="menu-caret"></div>
                     </a>
                     <div class="menu-submenu has-sub">
-                        <div class="menu-item active">
+                        <div class="menu-item">
                             <a href="{% url 'empresa_list' %}" class="menu-link">
                                 <div class="menu-text">Empresas</div>
                             </a>
@@ -150,6 +150,11 @@
                         <div class="menu-item">
                             <a href="{% url 'crear_producto' %}" class="menu-link">
                                 <div class="menu-text">Nuevo Producto</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'editar_producto' %}" class="menu-link">
+                                <div class="menu-text">Editar Producto</div>
                             </a>
                         </div>
                         <div class="menu-item">
@@ -196,7 +201,7 @@
                                     </a>
                                 </div>
                                 <div class="menu-item">
-                                    <a href="{% url 'consulta_producto' %}" class="menu-link">
+                                    <a href="" class="menu-link">
                                         <div class="menu-text">Consulta Producto</div>
                                         <div class="menu-caret"></div>
                                     </a>

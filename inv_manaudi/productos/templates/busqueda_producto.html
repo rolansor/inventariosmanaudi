@@ -51,6 +51,7 @@
                     <th>Precio</th>
                     <th>Tipo</th>
                     <th>Categoría</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,6 +63,10 @@
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.get_tipo_producto_display }}</td>
                         <td>{{ producto.categoria.nombre }}</td>
+                        <td>
+                            <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-info">Editar Producto</a>
+                            <a href="{% url 'eliminar_producto' producto.pk %}" class="btn btn-danger">Eliminar Producto</a>
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>

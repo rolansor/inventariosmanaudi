@@ -10,7 +10,7 @@ from .models import Producto
 from .forms import ProductoForm
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Encargado')
 def crear_producto(request):
     subcategorias = Subcategoria.objects.all()
 
@@ -59,7 +59,7 @@ def crear_producto(request):
     return render(request, 'nuevo_producto.html', {'subcategorias': subcategorias})
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Encargado')
 def lista_productos(request):
     # Obtener la empresa del perfil del usuario actual
     empresa = obtener_empresa(request)
@@ -71,9 +71,9 @@ def lista_productos(request):
     return render(request, 'lista_productos.html', {'productos': productos})
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Encargado')
 def busqueda_producto(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria')
 
     # Filtrar los productos por código, nombre o categoría
@@ -109,6 +109,30 @@ def busqueda_producto(request):
     return render(request, 'busqueda_producto.html', context)
 
 
+def bsq_por_codigo(request):
+    """
+    Vista para buscar un producto por su código y devolver sus datos en JSON.
+    """
+    codigo = request.GET.get('codigo')
+
+    try:
+        producto = Producto.objects.get(codigo=codigo)
+        # Devolver los datos del producto en JSON
+        data = {
+            'id': producto.pk,
+            'codigo': producto.codigo,
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'precio': producto.precio,
+            'tipo_producto': producto.tipo_producto,
+            'categoria_id': producto.categoria.pk if producto.categoria else None
+        }
+        return JsonResponse(data)
+    except Producto.DoesNotExist:
+        # Si no se encuentra el producto, devolver un error
+        return JsonResponse({'error': 'Producto no encontrado'}, status=404)
+
+
 def producto_list(request):
     productos = Producto.objects.all()
     subcategorias = Subcategoria.objects.all()
@@ -136,42 +160,44 @@ def producto_list(request):
     return render(request, 'productos.html', {'productos': productos, 'subcategorias': subcategorias, 'form': form})
 
 
-def consulta_producto(request):
-    productos = Producto.objects.all()
-    return render(request, 'consulta_producto.html', {'productos': productos})
+@control_acceso('Encargado')
+def editar_producto(request, pk=None):
+    subcategorias = Subcategoria.objects.all()
 
+    if pk:
+        # Si se proporciona el pk, busca el producto y procesa el formulario de edición
+        producto = get_object_or_404(Producto, pk=pk)
 
-def producto_edit(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
+        if request.method == 'POST':
+            form = ProductoForm(request.POST, instance=producto)
+            if form.is_valid():
+                producto = form.save()
 
-    if request.method == 'POST':
-        form = ProductoForm(request.POST, instance=producto)
-        if form.is_valid():
-            producto = form.save()
-            if request.is_ajax():
-                data = {
-                    'id': producto.pk,
-                    'codigo': producto.codigo,
-                    'nombre': producto.nombre,
-                    'precio': producto.precio,
-                    'tipo_producto': producto.get_tipo_producto_display(),
-                    'categoria': producto.categoria.nombre if producto.categoria else 'Sin categoría',
-                }
-                return JsonResponse(data)
+                if request.is_ajax():
+                    # Si es una solicitud AJAX, devolvemos un JSON con los datos actualizados
+                    data = {
+                        'id': producto.pk,
+                        'codigo': producto.codigo,
+                        'nombre': producto.nombre,
+                        'precio': producto.precio,
+                        'tipo_producto': producto.get_tipo_producto_display(),
+                        'categoria': producto.categoria.nombre if producto.categoria else 'Sin categoría',
+                    }
+                    return JsonResponse(data)
+                else:
+                    messages.success(request, 'Producto actualizado con éxito.')
+                    return redirect('lista_productos')
+            else:
+                if request.is_ajax():
+                    return JsonResponse({'error': 'Formulario no válido', 'errors': form.errors}, status=400)
+                else:
+                    messages.error(request, 'Error al actualizar el producto.')
         else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
+            form = ProductoForm(instance=producto)
+            return render(request, 'editar_producto_form.html', {'form': form, 'producto': producto, 'subcategorias': subcategorias})
     else:
-        if request.is_ajax():
-            data = {
-                'codigo': producto.codigo,
-                'nombre': producto.nombre,
-                'descripcion': producto.descripcion,
-                'precio': producto.precio,
-                'tipo_producto': producto.tipo_producto,
-                'categoria_id': producto.categoria_id,
-            }
-            return JsonResponse(data)
+        # Si no es POST, simplemente renderiza el formulario vacío para ingresar el código
+        return render(request, 'editar_producto.html', {'subcategorias': subcategorias})
 
 
 def producto_delete(request, pk):

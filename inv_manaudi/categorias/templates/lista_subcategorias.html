@@ -17,7 +17,7 @@
 
 {% block contenido %}
     <!-- Botón para abrir el modal de creación de subcategoría -->
-    {% if request.user|pertenece_grupo:"Contabilidad" %}
+    {% if request.user|pertenece_grupo:"Encargado" %}
     <button class="btn btn-success mb-3" id="create-subcategoria-btn" data-bs-toggle="modal" data-bs-target="#createSubcategoriaModal">
         Crear Subcategoría
     </button>
@@ -42,7 +42,7 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ subcategoria.nombre }}</td>
                         <td>
-                            {% if request.user|pertenece_grupo:"Contabilidad" %}
+                            {% if request.user|pertenece_grupo:"Encargado" %}
                                 <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.id }}">Editar</button>
                                 <button class="btn btn-danger delete-subcategoria" data-id="{{ subcategoria.id }}">Eliminar</button>
                             {% endif %}

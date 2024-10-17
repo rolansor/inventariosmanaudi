@@ -35,7 +35,7 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ categoria.nombre }}</td>
                         <td>
-                            {% if request.user|pertenece_grupo:"Contabilidad" %}
+                            {% if request.user|pertenece_grupo:"Encargado" %}
                                 <button class="btn btn-primary edit-categoria" data-id="{{ categoria.pk }}">Editar</button>
                                 <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
                                 <button class="btn btn-danger delete-categoria" data-id="{{ categoria.pk }}">Eliminar</button>
