@@ -179,7 +179,7 @@ def editar_producto(request, pk=None):
             if form.is_valid():
                 producto = form.save()
                 messages.success(request, 'Producto actualizado con éxito.')
-                return redirect('lista_productos')
+                return redirect('editar_producto')
             else:
                 messages.error(request, 'Error al actualizar el producto.')
         else:
@@ -193,7 +193,9 @@ def editar_producto(request, pk=None):
         })
 
     else:
+        # Escenario 2: No se pasa pk, mostrar formulario vacío para buscar por código
         if request.method == 'POST':
+            # Buscar el producto por código
             codigo = request.POST.get('codigo')
             try:
                 producto = Producto.objects.get(codigo=codigo)
@@ -201,7 +203,7 @@ def editar_producto(request, pk=None):
                 if form.is_valid():
                     form.save()
                     messages.success(request, 'Producto actualizado con éxito.')
-                    return redirect('lista_productos')
+                    return redirect('editar_producto')
                 else:
                     messages.error(request, 'Error al actualizar el producto.')
                     return render(request, 'editar_producto.html', {
