@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Movimientos por Sucursal{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'plugins/datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'plugins/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css' %}"
+          rel="stylesheet"/>
+    <link href="{% static 'plugins/select2/dist/css/select2.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block contenido %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+    <br>
+    <br>
+    <h1>Movimientos de Inventario para la Sucursal {{ sucursal.nombre }}</h1>
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="panel panel-inverse" style="">
+                <!-- BEGIN panel-heading -->
+                <div class="panel-heading ui-sortable-handle">
+                    <h4 class="panel-title">Tabla Datos</h4>
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i
+                                class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-warning" data-toggle="panel-collapse"><i
+                                class="fa fa-minus"></i></a>
+                    </div>
+                </div>
+                <!-- END panel-heading -->
+                <!-- BEGIN panel-body -->
+                <div class="panel-body">
+                    <!-- BEGIN table-responsive -->
+                    <div class="table-responsive">
+                        <table id="movimientos-table" class="table mb-0">
+                            <thead>
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Producto</th>
+                                <th>Sucursal Origen</th>
+                                <th>Sucursal Destino</th>
+                                <th>Cantidad</th>
+                                <th>Tipo Movimiento</th>
+                                <th>Fecha</th>
+                                <th>Comentario</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for movimiento in movimientos %}
+                                <tr>
+                                    <td>{{ movimiento.producto.codigo }}</td>
+                                    <td>{{ movimiento.producto.nombre }}</td>
+                                    <td>{{ movimiento.sucursal.nombre }}</td>
+                                    <td>
+                                        {% if movimiento.tipo_movimiento == 'traslado' %}
+                                            {{ movimiento.sucursal_destino.nombre }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ movimiento.cantidad }}</td>
+                                    <td>{{ movimiento.get_tipo_movimiento_display }}</td>
+                                    <td>{{ movimiento.fecha }}</td>
+                                    <td>{{ movimiento.comentario }}</td>
+                                    <td>
+                                        {% if movimiento.tipo_movimiento == 'traslado' %}
+                                            {% if movimiento.estado_recepcion == 'pendiente' %}
+                                                <span class="badge bg-warning">Pendiente</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Confirmado</span>
+                                            {% endif %}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- END table-responsive -->
+                </div>
+                <!-- END panel-body -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'plugins/datatables.net/js/dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-bs5/js/dataTables.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#movimientos-table').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                ordering: true,
+                pageLength: 50,   // Muestra 50 registros por página
+                lengthMenu: [50, 100, 200, 400],
+                language: {
+                    "lengthMenu": "Mostrar _MENU_ registros por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "emptyTable": "No hay movimientos para esta sucursal.",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ registros en total)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                order: [[6, 'asc']] // Ordena por fecha de forma ascendente
+            });
+        });
+    </script>
+{% endblock %}

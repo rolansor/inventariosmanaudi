@@ -1,6 +1,7 @@
 from django import forms
 
 from productos.models import Producto
+from usuarios.models import Sucursal
 from .models import MovimientoInventario
 
 
@@ -57,7 +58,31 @@ class ConfirmarRecepcionForm(forms.ModelForm):
 
 class ProductoSelectForm(forms.Form):
     producto = forms.ModelChoiceField(
-        queryset=Producto.objects.all(),
+        queryset=Producto.objects.none(),  # Inicialmente vacío, se llenará en el __init__
         widget=forms.Select(attrs={'class': 'form-control select2'}),
         label='Seleccione un producto'
     )
+
+    def __init__(self, *args, **kwargs):
+        empresa = kwargs.pop('empresa', None)  # Obtener la empresa pasada en los kwargs
+        super(ProductoSelectForm, self).__init__(*args, **kwargs)
+
+        if empresa:
+            # Filtrar productos que pertenezcan a la empresa
+            self.fields['producto'].queryset = Producto.objects.filter(empresa=empresa)
+
+
+class SucursalSelectForm(forms.Form):
+    sucursal = forms.ModelChoiceField(
+        queryset=Sucursal.objects.none(),  # Inicialmente vacío, se llenará en el __init__
+        widget=forms.Select(attrs={'class': 'select2 form-control'}),
+        label="Seleccione una sucursal"
+    )
+
+    def __init__(self, *args, **kwargs):
+        empresa = kwargs.pop('empresa', None)  # Obtener la empresa pasada en los kwargs
+        super(SucursalSelectForm, self).__init__(*args, **kwargs)
+
+        if empresa:
+            # Filtrar sucursales que pertenezcan a la empresa
+            self.fields['sucursal'].queryset = Sucursal.objects.filter(empresa=empresa)

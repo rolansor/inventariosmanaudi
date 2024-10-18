@@ -1,13 +1,12 @@
-from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
 from django.contrib import messages
 from productos.models import Producto
-from usuarios.models import Empresa, Sucursal
+from usuarios.models import Sucursal
 from usuarios.templatetags.tags import control_acceso
 from .models import MovimientoInventario
-from .forms import MovimientoInventarioForm, ConfirmarRecepcionForm, ProductoSelectForm
+from .forms import MovimientoInventarioForm, ConfirmarRecepcionForm, ProductoSelectForm, SucursalSelectForm
 
 
 @control_acceso('Encargado')
@@ -91,27 +90,54 @@ def confirmar_recepcion_detalle(request, pk):
     })
 
 
-@login_required
-def listar_movimientos(request):
-    usuario = request.user
+@control_acceso('Encargado')
+def movimientos_por_empresa(request):
+    empresa = request.user.perfil.empresa  # Asumimos que el perfil del usuario tiene un campo 'empresa'
+    sucursales = Sucursal.objects.filter(empresa=empresa)
 
-    if usuario.groups.filter(name='manaudi').exists():
-        # Si el usuario pertenece al grupo manaudi, mostramos movimientos de todas las sucursales de su empresa
-        movimientos = MovimientoInventario.objects.filter(sucursal__empresa=usuario.perfil.empresa).order_by('-fecha')
-    elif usuario.groups.filter(name='Encargado').exists():
-        # Si el usuario es Encargado, mostramos los movimientos solo de su sucursal
-        movimientos = MovimientoInventario.objects.filter(sucursal=usuario.perfil.sucursal).order_by('-fecha')
-    else:
-        # Si no pertenece a ningún grupo que pueda ver movimientos, mostramos nada o podrías redirigir
-        movimientos = MovimientoInventario.objects.none()
+    movimientos = MovimientoInventario.objects.filter(
+        Q(sucursal__in=sucursales) | Q(sucursal_destino__in=sucursales)
+    ).order_by('-fecha')
 
-    return render(request, 'listar_movimientos.html', {
-        'movimientos': movimientos
+    return render(request, 'movimientos_por_empresa.html', {
+        'movimientos': movimientos,
+        'empresa': empresa,
+    })
+
+
+@control_acceso('Encargado')
+def movimientos_por_sucursal(request):
+    """
+    Vista que muestra los movimientos de inventario para una sucursal específica.
+    Si el usuario pertenece al grupo 'Manaudi', muestra los movimientos de todas las sucursales de la empresa.
+    Si es 'Encargado', muestra solo los movimientos de la sucursal actual seleccionada.
+    """
+    # Obtener la empresa del usuario actual
+    empresa = request.user.perfil.empresa  # Asume que el perfil del usuario tiene el campo 'empresa'
+
+    # Inicializar los formularios con las sucursales de la empresa del usuario
+    form = SucursalSelectForm(empresa=empresa)
+    movimientos = None
+
+    if request.method == 'POST':
+        form = SucursalSelectForm(request.POST, empresa=empresa)
+        if form.is_valid():
+            sucursal = form.cleaned_data['sucursal']
+            movimientos = MovimientoInventario.objects.filter(sucursal=sucursal).order_by('-fecha')
+
+    return render(request, 'movimientos_por_sucursal.html', {
+        'form': form,
+        'movimientos': movimientos,
     })
 
 
 def movimientos_por_producto(request):
-    form = ProductoSelectForm()
+    # Obtener la empresa del usuario actual
+    empresa = request.user.perfil.empresa  # Ajustar según cómo se obtenga la empresa en tu proyecto
+
+    # Inicializar el formulario con los productos filtrados por empresa
+    form = ProductoSelectForm(empresa=empresa)
+
     entradas = None
     salidas = None
     traslados = None
@@ -123,7 +149,7 @@ def movimientos_por_producto(request):
     }
 
     if request.method == 'POST':
-        form = ProductoSelectForm(request.POST)
+        form = ProductoSelectForm(request.POST, empresa=empresa)
         if form.is_valid():
             producto = form.cleaned_data['producto']
 
@@ -150,80 +176,3 @@ def movimientos_por_producto(request):
         'traslados': traslados,
         'resumen': resumen,
     })
-
-
-
-
-
-def movimientos_producto(request, producto_id):
-    producto = get_object_or_404(Producto, pk=producto_id)
-    movimientos = MovimientoInventario.objects.filter(producto=producto).order_by('-fecha')
-
-    data = []
-    for movimiento in movimientos:
-        data.append({
-            'sucursal': movimiento.sucursal.nombre,
-            'sucursal_destino': movimiento.sucursal_destino.nombre if movimiento.sucursal_destino else 'N/A',
-            'tipo_movimiento': movimiento.get_tipo_movimiento_display(),
-            'cantidad': movimiento.cantidad,
-            'usuario': movimiento.usuario.username,
-            'fecha': movimiento.fecha.strftime("%Y-%m-%d %H:%M:%S"),
-            'comentario': movimiento.comentario,
-        })
-
-    return JsonResponse({'data': data})
-
-
-def lista_movimientos(request):
-    """Vista que muestra todos los movimientos en una tabla, sin usar Ajax."""
-    movimientos = MovimientoInventario.objects.all().order_by('-fecha')
-    return render(request, 'lista_movimientos.html', {'movimientos': movimientos})
-
-
-def buscar_productos_por_sucursal(request, empresa_id, sucursal_id):
-
-    # Obtener el filtro de producto opcional
-    producto_id = request.GET.get('producto_id', None)
-
-    if sucursal_id == 'all':
-        # Si no se seleccionó una sucursal, obtener todos los productos de la empresa
-        inventarios = Inventario.objects.filter(sucursal__empresa_id=empresa_id)
-    else:
-        # Obtener la sucursal y filtrar por ella
-        sucursal = get_object_or_404(Sucursal, pk=sucursal_id, empresa_id=empresa_id)
-        inventarios = Inventario.objects.filter(sucursal=sucursal)
-
-        # Filtrar opcionalmente por producto
-    if producto_id:
-        inventarios = inventarios.filter(producto_id=producto_id)
-
-    # Construir la respuesta en formato DataTables
-    data = []
-    for inventario in inventarios:
-        data.append({
-            'codigo': inventario.producto.codigo,
-            'nombre': inventario.producto.nombre,
-            'precio': inventario.producto.precio,
-            'cantidad': inventario.cantidad,
-            'tipo_producto': inventario.producto.get_tipo_producto_display(),
-            'categoria': inventario.producto.categoria.nombre if inventario.producto.categoria else 'Sin categoría',
-        })
-
-    return JsonResponse({'data': data})
-
-
-def productos_sucursales(request):
-    empresas = Empresa.objects.all()  # Lista de empresas
-    return render(request, 'productos_sucursal.html', {'empresas': empresas})
-
-
-def sucursales_por_empresa(request, empresa_id):
-    sucursales = Sucursal.objects.filter(empresa_id=empresa_id)
-    sucursal_data = [{'id': s.id, 'nombre': s.nombre} for s in sucursales]
-    return JsonResponse({'sucursales': sucursal_data})
-
-
-def productos_por_sucursal(request, sucursal_id):
-    productos = Producto.objects.filter(inventarios__sucursal_id=sucursal_id).distinct()
-    producto_data = [{'id': p.id, 'nombre': p.codigo + ' -- ' + p.nombre} for p in productos]
-    return JsonResponse({'productos': producto_data})
