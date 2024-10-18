@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Confirmar Recepción{% endblock %}
+
+{% block contenido %}
+<h1>Confirmar Recepción para {{ movimiento.producto.nombre }}</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_cantidad_recibida">Cantidad Recibida:</label>
+        {{ form.cantidad_recibida }}
+    </div>
+    <button type="submit" class="btn btn-success">Confirmar Recepción</button>
+</form>
+
+<p>Producto: {{ movimiento.producto.nombre }}</p>
+<p>Cantidad Enviada: {{ movimiento.cantidad }}</p>
+<p>Sucursal Origen: {{ movimiento.sucursal.nombre }}</p>
+<p>Sucursal Destino: {{ movimiento.sucursal_destino.nombre }}</p>
+{% endblock %}

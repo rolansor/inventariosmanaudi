@@ -158,13 +158,13 @@
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="{% url 'lista_productos' %}" class="menu-link">
-                                <div class="menu-text">Lista Productos</div>
+                            <a href="{% url 'busqueda_producto' %}" class="menu-link">
+                                <div class="menu-text">Busqueda Productos</div>
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="{% url 'busqueda_producto' %}" class="menu-link">
-                                <div class="menu-text">Busqueda Productos</div>
+                            <a href="{% url 'lista_productos' %}" class="menu-link">
+                                <div class="menu-text">Lista Productos</div>
                             </a>
                         </div>
                     </div>
@@ -172,20 +172,25 @@
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
-                            <i class="fa fa-clipboard-list"></i>
+                            <i class="fa fa-pen-ruler"></i>
                         </div>
-                        <div class="menu-text">Manejo Inventarios</div>
+                        <div class="menu-text">Mantenimiento Inventario</div>
                         <div class="menu-caret"></div>
                     </a>
                     <div class="menu-submenu">
                         <div class="menu-item">
-                            <a href="{% url 'lista_productos' %}" class="menu-link">
-                                <div class="menu-text">Productos</div>
+                            <a href="{% url 'movimiento_inventario' %}" class="menu-link">
+                                <div class="menu-text">Registrar</div>
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="{% url 'productos_sucursales' %}" class="menu-link">
-                                <div class="menu-text">Productos por Empresa</div>
+                            <a href="{% url 'confirmar_recepcion' %}" class="menu-link">
+                                <div class="menu-text">Acuse Recibo</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'listado_movimientos' %}" class="menu-link">
+                                <div class="menu-text">Listado Movimientos</div>
                             </a>
                         </div>
                         <div class="menu-item has-sub">
@@ -195,24 +200,45 @@
                             </a>
                             <div class="menu-submenu">
                                 <div class="menu-item">
-                                    <a href="{% url 'movimiento_inventario' %}" class="menu-link">
-                                        <div class="menu-text">Registrar Movimiento</div>
+                                    <a href="{% url 'movimiento_por_producto' %}" class="menu-link">
+                                        <div class="menu-text">Producto</div>
                                         <div class="menu-caret"></div>
                                     </a>
                                 </div>
                                 <div class="menu-item">
-                                    <a href="" class="menu-link">
-                                        <div class="menu-text">Consulta Producto</div>
+                                    <a href="{% url 'movimiento_por_empresa' %}" class="menu-link">
+                                        <div class="menu-text">Empresa</div>
                                         <div class="menu-caret"></div>
                                     </a>
                                 </div>
                                 <div class="menu-item">
-                                    <a href="{% url 'lista_movimientos' %}" class="menu-link">
-                                        <div class="menu-text">Lista Movimientos</div>
+                                    <a href="{% url 'movimiento_por_sucursal' %}" class="menu-link">
+                                        <div class="menu-text">Sucursal</div>
                                         <div class="menu-caret"></div>
                                     </a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="menu-item has-sub">
+                    <a href="javascript:;" class="menu-link">
+                        <div class="menu-icon">
+                            <i class="fa fa-clipboard-list"></i>
+                        </div>
+                        <div class="menu-text">Reportes</div>
+                        <div class="menu-caret"></div>
+                    </a>
+                    <div class="menu-submenu">
+                        <div class="menu-item">
+                            <a href="" class="menu-link">
+                                <div class="menu-text">Reporte 1</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="" class="menu-link">
+                                <div class="menu-text">Reporte 2</div>
+                            </a>
                         </div>
                     </div>
                 </div>

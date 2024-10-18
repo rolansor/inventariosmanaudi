@@ -77,24 +77,27 @@ def busqueda_producto(request):
     categoria_id = request.GET.get('categoria')
 
     # Filtrar los productos por código, nombre o categoría
-    productos = Producto.objects.all()
+    productos = None
+    if query or categoria_id:
+        productos = Producto.objects.all()
 
-    if query:
-        productos = productos.filter(
-            Q(codigo__icontains=query) |
-            Q(nombre__icontains=query)
-        )
+        if query:
+            productos = productos.filter(Q(codigo__icontains=query) | Q(nombre__icontains=query))
 
-        # Filtro por categoría (incluye todas las subcategorías de la categoría seleccionada)
-    if categoria_id:
-        # Obtener la categoría seleccionada
-        categoria = Categoria.objects.get(id=categoria_id)
+            # Filtro por categoría (incluye todas las subcategorías de la categoría seleccionada)
+        if categoria_id:
+            try:
+                # Obtener la categoría seleccionada
+                categoria = Categoria.objects.get(id=categoria_id)
 
-        # Obtener todas las subcategorías asociadas a la categoría seleccionada
-        subcategorias = Subcategoria.objects.filter(categoria=categoria)
+                # Obtener todas las subcategorías asociadas a la categoría seleccionada
+                subcategorias = Subcategoria.objects.filter(categoria=categoria)
 
-        # Filtrar los productos que pertenezcan a las subcategorías de la categoría seleccionada
-        productos = productos.filter(categoria__in=subcategorias)
+                # Filtrar los productos que pertenezcan a las subcategorías de la categoría seleccionada
+                productos = productos.filter(categoria__in=subcategorias)
+
+            except Categoria.DoesNotExist:
+                productos = Producto.objects.none()  # En caso de que no exista la categoría
 
     # Obtener todas las categorías para el filtro
     categorias = Categoria.objects.all()
