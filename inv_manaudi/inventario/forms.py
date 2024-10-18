@@ -1,4 +1,6 @@
 from django import forms
+
+from productos.models import Producto
 from .models import MovimientoInventario
 
 
@@ -51,3 +53,11 @@ class ConfirmarRecepcionForm(forms.ModelForm):
         if cantidad_recibida > self.instance.cantidad:
             raise forms.ValidationError(f"La cantidad recibida no puede ser mayor que la cantidad enviada ({self.instance.cantidad}).")
         return cantidad_recibida
+
+
+class ProductoSelectForm(forms.Form):
+    producto = forms.ModelChoiceField(
+        queryset=Producto.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control select2'}),
+        label='Seleccione un producto'
+    )

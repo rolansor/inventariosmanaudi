@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Movimientos por Producto{% endblock %}
+{% block extra_css %}
+    <link href="{% static 'plugins/select2/dist/css/select2.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Movimientos por Producto</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="widget widget-stats bg-blue">
+                <div class="stats-icon"><i class="fa fa-plus-circle"></i></div>
+                <div class="stats-info">
+                    <h4>Entradas</h4>
+                    <p>{{ resumen.entradas }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="widget widget-stats bg-red">
+                <div class="stats-icon"><i class="fa fa-minus-circle"></i></div>
+                <div class="stats-info">
+                    <h4>Salidas</h4>
+                    <p>{{ resumen.salidas }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="widget widget-stats bg-orange">
+                <div class="stats-icon"><i class="fa fa-exchange-alt"></i></div>
+                <div class="stats-info">
+                    <h4>Traslados</h4>
+                    <p>{{ resumen.traslados }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="widget widget-stats bg-green">
+                <div class="stats-icon"><i class="fa fa-database"></i></div>
+                <div class="stats-info">
+                    <h4>Total Movimientos</h4>
+                    <p>{{ resumen.total }}</p>
+                </div>
+                <div class="stats-link">
+                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <!-- Tabla de Entradas -->
+    <h3>Entradas</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+            <th>Comentario</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if entradas %}
+            {% for entrada in entradas %}
+                <tr>
+                    <td>{{ entrada.cantidad }}</td>
+                    <td>{{ entrada.fecha }}</td>
+                    <td>{{ entrada.comentario }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="3" class="text-center">No hay entradas para este producto.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <!-- Tabla de Salidas -->
+    <h3>Salidas</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+            <th>Comentario</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if salidas %}
+            {% for salida in salidas %}
+                <tr>
+                    <td>{{ salida.cantidad }}</td>
+                    <td>{{ salida.fecha }}</td>
+                    <td>{{ salida.comentario }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="3" class="text-center">No hay salidas para este producto.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <!-- Tabla de Traslados -->
+    <h3>Traslados</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Cantidad</th>
+            <th>Sucursal Origen</th>
+            <th>Sucursal Destino</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if traslados %}
+            {% for traslado in traslados %}
+                <tr>
+                    <td>{{ traslado.cantidad }}</td>
+                    <td>{{ traslado.sucursal.nombre }}</td>
+                    <td>{{ traslado.sucursal_destino.nombre }}</td>
+                    <td>{{ traslado.fecha }}</td>
+                    <td>
+                        {% if traslado.estado_recepcion == 'pendiente' %}
+                            <span class="badge bg-warning">Pendiente</span>
+                        {% else %}
+                            <span class="badge bg-success">Confirmado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No hay traslados para este producto.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'plugins/select2/dist/js/select2.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Seleccione un producto',
+                allowClear: true
+            });
+        });
+    </script>
+{% endblock %}

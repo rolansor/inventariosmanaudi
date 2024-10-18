@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
@@ -5,7 +7,7 @@ from productos.models import Producto
 from usuarios.models import Empresa, Sucursal
 from usuarios.templatetags.tags import control_acceso
 from .models import MovimientoInventario
-from .forms import MovimientoInventarioForm, ConfirmarRecepcionForm
+from .forms import MovimientoInventarioForm, ConfirmarRecepcionForm, ProductoSelectForm
 
 
 @control_acceso('Encargado')
@@ -87,6 +89,70 @@ def confirmar_recepcion_detalle(request, pk):
         'form': form,
         'movimiento': movimiento,
     })
+
+
+@login_required
+def listar_movimientos(request):
+    usuario = request.user
+
+    if usuario.groups.filter(name='manaudi').exists():
+        # Si el usuario pertenece al grupo manaudi, mostramos movimientos de todas las sucursales de su empresa
+        movimientos = MovimientoInventario.objects.filter(sucursal__empresa=usuario.perfil.empresa).order_by('-fecha')
+    elif usuario.groups.filter(name='Encargado').exists():
+        # Si el usuario es Encargado, mostramos los movimientos solo de su sucursal
+        movimientos = MovimientoInventario.objects.filter(sucursal=usuario.perfil.sucursal).order_by('-fecha')
+    else:
+        # Si no pertenece a ningún grupo que pueda ver movimientos, mostramos nada o podrías redirigir
+        movimientos = MovimientoInventario.objects.none()
+
+    return render(request, 'listar_movimientos.html', {
+        'movimientos': movimientos
+    })
+
+
+def movimientos_por_producto(request):
+    form = ProductoSelectForm()
+    entradas = None
+    salidas = None
+    traslados = None
+    resumen = {
+        'entradas': 0,
+        'salidas': 0,
+        'traslados': 0,
+        'total': 0
+    }
+
+    if request.method == 'POST':
+        form = ProductoSelectForm(request.POST)
+        if form.is_valid():
+            producto = form.cleaned_data['producto']
+
+            # Filtrar los movimientos por tipo
+            entradas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='entrada').order_by(
+                '-fecha')
+            salidas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='salida').order_by(
+                '-fecha')
+            traslados = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='traslado').order_by(
+                '-fecha')
+
+            # Calcular los totales
+            resumen['entradas'] = entradas.aggregate(total=models.Sum('cantidad'))['total'] or 0
+            resumen['salidas'] = salidas.aggregate(total=models.Sum('cantidad'))['total'] or 0
+            resumen['traslados'] = traslados.aggregate(total=models.Sum('cantidad'))['total'] or 0
+
+            # Calcular el total disponible
+            resumen['total'] = resumen['entradas'] - resumen['salidas']
+
+    return render(request, 'movimientos_por_producto.html', {
+        'form': form,
+        'entradas': entradas,
+        'salidas': salidas,
+        'traslados': traslados,
+        'resumen': resumen,
+    })
+
+
+
 
 
 def movimientos_producto(request, producto_id):
