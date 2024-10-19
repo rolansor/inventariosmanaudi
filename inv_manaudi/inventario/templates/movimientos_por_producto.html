@@ -24,9 +24,6 @@
                     <h4>Entradas</h4>
                     <p>{{ resumen.entradas }}</p>
                 </div>
-                <div class="stats-link">
-                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
-                </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
@@ -36,32 +33,62 @@
                     <h4>Salidas</h4>
                     <p>{{ resumen.salidas }}</p>
                 </div>
-                <div class="stats-link">
-                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
-                </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
+            <div class="widget widget-stats bg-lime">
+                <div class="stats-icon"><i class="fa fa-cubes"></i></div>
+                <div class="stats-info">
+                    <h4>Total Físico</h4>
+                    <p>{{ resumen.total_fisico }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+    <div class="col-xl-2 col-md-6">
             <div class="widget widget-stats bg-orange">
                 <div class="stats-icon"><i class="fa fa-exchange-alt"></i></div>
                 <div class="stats-info">
-                    <h4>Traslados</h4>
-                    <p>{{ resumen.traslados }}</p>
-                </div>
-                <div class="stats-link">
-                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
+                    <h4>Traslados Salida Real</h4>
+                    <p>{{ resumen.traslados_salida }}</p>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-6">
             <div class="widget widget-stats bg-green">
-                <div class="stats-icon"><i class="fa fa-database"></i></div>
+                <div class="stats-icon"><i class="fa fa-exchange-alt"></i></div>
                 <div class="stats-info">
-                    <h4>Total Movimientos</h4>
-                    <p>{{ resumen.total }}</p>
+                    <h4>Traslados Entrada Real</h4>
+                    <p>{{ resumen.traslados_entrada }}</p>
                 </div>
-                <div class="stats-link">
-                    <a href="javascript:;"><i class="fa fa-arrow-alt-circle-right"></i></a>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="widget widget-stats bg-teal">
+                <div class="stats-icon"><i class="fa fa-check-circle"></i></div>
+                <div class="stats-info">
+                    <h4>Productos Trasladados</h4>
+                    <p>{{ resumen.traslados_confirmados }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="widget widget-stats bg-yellow">
+                <div class="stats-icon"><i class="fa fa-hourglass-half"></i></div>
+                <div class="stats-info">
+                    <h4>Productos Transito</h4>
+                    <p>{{ resumen.traslados_pendientes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="widget widget-stats bg-purple">
+                <div class="stats-icon"><i class="fa fa-balance-scale"></i></div>
+                <div class="stats-info">
+                    <h4>Diferencia de Traslados</h4>
+                    <p>{{ resumen.diferencia_traslados }}</p>
                 </div>
             </div>
         </div>
@@ -141,11 +168,11 @@
             {% for traslado in traslados %}
                 <tr>
                     <td>{{ traslado.cantidad }}</td>
-                    <td>{{ traslado.sucursal.nombre }}</td>
+                    <td>{{ traslado.sucursal_origen.nombre }}</td>
                     <td>{{ traslado.sucursal_destino.nombre }}</td>
-                    <td>{{ traslado.fecha }}</td>
+                    <td>{{ traslado.fecha_creacion }}</td>
                     <td>
-                        {% if traslado.estado_recepcion == 'pendiente' %}
+                        {% if traslado.estado == 'pendiente' %}
                             <span class="badge bg-warning">Pendiente</span>
                         {% else %}
                             <span class="badge bg-success">Confirmado</span>

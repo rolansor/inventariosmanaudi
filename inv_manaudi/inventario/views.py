@@ -124,17 +124,23 @@ def confirmar_traslado(request, pk):
     })
 
 
-@control_acceso('Encargado')
+@control_acceso('Manaudi')
 def movimientos_por_empresa(request):
-    empresa = request.user.perfil.empresa  # Asumimos que el perfil del usuario tiene un campo 'empresa'
+    """
+    Vista para mostrar todos los movimientos y traslados de una empresa, solo accesible para usuarios del grupo 'Manaudi'.
+    """
+    empresa = request.user.perfil.empresa  # Se asume que el perfil del usuario tiene el campo 'empresa'
     sucursales = Sucursal.objects.filter(empresa=empresa)
 
-    movimientos = MovimientoInventario.objects.filter(
-        Q(sucursal__in=sucursales) | Q(sucursal_destino__in=sucursales)
-    ).order_by('-fecha')
+    # Movimientos de inventario (entradas y salidas)
+    movimientos = MovimientoInventario.objects.filter(sucursal__in=sucursales).order_by('-fecha')
+
+    # Traslados de salida (traslados realizados desde la empresa actual)
+    traslados = Traslado.objects.filter(producto__empresa=empresa).order_by('-fecha_creacion')
 
     return render(request, 'movimientos_por_empresa.html', {
         'movimientos': movimientos,
+        'traslados': traslados,
         'empresa': empresa,
     })
 
@@ -142,44 +148,56 @@ def movimientos_por_empresa(request):
 @control_acceso('Encargado')
 def movimientos_por_sucursal(request):
     """
-    Vista que muestra los movimientos de inventario para una sucursal específica.
-    Si el usuario pertenece al grupo 'Manaudi', muestra los movimientos de todas las sucursales de la empresa.
-    Si es 'Encargado', muestra solo los movimientos de la sucursal actual seleccionada.
+    Vista que muestra los movimientos de inventario y traslados para una sucursal específica.
     """
     # Obtener la empresa del usuario actual
-    empresa = request.user.perfil.empresa  # Asume que el perfil del usuario tiene el campo 'empresa'
+    empresa = request.user.perfil.empresa
 
-    # Inicializar los formularios con las sucursales de la empresa del usuario
+    # Inicializar formulario para seleccionar sucursal
     form = SucursalSelectForm(empresa=empresa)
     movimientos = None
+    traslados = None
 
     if request.method == 'POST':
         form = SucursalSelectForm(request.POST, empresa=empresa)
         if form.is_valid():
             sucursal = form.cleaned_data['sucursal']
+
+            # Filtrar solo los movimientos de la sucursal seleccionada
             movimientos = MovimientoInventario.objects.filter(sucursal=sucursal).order_by('-fecha')
+
+            # Filtrar los traslados donde la sucursal seleccionada es la de origen o destino
+            traslados = Traslado.objects.filter(sucursal_origen=sucursal).order_by('-fecha_creacion')
 
     return render(request, 'movimientos_por_sucursal.html', {
         'form': form,
         'movimientos': movimientos,
+        'traslados': traslados,
     })
 
 
+@control_acceso('Encargado')
 def movimientos_por_producto(request):
     # Obtener la empresa del usuario actual
-    empresa = request.user.perfil.empresa  # Ajustar según cómo se obtenga la empresa en tu proyecto
+    empresa = request.user.perfil.empresa
 
     # Inicializar el formulario con los productos filtrados por empresa
     form = ProductoSelectForm(empresa=empresa)
 
     entradas = None
     salidas = None
+    traslados_salida = None
+    traslados_entrada = None
     traslados = None
     resumen = {
         'entradas': 0,
         'salidas': 0,
-        'traslados': 0,
-        'total': 0
+        'traslados_salida': 0,
+        'traslados_entrada': 0,
+        'traslados_confirmados': 0,
+        'traslados_pendientes': 0,
+        'diferencia_traslados': 0,
+        'total_fisico': 0,
     }
 
     if request.method == 'POST':
@@ -187,26 +205,44 @@ def movimientos_por_producto(request):
         if form.is_valid():
             producto = form.cleaned_data['producto']
 
-            # Filtrar los movimientos por tipo
-            entradas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='entrada').order_by(
-                '-fecha')
-            salidas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='salida').order_by(
-                '-fecha')
-            traslados = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='traslado').order_by(
-                '-fecha')
+            # Filtrar los movimientos por tipo (entrada y salida) excluyendo aquellos relacionados a traslados
+            entradas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='entrada') \
+                .exclude(traslado_entrada__isnull=False).order_by('-fecha')
+            salidas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='salida') \
+                .exclude(traslado_salida__isnull=False).order_by('-fecha')
 
-            # Calcular los totales
+            traslados = Traslado.objects.filter(producto=producto).order_by('-fecha_creacion')
+            traslados_confirmados = Traslado.objects.filter(producto=producto, estado='confirmado').order_by('-fecha_creacion')
+            traslados_pendientes = Traslado.objects.filter(producto=producto, movimiento_salida__isnull=False, estado='pendiente').order_by('-fecha_creacion')
+
+            traslados_salida= MovimientoInventario.objects.filter(traslado_salida__producto=producto).aggregate(
+                total=models.Sum('cantidad'))['total'] or 0
+            resumen['traslados_salida'] = traslados_salida
+
+            traslados_entrada = MovimientoInventario.objects.filter(traslado_entrada__producto=producto).aggregate(
+                total=models.Sum('cantidad'))['total'] or 0
+            resumen['traslados_entrada'] = traslados_entrada
+
+            # Calcular los totales de entradas, salidas, y traslados
             resumen['entradas'] = entradas.aggregate(total=models.Sum('cantidad'))['total'] or 0
             resumen['salidas'] = salidas.aggregate(total=models.Sum('cantidad'))['total'] or 0
-            resumen['traslados'] = traslados.aggregate(total=models.Sum('cantidad'))['total'] or 0
 
-            # Calcular el total disponible
-            resumen['total'] = resumen['entradas'] - resumen['salidas']
+            # Calcular los totales pendientes de confirmar
+            resumen['traslados_pendientes'] = traslados_pendientes.aggregate(total=models.Sum('cantidad'))['total'] or 0
+            resumen['traslados_confirmados'] = traslados_confirmados.aggregate(total=models.Sum('cantidad'))['total'] or 0
+
+            # Calcular el total físico disponible (entradas + traslados de entrada - salidas - traslados de salida)
+            resumen['total_fisico'] = resumen['entradas'] - resumen['salidas'] - resumen['traslados_pendientes']
+
+            # Calcular el excedente o faltante (físico - pendiente de confirmar)
+            resumen['diferencia_traslados'] = resumen['traslados_salida'] - resumen['traslados_entrada'] - resumen['traslados_pendientes']
 
     return render(request, 'movimientos_por_producto.html', {
         'form': form,
         'entradas': entradas,
         'salidas': salidas,
+        'traslados_salida': traslados_salida,
+        'traslados_entrada': traslados_entrada,
         'traslados': traslados,
         'resumen': resumen,
     })

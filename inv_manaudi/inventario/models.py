@@ -75,8 +75,8 @@ class Traslado(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     documento_respaldo = models.TextField(blank=True, null=True)
     documento_soporte = models.FileField(upload_to='documento_soporte/', blank=True, null=True)
-    movimiento_salida = models.ForeignKey(MovimientoInventario, related_name='transferencia_salida', on_delete=models.SET_NULL, null=True, blank=True)
-    movimiento_entrada = models.ForeignKey(MovimientoInventario, related_name='transferencia_entrada', on_delete=models.SET_NULL, null=True, blank=True)
+    movimiento_salida = models.ForeignKey(MovimientoInventario, related_name='traslado_salida', on_delete=models.SET_NULL, null=True, blank=True)
+    movimiento_entrada = models.ForeignKey(MovimientoInventario, related_name='traslado_entrada', on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         # Validar que la sucursal de origen y destino no sean las mismas
