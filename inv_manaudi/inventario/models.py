@@ -30,74 +30,96 @@ class MovimientoInventario(models.Model):
     TIPO_MOVIMIENTO_CHOICES = [
         ('entrada', 'Entrada'),
         ('salida', 'Salida'),
-        ('traslado', 'Traslado'),
-    ]
-
-    ESTADO_RECEPCION_CHOICES = [
-        ('pendiente', 'Pendiente'),
-        ('confirmado', 'Confirmado'),
     ]
 
     sucursal = models.ForeignKey(Sucursal, related_name='movimientos', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, related_name='movimientos', on_delete=models.CASCADE)
     tipo_movimiento = models.CharField(max_length=10, choices=TIPO_MOVIMIENTO_CHOICES)
     cantidad = models.IntegerField()
-    sucursal_destino = models.ForeignKey(Sucursal, related_name='movimientos_destino', on_delete=models.SET_NULL, null=True, blank=True)
-    cantidad_recibida = models.IntegerField(null=True, blank=True)  # Nuevo campo para registrar la cantidad recibida
-    estado_recepcion = models.CharField(max_length=10, choices=ESTADO_RECEPCION_CHOICES, null=True, blank=True)  # Nuevo campo para el estado de recepción
     fecha = models.DateTimeField(auto_now_add=True)
     comentario = models.TextField(blank=True, null=True)
     documento_respaldo = models.TextField(blank=True, null=True)
-    documento_traslado = models.FileField(upload_to='documentos_traslado/', blank=True, null=True)
+    documento_soporte = models.FileField(upload_to='documento_soporte/', blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
-
     def __str__(self):
-        if self.tipo_movimiento == 'traslado':
-            return f'Traslado de {self.cantidad} {self.producto.get_tipo_producto_display()} de {self.sucursal.nombre} a {self.sucursal_destino.nombre}'
-        return f'{self.tipo_movimiento.capitalize()} de {self.cantidad} {self.producto.get_tipo_producto_display()} - {self.producto.nombre}'
-
-    def confirmar_recepcion(self, cantidad_recibida):
-        """Método para confirmar la recepción y actualizar el inventario de la sucursal destino."""
-        if cantidad_recibida > self.cantidad:
-            raise ValueError("La cantidad recibida no puede ser mayor que la cantidad enviada.")
-
-        self.cantidad_recibida = cantidad_recibida
-        self.estado_recepcion = 'confirmado'
-
-        # Actualizar el inventario solo en la confirmación de recepción
-        inventario_destino, created = Inventario.objects.get_or_create(sucursal=self.sucursal_destino,
-                                                                       producto=self.producto)
-        inventario_destino.cantidad += self.cantidad_recibida
-        inventario_destino.save()
-        self.save()
+        return f'{self.tipo_movimiento.capitalize()} de {self.cantidad} {self.producto.nombre} en {self.sucursal.nombre}'
 
     def save(self, *args, **kwargs):
-        # Verificar si ya existe un registro para evitar la sobreescritura en caso de una confirmación previa
-        if self.pk is None or self.estado_recepcion == 'pendiente':  # Solo ejecutar si es un nuevo registro o traslado pendiente
-            if self.tipo_movimiento == 'traslado':
-                self.estado_recepcion = 'pendiente'
-            else:
-                self.estado_recepcion = None
-
-            # Solo actualizamos el inventario de la sucursal de origen, no el de destino
-            inventario_origen, created = Inventario.objects.get_or_create(sucursal=self.sucursal, producto=self.producto)
+        if self.pk is None:  # Solo ejecutar si es un nuevo registro
+            inventario, created = Inventario.objects.get_or_create(sucursal=self.sucursal, producto=self.producto)
 
             if self.tipo_movimiento == 'entrada':
-                inventario_origen.cantidad += self.cantidad
+                inventario.cantidad += self.cantidad
             elif self.tipo_movimiento == 'salida':
-                if inventario_origen.cantidad >= self.cantidad:
-                    inventario_origen.cantidad -= self.cantidad
+                if inventario.cantidad >= self.cantidad:
+                    inventario.cantidad -= self.cantidad
                 else:
                     raise ValueError('Stock insuficiente para la salida solicitada.')
-            elif self.tipo_movimiento == 'traslado':
-                # Solo restamos en la sucursal de origen
-                if inventario_origen.cantidad >= self.cantidad:
-                    inventario_origen.cantidad -= self.cantidad
-                else:
-                    raise ValueError('No hay suficiente stock en la sucursal de origen para este traslado.')
-                # No sumamos en la sucursal destino hasta la confirmación
-
-            inventario_origen.save()
+            inventario.save()
         super(MovimientoInventario, self).save(*args, **kwargs)
 
+
+class Traslado(models.Model):
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('confirmado', 'Confirmado'),
+    ]
+
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    sucursal_origen = models.ForeignKey(Sucursal, related_name='transferencias_salida', on_delete=models.CASCADE)
+    sucursal_destino = models.ForeignKey(Sucursal, related_name='transferencias_entrada', on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    documento_respaldo = models.TextField(blank=True, null=True)
+    documento_soporte = models.FileField(upload_to='documento_soporte/', blank=True, null=True)
+    movimiento_salida = models.ForeignKey(MovimientoInventario, related_name='transferencia_salida', on_delete=models.SET_NULL, null=True, blank=True)
+    movimiento_entrada = models.ForeignKey(MovimientoInventario, related_name='transferencia_entrada', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Validar que la sucursal de origen y destino no sean las mismas
+        if self.sucursal_origen == self.sucursal_destino:
+            raise ValueError('La sucursal de origen y destino no pueden ser las mismas.')
+
+        # Crear movimiento de salida al crear el traslado si es un nuevo registro
+        if not self.pk:
+            try:
+                movimiento_salida = MovimientoInventario.objects.create(
+                    sucursal=self.sucursal_origen,
+                    producto=self.producto,
+                    tipo_movimiento='salida',
+                    cantidad=self.cantidad,
+                    comentario=f'Transferencia a {self.sucursal_destino.nombre}',
+                    documento_soporte=self.documento_soporte,
+                    documento_respaldo=self.documento_respaldo,
+                    usuario=self.usuario
+                )
+                self.movimiento_salida = movimiento_salida
+            except ValueError as e:
+                raise ValueError(f'Error al crear movimiento de salida: {e}')
+        super(Traslado, self).save(*args, **kwargs)
+
+    def confirmar(self):
+        if self.estado != 'pendiente':
+            raise ValueError('Esta transferencia ya ha sido confirmada.')
+
+        # Verificar que no haya errores de stock en la sucursal destino
+        try:
+            movimiento_entrada = MovimientoInventario.objects.create(
+                sucursal=self.sucursal_destino,
+                producto=self.producto,
+                tipo_movimiento='entrada',
+                cantidad=self.cantidad,
+                comentario=f'Transferencia desde {self.sucursal_origen.nombre}',
+                documento_soporte=self.documento_soporte,
+                documento_respaldo=self.documento_respaldo,
+                usuario=self.usuario
+            )
+            self.movimiento_entrada = movimiento_entrada
+            self.estado = 'confirmado'
+            self.save()
+
+        except ValueError as e:
+            raise ValueError(f'Error al crear movimiento de entrada: {e}')

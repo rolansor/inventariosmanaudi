@@ -180,11 +180,16 @@
                     <div class="menu-submenu">
                         <div class="menu-item">
                             <a href="{% url 'movimiento_inventario' %}" class="menu-link">
-                                <div class="menu-text">Registrar</div>
+                                <div class="menu-text">Entrada/Salida</div>
+                            </a>
+                        </div>
+                         <div class="menu-item">
+                            <a href="{% url 'iniciar_traslado' %}" class="menu-link">
+                                <div class="menu-text">Traslado</div>
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="{% url 'confirmar_recepcion' %}" class="menu-link">
+                            <a href="{% url 'traslados_pendientes' %}" class="menu-link">
                                 <div class="menu-text">Acuse Recibo</div>
                             </a>
                         </div>

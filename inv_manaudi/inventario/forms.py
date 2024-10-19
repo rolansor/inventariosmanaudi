@@ -1,58 +1,82 @@
 from django import forms
-
 from productos.models import Producto
 from usuarios.models import Sucursal
-from .models import MovimientoInventario
+from .models import MovimientoInventario, Traslado
 
 
 class MovimientoInventarioForm(forms.ModelForm):
     class Meta:
         model = MovimientoInventario
-        fields = ['sucursal', 'producto', 'tipo_movimiento', 'cantidad', 'sucursal_destino', 'comentario', 'documento_respaldo', 'documento_traslado']
+        fields = ['sucursal', 'producto', 'tipo_movimiento', 'cantidad', 'comentario', 'documento_respaldo', 'documento_soporte']
         widgets = {
             'sucursal': forms.Select(attrs={'class': 'form-control'}),
             'producto': forms.Select(attrs={'class': 'form-control'}),
             'tipo_movimiento': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'sucursal_destino': forms.Select(attrs={'class': 'form-control'}),
             'comentario': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
-            'documento_traslado': forms.FileInput(attrs={'class': 'form-control'}),
+            'documento_soporte': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+    def clean_cantidad(self):
+        cantidad = self.cleaned_data.get('cantidad')
+        if cantidad <= 0:
+            raise forms.ValidationError("La cantidad debe ser un número positivo.")
+        return cantidad
+
+    def clean_documento_traslado(self):
+        documento_soporte = self.cleaned_data.get('documento_soporte')
+        if documento_soporte and documento_soporte.size > 5 * 1024 * 1024:  # Limitar a 5MB
+            raise forms.ValidationError("El documento de traslado no puede exceder 5 MB.")
+        return documento_soporte
+
+
+class TrasladoForm(forms.ModelForm):
+    class Meta:
+        model = Traslado
+        fields = ['producto', 'sucursal_origen', 'sucursal_destino', 'cantidad', 'documento_respaldo', 'documento_soporte']
+        widgets = {
+            'producto': forms.Select(attrs={'class': 'form-control'}),
+            'sucursal_origen': forms.Select(attrs={'class': 'form-control'}),
+            'sucursal_destino': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'documento_soporte': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def clean(self):
-        # Llamamos al método clean() del padre para obtener los datos ya limpiados
         cleaned_data = super().clean()
-        tipo_movimiento = cleaned_data.get('tipo_movimiento')
-        sucursal = cleaned_data.get('sucursal')
+        sucursal_origen = cleaned_data.get('sucursal_origen')
         sucursal_destino = cleaned_data.get('sucursal_destino')
         cantidad = cleaned_data.get('cantidad')
 
-        # Validación de que la sucursal de origen y destino no sean la misma
-        if tipo_movimiento == 'traslado' and sucursal == sucursal_destino:
-            raise forms.ValidationError("La sucursal de destino no puede ser la misma que la sucursal de origen.")
+        if sucursal_origen == sucursal_destino:
+            raise forms.ValidationError("La sucursal de origen y destino no pueden ser la misma.")
 
-        # Validación de que la cantidad sea un número entero positivo
-        if cantidad is not None and cantidad <= 0:
-            raise forms.ValidationError("La cantidad debe ser un número entero positivo.")
+        if cantidad <= 0:
+            raise forms.ValidationError("La cantidad debe ser un número positivo.")
 
         return cleaned_data
 
 
 class ConfirmarRecepcionForm(forms.ModelForm):
     class Meta:
-        model = MovimientoInventario
-        fields = ['cantidad_recibida']
+        model = Traslado
+        fields = ['cantidad']  # Campo para actualizar la cantidad recibida
         widgets = {
-            'cantidad_recibida': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
-    def clean_cantidad_recibida(self):
-        cantidad_recibida = self.cleaned_data['cantidad_recibida']
+    def clean_cantidad(self):
+        cantidad_recibida = self.cleaned_data.get('cantidad')
         if cantidad_recibida <= 0:
             raise forms.ValidationError("La cantidad recibida debe ser un número positivo.")
+
+        # Comparar la cantidad recibida con la cantidad enviada
         if cantidad_recibida > self.instance.cantidad:
-            raise forms.ValidationError(f"La cantidad recibida no puede ser mayor que la cantidad enviada ({self.instance.cantidad}).")
+            raise forms.ValidationError(
+                f"La cantidad recibida no puede ser mayor que la cantidad enviada ({self.instance.cantidad}).")
+
         return cantidad_recibida
 
 

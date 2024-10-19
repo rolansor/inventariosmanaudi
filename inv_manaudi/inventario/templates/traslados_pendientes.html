@@ -24,6 +24,7 @@
                 <th>Sucursal Origen</th>
                 <th>Sucursal Destino</th>
                 <th>Cantidad</th>
+                <th>N. Documento</th>
                 <th>Fecha</th>
                 <th>Acción</th>
             </tr>
@@ -32,12 +33,13 @@
             {% for movimiento in movimientos_pendientes %}
             <tr>
                 <td>{{ movimiento.producto.nombre }}</td>
-                <td>{{ movimiento.sucursal.nombre }}</td>
+                <td>{{ movimiento.sucursal_origen.nombre}}</td>
                 <td>{{ movimiento.sucursal_destino.nombre }}</td>
                 <td>{{ movimiento.cantidad }}</td>
-                <td>{{ movimiento.fecha }}</td>
+                <td>{{ movimiento.documento_respaldo }}</td>
+                <td>{{ movimiento.fecha_creacion }}</td>
                 <td>
-                    <a href="{% url 'confirmar_recepcion_detalle' movimiento.pk %}" class="btn btn-primary">Confirmar Recepción</a>
+                    <a href="{% url 'confirmar_traslado' movimiento.pk %}" class="btn btn-primary">Confirmar Recepción</a>
                 </td>
             </tr>
             {% endfor %}

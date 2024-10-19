@@ -5,46 +5,37 @@ from django.contrib import messages
 from productos.models import Producto
 from usuarios.models import Sucursal
 from usuarios.templatetags.tags import control_acceso
-from .models import MovimientoInventario
-from .forms import MovimientoInventarioForm, ConfirmarRecepcionForm, ProductoSelectForm, SucursalSelectForm
+from .models import MovimientoInventario, Traslado
+from .forms import MovimientoInventarioForm, ProductoSelectForm, SucursalSelectForm, \
+    TrasladoForm, ConfirmarRecepcionForm
 
 
 @control_acceso('Encargado')
 def movimiento_inventario(request):
-    # Obtener la empresa del usuario logueado
     empresa_actual = request.user.perfil.empresa
 
     if request.method == 'POST':
         form = MovimientoInventarioForm(request.POST, request.FILES)
-
-        # Filtrar los productos y sucursales de la empresa actual para el formulario
         form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_actual)
         form.fields['sucursal'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
-        form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
 
         if form.is_valid():
             try:
                 movimiento = form.save(commit=False)
-                movimiento.usuario = request.user  # Asigna el usuario actual
-                movimiento.save()  # Guarda en la base de datos
+                movimiento.usuario = request.user
+                movimiento.save()
+                messages.success(request, 'Movimiento registrado exitosamente.')
                 return redirect('movimiento_inventario')
             except ValueError as e:
                 form.add_error(None, str(e))
         else:
-            # Si el formulario no es válido, retornar los errores
-            return render(request, 'movimiento_inventario.html', {
-                'form': form,
-                'movimientos': MovimientoInventario.objects.filter(producto__empresa=empresa_actual).order_by('-fecha')[:10]
-            })
+            messages.error(request, 'Por favor, corrige los errores indicados.')
+
     else:
         form = MovimientoInventarioForm()
-
-        # Filtrar los productos y sucursales de la empresa actual para el formulario
         form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_actual)
         form.fields['sucursal'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
-        form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
 
-    # Filtrar los movimientos de inventario por la empresa actual
     movimientos = MovimientoInventario.objects.filter(producto__empresa=empresa_actual).order_by('-fecha')[:10]
 
     return render(request, 'movimiento_inventario.html', {
@@ -54,37 +45,80 @@ def movimiento_inventario(request):
 
 
 @control_acceso('Encargado')
-def confirmar_recepcion(request):
-    """Mostrar todos los movimientos de traslado pendientes de confirmación."""
-    movimientos_pendientes = MovimientoInventario.objects.filter(
-        tipo_movimiento='traslado',
-        estado_recepcion='pendiente'
-    ).order_by('-fecha')
+def iniciar_traslado(request):
+    empresa_actual = request.user.perfil.empresa
 
-    return render(request, 'confirmar_recepcion.html', {
+    if request.method == 'POST':
+        form = TrasladoForm(request.POST)
+        # Aplicar filtros de productos y sucursales según la empresa actual
+        form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_actual)
+        form.fields['sucursal_origen'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
+        form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
+
+        if form.is_valid():
+            traslado = form.save(commit=False)  # No se guarda aún en la base de datos
+            traslado.usuario = request.user  # Asignar el usuario que inicia el traslado
+
+            try:
+                traslado.save()  # Guardar el traslado
+                messages.success(request, 'Traslado iniciado exitosamente.')
+                return redirect('iniciar_traslado')  # Redireccionar después de guardar
+            except ValueError as e:
+                form.add_error(None, str(e))  # Manejar errores con un mensaje adecuado
+        else:
+            messages.error(request, 'Por favor, corrige los errores indicados.')
+
+    else:
+        form = TrasladoForm()
+        # Filtrar productos y sucursales por la empresa actual
+        form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_actual)
+        form.fields['sucursal_origen'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
+        form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
+
+    # Obtener los últimos 10 traslados
+    traslados_recientes = Traslado.objects.filter(
+        producto__empresa=empresa_actual
+    ).order_by('-fecha_creacion')[:10]
+
+    return render(request, 'iniciar_traslado.html', {
+        'form': form,
+        'traslados_recientes': traslados_recientes,  # Pasamos los traslados a la plantilla
+    })
+
+
+@control_acceso('Encargado')
+def traslados_pendientes(request):
+    """Mostrar todos los traslados pendientes de confirmación que pertenecen a la sucursal del usuario."""
+    # Obtener la sucursal del usuario actual
+    sucursal_usuario = request.user.perfil.sucursal
+
+    # Filtrar solo los traslados pendientes donde la sucursal destino es la del usuario
+    movimientos_pendientes = Traslado.objects.filter(
+        estado='pendiente',
+        sucursal_destino=sucursal_usuario
+    ).order_by('-fecha_creacion')
+
+    return render(request, 'traslados_pendientes.html', {
         'movimientos_pendientes': movimientos_pendientes,
     })
 
 
 @control_acceso('Encargado')
-def confirmar_recepcion_detalle(request, pk):
-    """Permite confirmar la recepción de un traslado en particular."""
-    movimiento = get_object_or_404(MovimientoInventario, pk=pk, tipo_movimiento='traslado', estado_recepcion='pendiente')
-
+def confirmar_traslado(request, pk):
+    movimiento = get_object_or_404(Traslado, pk=pk, estado='pendiente')
     if request.method == 'POST':
         form = ConfirmarRecepcionForm(request.POST, instance=movimiento)
         if form.is_valid():
-            cantidad_recibida = form.cleaned_data['cantidad_recibida']
             try:
-                movimiento.confirmar_recepcion(cantidad_recibida)
-                messages.success(request, f'Recepción confirmada para {movimiento.producto.nombre}.')
-                return redirect('confirmar_recepcion')
+                movimiento.confirmar()
+                messages.success(request, 'Recepción confirmada exitosamente.')
+                return redirect('traslados_pendientes')
             except ValueError as e:
-                form.add_error(None, str(e))
+                messages.error(request, str(e))
     else:
         form = ConfirmarRecepcionForm(instance=movimiento)
 
-    return render(request, 'confirmar_recepcion_detalle.html', {
+    return render(request, 'confirmar_traslado.html', {
         'form': form,
         'movimiento': movimiento,
     })

@@ -2,13 +2,13 @@
 {% load static %}
 {% load tags %}
 
-{% block title %}Registrar Movimiento de Inventario{% endblock %}
+{% block title %}Registrar Traslado de Inventario{% endblock %}
 {% block extra_css %}
     <link href="{% static "plugins/select2/dist/css/select2.min.css" %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block contenido %}
-<h1>Registrar Movimiento de Inventario</h1>
+<h1>Registrar Traslado de Inventario</h1>
 
 {% if form.non_field_errors %}
     <div class="alert alert-danger">
@@ -18,27 +18,23 @@
     </div>
 {% endif %}
 
-<form method="post" id="movimiento-form" enctype="multipart/form-data">
+<form method="post" id="traslado-form" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
-        <label for="id_sucursal">Sucursal:</label>
-        {{ form.sucursal }}
+        <label for="id_sucursal_origen">Sucursal Origen:</label>
+        {{ form.sucursal_origen }}
+    </div>
+    <div class="form-group">
+        <label for="id_sucursal_destino">Sucursal Destino:</label>
+        {{ form.sucursal_destino }}
     </div>
     <div class="form-group">
         <label for="id_producto">Producto:</label>
         {{ form.producto }}
     </div>
     <div class="form-group">
-        <label for="id_tipo_movimiento">Tipo movimiento:</label>
-        {{ form.tipo_movimiento }}
-    </div>
-    <div class="form-group">
         <label for="id_cantidad">Cantidad:</label>
         {{ form.cantidad }}
-    </div>
-    <div class="form-group">
-        <label for="id_comentario">Comentario:</label>
-        {{ form.comentario }}
     </div>
     <div class="form-group">
         <label for="id_documento_respaldo">Documento Respaldo:</label>
@@ -49,31 +45,35 @@
         {{ form.documento_soporte }} <!-- Campo para subir el archivo -->
     </div>
     <br>
-    <button type="submit" class="btn btn-primary">Registrar Movimiento</button>
+    <button type="submit" class="btn btn-primary">Registrar Traslado</button>
 </form>
 <br>
 <br>
-<h2>Movimientos Recientes</h2>
+<h2>Traslados Recientes</h2>
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Producto</th>
             <th>Sucursal Origen</th>
+            <th>Sucursal Destino</th>
             <th>Cantidad</th>
-            <th>Tipo de Movimiento</th>
+            <th>Estado</th>
+            <th>Usuario</th>
             <th>Fecha</th>
-            <th>Comentario</th>
+            <th>Documento Respaldo</th>
         </tr>
     </thead>
     <tbody>
-        {% for movimiento in movimientos %}
+        {% for traslado in traslados_recientes  %}
         <tr>
-            <td>{{ movimiento.producto.codigo }} -- {{ movimiento.producto.nombre }}</td>
-            <td>{{ movimiento.sucursal.nombre }}</td>
-            <td>{{ movimiento.cantidad }}</td>
-            <td>{{ movimiento.get_tipo_movimiento_display }}</td>
-            <td>{{ movimiento.fecha }}</td>
-            <td>{{ movimiento.comentario }}</td>
+            <td>{{ traslado.producto.codigo }} -- {{ traslado.producto.nombre }}</td>
+            <td>{{ traslado.sucursal_origen.nombre }}</td>
+            <td>{{ traslado.sucursal_destino.nombre }}</td>
+            <td>{{ traslado.cantidad }}</td>
+            <td>{{ traslado.get_estado_display }}</td>
+            <td>{{ traslado.usuario.username }}</td>
+            <td>{{ traslado.fecha_creacion }}</td>
+            <td>{{ traslado.documento_respaldo }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -84,14 +84,19 @@
     <script src="{% static 'plugins/select2/dist/js/select2.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Apply Select2 to the select fields
+            // Aplicar Select2 a los campos select
             $('#id_producto').select2({
                 placeholder: 'Seleccione un producto',
                 allowClear: true
             });
 
-            $('#id_sucursal').select2({
-                placeholder: 'Seleccione una sucursal',
+            $('#id_sucursal_origen').select2({
+                placeholder: 'Seleccione la sucursal de origen',
+                allowClear: true
+            });
+
+            $('#id_sucursal_destino').select2({
+                placeholder: 'Seleccione la sucursal de destino',
                 allowClear: true
             });
         });
