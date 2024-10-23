@@ -86,7 +86,8 @@
                                 <th>Producto</th>
                                 <th>Sucursal Origen</th>
                                 <th>Sucursal Destino</th>
-                                <th>Cantidad</th>
+                                <th>Cantidad Entregada</th>
+                                <th>Cantidad Recibida</th>
                                 <th>Estado</th>
                                 <th>Fecha</th>
                             </tr>
@@ -98,7 +99,8 @@
                                         <td>{{ traslado.producto.nombre }}</td>
                                         <td>{{ traslado.sucursal_origen.nombre }}</td>
                                         <td>{{ traslado.sucursal_destino.nombre }}</td>
-                                        <td>{{ traslado.cantidad }}</td>
+                                        <td>{{ traslado.cantidad_entregada }}</td>
+                                        <td>{{ traslado.cantidad_recibida }}</td>
                                         <td>{{ traslado.get_estado_display }}</td>
                                         <td>{{ traslado.fecha_creacion }}</td>
                                     </tr>

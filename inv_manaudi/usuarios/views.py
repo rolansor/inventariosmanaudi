@@ -16,17 +16,37 @@ def inicio(request):
     # Obtener la empresa del usuario logueado a través de su perfil
     empresa_usuario = request.user.perfil.empresa
 
-    # Filtrar productos y movimientos solo por la empresa del usuario logueado
+    # Intentar obtener la sucursal del usuario, si existe
+    sucursal_usuario = getattr(request.user.perfil, 'sucursal', None)
+
+    # Filtrar productos y movimientos según la empresa y, si aplica, la sucursal
     total_productos = Producto.objects.filter(empresa=empresa_usuario).count()
-    total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
-    productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad__lt=F('stock_minimo')).count()
-    productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad=0).count()
 
-    movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:10]
+    if sucursal_usuario:
+        # Si el usuario tiene una sucursal, filtrar por sucursal
+        total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad__lt=F('stock_minimo')).count()
+        productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad=0).count()
 
-    # Productos más movidos solo para la empresa del usuario
-    productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).values('producto__nombre').annotate(
-        total=Sum('cantidad')).order_by('-total')[:5]
+        # Filtrar los movimientos recientes solo de la sucursal del usuario
+        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:10]
+
+        # Productos más movidos solo para la sucursal del usuario
+        productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).values('producto__nombre').annotate(
+            total=Sum('cantidad')).order_by('-total')[:5]
+
+    else:
+        # Si el usuario no tiene sucursal pero tiene empresa, filtrar por la empresa
+        total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+        productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad__lt=F('stock_minimo')).count()
+        productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad=0).count()
+
+        # Filtrar los movimientos recientes para toda la empresa
+        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:10]
+
+        # Productos más movidos para toda la empresa
+        productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).values('producto__nombre').annotate(
+            total=Sum('cantidad')).order_by('-total')[:5]
 
     return render(request, 'inicio.html', {
         'total_productos': total_productos,
@@ -94,6 +114,7 @@ def editar_usuario(request):
     return render(request, 'editar.html', {'form': form, 'perfil_form': perfil_form})
 
 
+@control_acceso('Manaudi')
 def empresa_list(request):
     # Obtener todas las empresas
     empresas = Empresa.objects.all()
@@ -123,7 +144,7 @@ def empresa_list(request):
     return render(request, 'empresas.html', {'empresas': empresas, 'form': form})
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Manaudi')
 def empresa_edit(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
 
@@ -156,7 +177,7 @@ def empresa_edit(request, pk):
             return JsonResponse(data)
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Manaudi')
 def empresa_delete(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
     if request.method == 'POST':
@@ -165,7 +186,7 @@ def empresa_delete(request, pk):
     return render(request, 'empresas.html', {'form': EmpresaForm(), 'empresas': Empresa.objects.all()})
 
 
-# Listar todas las sucursales
+@control_acceso('Manaudi')
 def sucursal_list(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
     sucursales = Sucursal.objects.filter(empresa=empresa)
@@ -199,7 +220,7 @@ def sucursal_list(request, pk):
     return render(request, 'sucursales.html', {'sucursales': sucursales, 'empresa': empresa, 'form': form})
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Manaudi')
 def sucursal_edit(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
 
@@ -232,7 +253,7 @@ def sucursal_edit(request, pk):
             return JsonResponse(data)
 
 
-@control_acceso('Contabilidad')
+@control_acceso('Manaudi')
 def sucursal_delete(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
     if request.method == 'POST':

@@ -10,9 +10,10 @@ from .models import Producto
 from .forms import ProductoForm
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def crear_producto(request):
-    subcategorias = Subcategoria.objects.all()
+    empresa_actual = request.user.perfil.empresa  # Obtener la empresa actual del usuario logueado
+    subcategorias = Subcategoria.objects.filter(categoria__empresa=empresa_actual)
 
     if request.method == 'POST':
         codigo = request.POST.get('codigo')
@@ -23,7 +24,7 @@ def crear_producto(request):
         subcategoria_id = request.POST.get('categoria')
 
         try:
-            subcategoria = Subcategoria.objects.get(pk=subcategoria_id)
+            subcategoria = Subcategoria.objects.get(pk=subcategoria_id, categoria__empresa=empresa_actual)
 
             # Validar que el precio esté en el formato correcto
             if float(precio) <= 0:
@@ -44,6 +45,7 @@ def crear_producto(request):
 
         except Subcategoria.DoesNotExist:
             messages.error(request, 'Subcategoría no encontrada.')
+            return redirect('crear_producto')
 
         except DataError as e:
             # Manejo del error de rango de precio
@@ -59,7 +61,7 @@ def crear_producto(request):
     return render(request, 'nuevo_producto.html', {'subcategorias': subcategorias})
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def lista_productos(request):
     # Obtener la empresa del perfil del usuario actual
     empresa = obtener_empresa(request)
@@ -73,6 +75,7 @@ def lista_productos(request):
 
 @control_acceso('Encargado')
 def busqueda_producto(request):
+    empresa_actual = request.user.perfil.empresa
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria')
 
@@ -100,7 +103,7 @@ def busqueda_producto(request):
                 productos = Producto.objects.none()  # En caso de que no exista la categoría
 
     # Obtener todas las categorías para el filtro
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.filter(empresa=empresa_actual)
 
     context = {
         'productos': productos,
@@ -136,7 +139,7 @@ def buscar_producto_por_codigo(request):
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def editar_producto(request, pk=None):
     """
     Vista para editar un producto.
@@ -219,7 +222,7 @@ def bsq_por_codigo(request):
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def desactivar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'GET':
@@ -230,7 +233,7 @@ def desactivar_producto(request, pk):
     return redirect('lista_productos')
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def activar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'GET':

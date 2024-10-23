@@ -18,6 +18,26 @@ class MovimientoInventarioForm(forms.ModelForm):
             'documento_soporte': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user is not None:
+            empresa = user.perfil.empresa
+            sucursal = getattr(user.perfil, 'sucursal', None)
+
+            if sucursal:
+                # Limitar la sucursal del usuario y hacerla no editable
+                self.fields['sucursal'].queryset = Sucursal.objects.filter(id=sucursal.id)
+                self.fields['sucursal'].initial = sucursal
+                self.fields['sucursal'].widget.attrs['readonly'] = True
+            else:
+                # Mostrar todas las sucursales de la empresa si no tiene una específica
+                self.fields['sucursal'].queryset = Sucursal.objects.filter(empresa=empresa)
+
+            # Limitar los productos a los de la empresa del usuario
+            self.fields['producto'].queryset = Producto.objects.filter(empresa=empresa)
+
     def clean_cantidad(self):
         cantidad = self.cleaned_data.get('cantidad')
         if cantidad <= 0:
@@ -34,12 +54,12 @@ class MovimientoInventarioForm(forms.ModelForm):
 class TrasladoForm(forms.ModelForm):
     class Meta:
         model = Traslado
-        fields = ['producto', 'sucursal_origen', 'sucursal_destino', 'cantidad', 'documento_respaldo', 'documento_soporte']
+        fields = ['producto', 'sucursal_origen', 'sucursal_destino', 'cantidad_entregada', 'documento_respaldo', 'documento_soporte']
         widgets = {
             'producto': forms.Select(attrs={'class': 'form-control'}),
             'sucursal_origen': forms.Select(attrs={'class': 'form-control'}),
             'sucursal_destino': forms.Select(attrs={'class': 'form-control'}),
-            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'cantidad_entregada': forms.NumberInput(attrs={'class': 'form-control'}),
             'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'documento_soporte': forms.FileInput(attrs={'class': 'form-control'}),
         }
@@ -48,13 +68,13 @@ class TrasladoForm(forms.ModelForm):
         cleaned_data = super().clean()
         sucursal_origen = cleaned_data.get('sucursal_origen')
         sucursal_destino = cleaned_data.get('sucursal_destino')
-        cantidad = cleaned_data.get('cantidad')
+        cantidad_entregada = cleaned_data.get('cantidad_entregada')
 
         if sucursal_origen == sucursal_destino:
             raise forms.ValidationError("La sucursal de origen y destino no pueden ser la misma.")
 
-        if cantidad <= 0:
-            raise forms.ValidationError("La cantidad debe ser un número positivo.")
+        if cantidad_entregada <= 0:
+            raise forms.ValidationError("La cantidad entregada debe ser un número positivo.")
 
         return cleaned_data
 
@@ -62,21 +82,18 @@ class TrasladoForm(forms.ModelForm):
 class ConfirmarRecepcionForm(forms.ModelForm):
     class Meta:
         model = Traslado
-        fields = ['cantidad']  # Campo para actualizar la cantidad recibida
+        fields = ['cantidad_recibida']  # Campo para actualizar la cantidad recibida
         widgets = {
-            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'cantidad_recibida': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
-    def clean_cantidad(self):
-        cantidad_recibida = self.cleaned_data.get('cantidad')
+    def clean_cantidad_recibida(self):
+        cantidad_recibida = self.cleaned_data.get('cantidad_recibida')
+
         if cantidad_recibida <= 0:
-            raise forms.ValidationError("La cantidad recibida debe ser un número positivo.")
+            raise forms.ValidationError("La cantidad recibida debe ser un número mayor a 0.")
 
-        # Comparar la cantidad recibida con la cantidad enviada
-        if cantidad_recibida > self.instance.cantidad:
-            raise forms.ValidationError(
-                f"La cantidad recibida no puede ser mayor que la cantidad enviada ({self.instance.cantidad}).")
-
+        # No se valida si es mayor que la cantidad entregada, como se acordó
         return cantidad_recibida
 
 

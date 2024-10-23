@@ -33,8 +33,8 @@
         {{ form.producto }}
     </div>
     <div class="form-group">
-        <label for="id_cantidad">Cantidad:</label>
-        {{ form.cantidad }}
+        <label for="id_cantidad">Cantidad Entregada:</label>
+        {{ form.cantidad_entregada }}
     </div>
     <div class="form-group">
         <label for="id_documento_respaldo">Documento Respaldo:</label>
@@ -56,7 +56,7 @@
             <th>Producto</th>
             <th>Sucursal Origen</th>
             <th>Sucursal Destino</th>
-            <th>Cantidad</th>
+            <th>Cantidad Entregada</th>
             <th>Estado</th>
             <th>Usuario</th>
             <th>Fecha</th>
@@ -69,7 +69,7 @@
             <td>{{ traslado.producto.codigo }} -- {{ traslado.producto.nombre }}</td>
             <td>{{ traslado.sucursal_origen.nombre }}</td>
             <td>{{ traslado.sucursal_destino.nombre }}</td>
-            <td>{{ traslado.cantidad }}</td>
+            <td>{{ traslado.cantidad_entregada }}</td>
             <td>{{ traslado.get_estado_display }}</td>
             <td>{{ traslado.usuario.username }}</td>
             <td>{{ traslado.fecha_creacion }}</td>

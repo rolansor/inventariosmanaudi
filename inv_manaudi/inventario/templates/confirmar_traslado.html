@@ -20,10 +20,10 @@
     {% csrf_token %}
     <div class="form-group">
         <label for="id_cantidad_recibida">Cantidad Recibida:</label>
-        {{ form.cantidad }}
-        {% if form.cantidad.errors %}
+        {{ form.cantidad_recibida }}
+        {% if form.cantidad_recibida.errors %}
             <div class="alert alert-danger">
-                {% for error in form.cantidad.errors %}
+                {% for error in form.cantidad_recibida.errors %}
                     <p>{{ error }}</p>
                 {% endfor %}
             </div>
@@ -36,7 +36,7 @@
 <hr>
 <h3>Detalles del Movimiento</h3>
 <p><strong>Producto:</strong> {{ movimiento.producto.nombre }}</p>
-<p><strong>Cantidad Enviada:</strong> {{ movimiento.cantidad }}</p>
+<p><strong>Cantidad Enviada:</strong> {{ movimiento.cantidad_entregada }}</p>
 <p><strong>Sucursal Origen:</strong> {{ movimiento.sucursal_origen.nombre }}</p>
 <p><strong>Sucursal Destino:</strong> {{ movimiento.sucursal_destino.nombre }}</p>
 <p><strong>Fecha de Envío:</strong> {{ movimiento.fecha_creacion }}</p>

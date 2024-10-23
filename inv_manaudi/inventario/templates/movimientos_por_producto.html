@@ -156,7 +156,8 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>Cantidad</th>
+            <th>Cantidad Entregada</th>
+            <th>Cantidad Recibida</th>
             <th>Sucursal Origen</th>
             <th>Sucursal Destino</th>
             <th>Fecha</th>
@@ -167,7 +168,8 @@
         {% if traslados %}
             {% for traslado in traslados %}
                 <tr>
-                    <td>{{ traslado.cantidad }}</td>
+                    <td>{{ traslado.cantidad_entregada }}</td>
+                    <td>{{ traslado.cantidad_recibida }}</td>
                     <td>{{ traslado.sucursal_origen.nombre }}</td>
                     <td>{{ traslado.sucursal_destino.nombre }}</td>
                     <td>{{ traslado.fecha_creacion }}</td>

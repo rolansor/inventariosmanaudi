@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 {% endif %}
-                {% if request.user|pertenece_grupo:"Encargado" %}
+                {% if request.user|pertenece_grupo:"Supervisor" %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -137,7 +137,6 @@
                         </div>
                     </div>
                 </div>
-                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -169,6 +168,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -183,11 +183,13 @@
                                 <div class="menu-text">Entrada/Salida</div>
                             </a>
                         </div>
+                        {% if request.user|pertenece_grupo:"Supervisor" %}
                          <div class="menu-item">
                             <a href="{% url 'iniciar_traslado' %}" class="menu-link">
                                 <div class="menu-text">Traslado</div>
                             </a>
                         </div>
+                        {% endif %}
                         <div class="menu-item">
                             <a href="{% url 'traslados_pendientes' %}" class="menu-link">
                                 <div class="menu-text">Acuse Recibo</div>
@@ -199,6 +201,7 @@
                                 <div class="menu-caret"></div>
                             </a>
                             <div class="menu-submenu">
+                                {% if request.user|pertenece_grupo:"Supervisor" %}
                                 <div class="menu-item">
                                     <a href="{% url 'movimientos_por_empresa' %}" class="menu-link">
                                         <div class="menu-text">Empresa</div>
@@ -211,6 +214,7 @@
                                         <div class="menu-caret"></div>
                                     </a>
                                 </div>
+                                {% endif %}
                                 <div class="menu-item">
                                     <a href="{% url 'movimientos_por_producto' %}" class="menu-link">
                                         <div class="menu-text">Producto</div>

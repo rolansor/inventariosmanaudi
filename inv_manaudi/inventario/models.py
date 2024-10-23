@@ -69,7 +69,8 @@ class Traslado(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     sucursal_origen = models.ForeignKey(Sucursal, related_name='transferencias_salida', on_delete=models.CASCADE)
     sucursal_destino = models.ForeignKey(Sucursal, related_name='transferencias_entrada', on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
+    cantidad_entregada = models.IntegerField()
+    cantidad_recibida = models.IntegerField(blank=True, null=True)
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
@@ -90,7 +91,7 @@ class Traslado(models.Model):
                     sucursal=self.sucursal_origen,
                     producto=self.producto,
                     tipo_movimiento='salida',
-                    cantidad=self.cantidad,
+                    cantidad=self.cantidad_entregada,
                     comentario=f'Transferencia a {self.sucursal_destino.nombre}',
                     documento_soporte=self.documento_soporte,
                     documento_respaldo=self.documento_respaldo,
@@ -105,13 +106,17 @@ class Traslado(models.Model):
         if self.estado != 'pendiente':
             raise ValueError('Esta transferencia ya ha sido confirmada.')
 
+        # Validar la cantidad recibida (puede ser opcional, pero no debería exceder la cantidad entregada)
+        if self.cantidad_recibida is None or self.cantidad_recibida == 0:
+            raise ValueError('Debe ingresar una cantidad recibida antes de confirmar la transferencia.')
+
         # Verificar que no haya errores de stock en la sucursal destino
         try:
             movimiento_entrada = MovimientoInventario.objects.create(
                 sucursal=self.sucursal_destino,
                 producto=self.producto,
                 tipo_movimiento='entrada',
-                cantidad=self.cantidad,
+                cantidad=self.cantidad_recibida,
                 comentario=f'Transferencia desde {self.sucursal_origen.nombre}',
                 documento_soporte=self.documento_soporte,
                 documento_respaldo=self.documento_respaldo,

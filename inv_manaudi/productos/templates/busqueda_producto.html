@@ -51,7 +51,7 @@
                     <th>Descripción</th>
                     <th>Precio</th>
                     <th>Tipo</th>
-                    <th>Categoría</th>
+                    <th>Categoría/Subcategoria</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -63,10 +63,11 @@
                         <td>{{ producto.descripcion|default:"Sin descripción" }}</td>
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.get_tipo_producto_display }}</td>
-                        <td>{{ producto.categoria.nombre }}</td>
+                        <td>{{ producto.categoria.categoria.nombre }} -- {{ producto.categoria.nombre }}</td>
                         <td>
-                            <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-info">Editar Producto</a>
-                            {% if request.user|pertenece_grupo:"Administrador" %}
+                            {% if request.user|pertenece_grupo:"Supervisor" %}
+                            <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-info">Editar Producto</a>{% endif %}
+                            {% if request.user|pertenece_grupo:"Manaudi" %}
                             <a href="{% url 'eliminar_producto' producto.pk %}" class="btn btn-danger">Eliminar Producto</a>{% endif %}
                         </td>
                     </tr>
