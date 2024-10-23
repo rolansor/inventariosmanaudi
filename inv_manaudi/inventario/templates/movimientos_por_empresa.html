@@ -13,7 +13,6 @@
     <div class="row">
         <div class="col-xl-12">
             <div class="panel panel-inverse" style="">
-                <!-- BEGIN panel-heading -->
                 <div class="panel-heading ui-sortable-handle">
                     <h4 class="panel-title">Tabla Movimientos</h4>
                     <div class="panel-heading-btn">
@@ -23,10 +22,7 @@
                                 class="fa fa-minus"></i></a>
                     </div>
                 </div>
-                <!-- END panel-heading -->
-                <!-- BEGIN panel-body -->
                 <div class="panel-body">
-                    <!-- BEGIN table-responsive -->
                     <div class="table-responsive">
                         <table id="movimientos-table" class="table mb-0">
                             <thead>
@@ -40,7 +36,6 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% if movimientos %}
                                 {% for movimiento in movimientos %}
                                     <tr>
                                         <td>{{ movimiento.producto.nombre }}</td>
@@ -51,16 +46,9 @@
                                         <td>{{ movimiento.comentario }}</td>
                                     </tr>
                                 {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No hay movimientos para la
-                                        empresa {{ empresa.nombre }}</td>
-                                </tr>
-                            {% endif %}
                             </tbody>
                         </table>
                     </div>
-                    <!-- END panel-body -->
                 </div>
             </div>
         </div>
@@ -93,24 +81,17 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% if traslados %}
-                                {% for traslado in traslados %}
-                                    <tr>
-                                        <td>{{ traslado.producto.nombre }}</td>
-                                        <td>{{ traslado.sucursal_origen.nombre }}</td>
-                                        <td>{{ traslado.sucursal_destino.nombre }}</td>
-                                        <td>{{ traslado.cantidad_entregada }}</td>
-                                        <td>{{ traslado.cantidad_recibida }}</td>
-                                        <td>{{ traslado.get_estado_display }}</td>
-                                        <td>{{ traslado.fecha_creacion }}</td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
+                            {% for traslado in traslados %}
                                 <tr>
-                                    <td colspan="6" class="text-center">No hay movimientos para la
-                                        empresa {{ empresa.nombre }}</td>
+                                    <td>{{ traslado.producto.nombre }}</td>
+                                    <td>{{ traslado.sucursal_origen.nombre }}</td>
+                                    <td>{{ traslado.sucursal_destino.nombre }}</td>
+                                    <td>{{ traslado.cantidad_entregada }}</td>
+                                    <td>{{ traslado.cantidad_recibida }}</td>
+                                    <td>{{ traslado.get_estado_display }}</td>
+                                    <td>{{ traslado.fecha_creacion }}</td>
                                 </tr>
-                            {% endif %}
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -138,6 +119,7 @@
                 language: {
                     "lengthMenu": "Mostrar _MENU_ registros por página",
                     "zeroRecords": "No se encontraron resultados",
+                    "emptyTable": "No hay movimientos para esta sucursal.",
                     "info": "Mostrando página _PAGE_ de _PAGES_",
                     "infoEmpty": "No hay registros disponibles",
                     "infoFiltered": "(filtrado de _MAX_ registros en total)",
