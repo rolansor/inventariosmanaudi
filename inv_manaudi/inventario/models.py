@@ -32,9 +32,18 @@ class MovimientoInventario(models.Model):
         ('salida', 'Salida'),
     ]
 
+    TIPO_DOCUMENTO_CHOICES = [
+        ('nota_venta', 'Nota de Venta'),
+        ('factura', 'Factura'),
+        ('orden_trabajo', 'Orden de Trabajo'),
+        ('nota_pedido', 'Nota de Pedido'),
+        ('otros', 'Otros'),
+    ]
+
     sucursal = models.ForeignKey(Sucursal, related_name='movimientos', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, related_name='movimientos', on_delete=models.CASCADE)
     tipo_movimiento = models.CharField(max_length=10, choices=TIPO_MOVIMIENTO_CHOICES)
+    tipo_documento = models.CharField(max_length=20, choices=TIPO_DOCUMENTO_CHOICES)
     cantidad = models.IntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
     comentario = models.TextField(blank=True, null=True)
@@ -66,6 +75,13 @@ class Traslado(models.Model):
         ('confirmado', 'Confirmado'),
     ]
 
+    TIPO_DOCUMENTO_CHOICES = [
+        ('guia_remision', 'Guia de Remision'),
+        ('guia_servientrega', 'Guia Servientrega'),
+        ('orden_trabajo', 'Orden de Trabajo'),
+        ('otros', 'Otros'),
+    ]
+
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     sucursal_origen = models.ForeignKey(Sucursal, related_name='transferencias_salida', on_delete=models.CASCADE)
     sucursal_destino = models.ForeignKey(Sucursal, related_name='transferencias_entrada', on_delete=models.CASCADE)
@@ -74,6 +90,7 @@ class Traslado(models.Model):
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    tipo_documento = models.CharField(max_length=20, choices=TIPO_DOCUMENTO_CHOICES)
     documento_respaldo = models.TextField(blank=True, null=True)
     documento_soporte = models.FileField(upload_to='documento_soporte/', blank=True, null=True)
     movimiento_salida = models.ForeignKey(MovimientoInventario, related_name='traslado_salida', on_delete=models.SET_NULL, null=True, blank=True)
@@ -93,6 +110,7 @@ class Traslado(models.Model):
                     tipo_movimiento='salida',
                     cantidad=self.cantidad_entregada,
                     comentario=f'Transferencia a {self.sucursal_destino.nombre}',
+                    tipo_documento=self.tipo_documento,
                     documento_soporte=self.documento_soporte,
                     documento_respaldo=self.documento_respaldo,
                     usuario=self.usuario
@@ -118,6 +136,7 @@ class Traslado(models.Model):
                 tipo_movimiento='entrada',
                 cantidad=self.cantidad_recibida,
                 comentario=f'Transferencia desde {self.sucursal_origen.nombre}',
+                tipo_documento=self.tipo_documento,
                 documento_soporte=self.documento_soporte,
                 documento_respaldo=self.documento_respaldo,
                 usuario=self.usuario

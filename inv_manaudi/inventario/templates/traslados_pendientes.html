@@ -39,7 +39,11 @@
                 <td>{{ movimiento.documento_respaldo }}</td>
                 <td>{{ movimiento.fecha_creacion }}</td>
                 <td>
-                    <a href="{% url 'confirmar_traslado' movimiento.pk %}" class="btn btn-primary">Confirmar Recepción</a>
+                    {% if movimiento.sucursal_destino == request.user.perfil.sucursal %}
+                        <a href="{% url 'confirmar_traslado' movimiento.pk %}" class="btn btn-primary">Confirmar Recepción</a>
+                    {% else %}
+                        <span class="text-muted">No Disponible</span>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

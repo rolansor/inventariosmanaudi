@@ -61,7 +61,7 @@ def iniciar_traslado(request):
             try:
                 traslado.save()  # Guardar el traslado
                 messages.success(request, 'Traslado iniciado exitosamente.')
-                return redirect('iniciar_traslado')  # Redireccionar después de guardar
+                return redirect('traslados_pendientes')  # Redireccionar después de guardar
             except ValueError as e:
                 form.add_error(None, str(e))  # Manejar errores con un mensaje adecuado
         else:
@@ -75,9 +75,7 @@ def iniciar_traslado(request):
         form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
 
     # Obtener los últimos 10 traslados
-    traslados_recientes = Traslado.objects.filter(
-        producto__empresa=empresa_actual
-    ).order_by('-fecha_creacion')[:10]
+    traslados_recientes = Traslado.objects.filter(producto__empresa=empresa_actual).order_by('-fecha_creacion')[:10]
 
     return render(request, 'iniciar_traslado.html', {
         'form': form,
@@ -87,24 +85,22 @@ def iniciar_traslado(request):
 
 @control_acceso('Encargado')
 def traslados_pendientes(request):
-    """Mostrar todos los traslados pendientes de confirmación que pertenecen a la sucursal del usuario."""
-    # Obtener la sucursal del usuario actual
-    sucursal_usuario = request.user.perfil.sucursal
-
     # Filtrar solo los traslados pendientes donde la sucursal destino es la del usuario
-    movimientos_pendientes = Traslado.objects.filter(
-        estado='pendiente',
-        sucursal_destino=sucursal_usuario
-    ).order_by('-fecha_creacion')
-
+    movimientos_pendientes = Traslado.objects.filter(estado='pendiente').order_by('-fecha_creacion')
     return render(request, 'traslados_pendientes.html', {
-        'movimientos_pendientes': movimientos_pendientes,
-    })
+        'movimientos_pendientes': movimientos_pendientes,})
 
 
 @control_acceso('Encargado')
 def confirmar_traslado(request, pk):
     movimiento = get_object_or_404(Traslado, pk=pk, estado='pendiente')
+    # Obtener la sucursal del usuario logueado (suponiendo que el perfil del usuario tiene el campo sucursal)
+    sucursal_usuario = request.user.perfil.sucursal
+    # Validar si la sucursal de destino es la misma que la sucursal del usuario
+    if movimiento.sucursal_destino != sucursal_usuario:
+        messages.error(request, 'No tienes permiso para confirmar este traslado.')
+        return redirect('traslados_pendientes')
+
     if request.method == 'POST':
         form = ConfirmarRecepcionForm(request.POST, instance=movimiento)
         if form.is_valid():

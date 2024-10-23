@@ -7,13 +7,14 @@ from .models import MovimientoInventario, Traslado
 class MovimientoInventarioForm(forms.ModelForm):
     class Meta:
         model = MovimientoInventario
-        fields = ['sucursal', 'producto', 'tipo_movimiento', 'cantidad', 'comentario', 'documento_respaldo', 'documento_soporte']
+        fields = ['sucursal', 'producto', 'tipo_movimiento', 'tipo_documento', 'cantidad', 'comentario', 'documento_respaldo', 'documento_soporte']
         widgets = {
             'sucursal': forms.Select(attrs={'class': 'form-control'}),
             'producto': forms.Select(attrs={'class': 'form-control'}),
             'tipo_movimiento': forms.Select(attrs={'class': 'form-control'}),
+            'tipo_documento': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'comentario': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'comentario': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
             'documento_soporte': forms.FileInput(attrs={'class': 'form-control'}),
         }
@@ -50,17 +51,32 @@ class MovimientoInventarioForm(forms.ModelForm):
             raise forms.ValidationError("El documento de traslado no puede exceder 5 MB.")
         return documento_soporte
 
+    # Validación del campo tipo_documento
+    def clean_tipo_documento(self):
+        tipo_documento = self.cleaned_data.get('tipo_documento')
+        if not tipo_documento:
+            raise forms.ValidationError("El tipo de documento es obligatorio.")
+        return tipo_documento
+
+    # Validación del campo documento_respaldo
+    def clean_documento_respaldo(self):
+        documento_respaldo = self.cleaned_data.get('documento_respaldo')
+        if not documento_respaldo:
+            raise forms.ValidationError("El documento de respaldo es obligatorio.")
+        return documento_respaldo
+
 
 class TrasladoForm(forms.ModelForm):
     class Meta:
         model = Traslado
-        fields = ['producto', 'sucursal_origen', 'sucursal_destino', 'cantidad_entregada', 'documento_respaldo', 'documento_soporte']
+        fields = ['producto', 'sucursal_origen', 'sucursal_destino', 'cantidad_entregada', 'tipo_documento', 'documento_respaldo', 'documento_soporte']
         widgets = {
             'producto': forms.Select(attrs={'class': 'form-control'}),
             'sucursal_origen': forms.Select(attrs={'class': 'form-control'}),
             'sucursal_destino': forms.Select(attrs={'class': 'form-control'}),
+            'tipo_documento': forms.Select(attrs={'class': 'form-control'}),
             'cantidad_entregada': forms.NumberInput(attrs={'class': 'form-control'}),
-            'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'documento_respaldo': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),
             'documento_soporte': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
@@ -77,6 +93,20 @@ class TrasladoForm(forms.ModelForm):
             raise forms.ValidationError("La cantidad entregada debe ser un número positivo.")
 
         return cleaned_data
+
+        # Validación del campo tipo_documento
+    def clean_tipo_documento(self):
+        tipo_documento = self.cleaned_data.get('tipo_documento')
+        if not tipo_documento:
+            raise forms.ValidationError("El tipo de documento es obligatorio.")
+        return tipo_documento
+
+    # Validación del campo documento_respaldo
+    def clean_documento_respaldo(self):
+        documento_respaldo = self.cleaned_data.get('documento_respaldo')
+        if not documento_respaldo:
+            raise forms.ValidationError("El documento de respaldo es obligatorio.")
+        return documento_respaldo
 
 
 class ConfirmarRecepcionForm(forms.ModelForm):
