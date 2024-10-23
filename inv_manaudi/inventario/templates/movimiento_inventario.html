@@ -37,9 +37,32 @@
         {{ form.cantidad }}
     </div>
     <div class="form-group">
-        <label for="id_comentario">Comentario:</label>
-        {{ form.comentario }}
-    </div>
+    <label for="id_comentario">Comentario:</label>
+    <input list="razones-sugeridas" class="form-control" name="comentario" id="id_comentario">
+    <datalist id="razones-sugeridas">
+        <option value="Devolución de producto">
+        <option value="Corrección de stock">
+        <option value="Transferencia entre sucursales">
+        <option value="Ajuste por pérdida">
+        <option value="Ajuste por auditoría">
+        <option value="Producto defectuoso">
+        <option value="Cambio de modelo de lentes">
+        <option value="Cambio de montura">
+        <option value="Reparación de montura">
+        <option value="Ajuste de lentes">
+        <option value="Pedido especial">
+        <option value="Lentes de contacto no compatibles">
+        <option value="Reembolso por producto no entregado">
+        <option value="Descuento aplicado incorrectamente">
+        <option value="Error en la facturación">
+        <option value="Revisión de lentes por problemas de visión">
+        <option value="Actualización de prescripción">
+        <option value="Solicitud de revisión de stock">
+        <option value="Devolución por mal ajuste">
+        <option value="Ajuste por rotura del producto">
+        <option value="Reposición por pérdida">
+    </datalist>
+</div>
     <div class="form-group">
         <label for="id_tipo_documento">Tipo de Documento:</label>
         {{ form.tipo_documento }}
