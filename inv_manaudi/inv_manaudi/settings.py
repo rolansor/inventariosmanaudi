@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-mus*w*^jt@(xzz@_6crj=i=84#lic1b*u7h&-zv@@_@9_lh++k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['rolansor.pythonanywhere.com', 'localhost']
+ALLOWED_HOSTS = ['sifcol.pythonanywhere.com', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

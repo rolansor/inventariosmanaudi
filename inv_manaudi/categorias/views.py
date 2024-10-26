@@ -21,7 +21,8 @@ def nueva_categoria(request):
 
 
 def lista_categorias(request):
-    categorias = Categoria.objects.all()
+    empresa = request.user.perfil.empresa
+    categorias = Categoria.objects.filter(empresa=empresa)
     return render(request, 'lista_categorias.html', {'categorias': categorias})
 
 
