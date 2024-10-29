@@ -18,7 +18,7 @@ class Producto(models.Model):
         ('inactivo', 'Inactivo'),
     ]
 
-    codigo = models.CharField(max_length=50, unique=True)
+    codigo = models.CharField(max_length=50)
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
@@ -26,6 +26,10 @@ class Producto(models.Model):
     categoria = models.ForeignKey(Subcategoria, related_name='productos', on_delete=models.SET_NULL, null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_PRODUCTO_CHOICES, default='activo')
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['codigo', 'empresa'], name='unique_codigo_empresa')
+        ]
     objects = ProductoManager()
 
     def __str__(self):
