@@ -32,17 +32,19 @@
                                 <th>Cantidad</th>
                                 <th>Tipo Movimiento</th>
                                 <th>Fecha</th>
+                                <th>Responsable</th>
                                 <th>Comentario</th>
                             </tr>
                             </thead>
                             <tbody>
                                 {% for movimiento in movimientos %}
                                     <tr>
-                                        <td>{{ movimiento.producto.nombre }}</td>
+                                        <td>{{ movimiento.producto.codigo }} -- {{ movimiento.producto.nombre }}</td>
                                         <td>{{ movimiento.sucursal.nombre }}</td>
                                         <td>{{ movimiento.cantidad }}</td>
                                         <td>{{ movimiento.get_tipo_movimiento_display }}</td>
                                         <td>{{ movimiento.fecha }}</td>
+                                        <td>{{ movimiento.usuario.first_name }} {{ movimiento.usuario.last_name }}</td>
                                         <td>{{ movimiento.comentario }}</td>
                                     </tr>
                                 {% endfor %}

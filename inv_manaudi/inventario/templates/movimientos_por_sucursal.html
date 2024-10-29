@@ -44,6 +44,7 @@
                                 <th>Cantidad</th>
                                 <th>Tipo Movimiento</th>
                                 <th>Fecha</th>
+                                <th>Responsable</th>
                                 <th>Comentario</th>
                             </tr>
                             </thead>
@@ -55,6 +56,7 @@
                                         <td>{{ movimiento.cantidad }}</td>
                                         <td>{{ movimiento.get_tipo_movimiento_display }}</td>
                                         <td>{{ movimiento.fecha }}</td>
+                                        <td>{{ movimiento.usuario.first_name }} {{ movimiento.usuario.last_name }}</td>
                                         <td>{{ movimiento.comentario }}</td>
                                     </tr>
                                 {% endfor %}
@@ -94,6 +96,7 @@
                                 <th>Cantidad</th>
                                 <th>Estado</th>
                                 <th>Fecha</th>
+                                <th>Responsable</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -105,6 +108,7 @@
                                         <td>{{ traslado.cantidad }}</td>
                                         <td>{{ traslado.get_estado_display }}</td>
                                         <td>{{ traslado.fecha_creacion }}</td>
+                                        <td>{{ traslado.usuario.first_name }} {{ traslado.usuario.last_name }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

@@ -102,6 +102,7 @@
         <tr>
             <th>Cantidad</th>
             <th>Fecha</th>
+            <th>Responsable</th>
             <th>Comentario</th>
         </tr>
         </thead>
@@ -111,6 +112,7 @@
                 <tr>
                     <td>{{ entrada.cantidad }}</td>
                     <td>{{ entrada.fecha }}</td>
+                    <td>{{ entrada.usuario.first_name }} {{ entrada.usuario.last_name }}</td>
                     <td>{{ entrada.comentario }}</td>
                 </tr>
             {% endfor %}
@@ -130,6 +132,7 @@
         <tr>
             <th>Cantidad</th>
             <th>Fecha</th>
+            <th>Responsable</th>
             <th>Comentario</th>
         </tr>
         </thead>
@@ -139,12 +142,13 @@
                 <tr>
                     <td>{{ salida.cantidad }}</td>
                     <td>{{ salida.fecha }}</td>
+                    <td>{{ salida.usuario.first_name }} {{ salida.usuario.last_name }}</td>
                     <td>{{ salida.comentario }}</td>
                 </tr>
             {% endfor %}
         {% else %}
             <tr>
-                <td colspan="3" class="text-center">No hay salidas para este producto.</td>
+                <td colspan="4" class="text-center">No hay salidas para este producto.</td>
             </tr>
         {% endif %}
         </tbody>
@@ -162,6 +166,7 @@
             <th>Sucursal Destino</th>
             <th>Fecha</th>
             <th>Estado</th>
+            <th>Responsable</th>
         </tr>
         </thead>
         <tbody>
@@ -180,11 +185,12 @@
                             <span class="badge bg-success">Confirmado</span>
                         {% endif %}
                     </td>
+                    <td>{{ traslado.usuario.first_name }} {{ traslado.usuario.last_name }}</td>
                 </tr>
             {% endfor %}
         {% else %}
             <tr>
-                <td colspan="5" class="text-center">No hay traslados para este producto.</td>
+                <td colspan="7" class="text-center">No hay traslados para este producto.</td>
             </tr>
         {% endif %}
         </tbody>

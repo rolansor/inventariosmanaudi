@@ -14,13 +14,13 @@ from .models import Empresa, Sucursal
 @login_required
 def inicio(request):
     # Obtener la empresa del usuario logueado a través de su perfil
-    empresa_usuario = request.user.perfil.empresa
+    empresa_usuario = obtener_empresa(request)
 
     # Intentar obtener la sucursal del usuario, si existe
     sucursal_usuario = getattr(request.user.perfil, 'sucursal', None)
 
     # Filtrar productos y movimientos según la empresa y, si aplica, la sucursal
-    total_productos = Producto.objects.filter(empresa=empresa_usuario).count()
+    total_productos = Producto.objects.para_empresa(empresa_usuario).count()
 
     if sucursal_usuario:
         # Si el usuario tiene una sucursal, filtrar por sucursal
