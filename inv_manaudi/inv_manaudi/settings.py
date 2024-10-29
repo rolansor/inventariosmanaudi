@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-mus*w*^jt@(xzz@_6crj=i=84#lic1b*u7h&-zv@@_@9_lh++k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['rolansor.pythonanywhere.com', 'localhost']
+ALLOWED_HOSTS = ['sifcol.pythonanywhere.com', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -67,10 +67,10 @@ WSGI_APPLICATION = 'inv_manaudi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inv_manaudi',
-        'USER': 'root',
-        'PASSWORD': 'f4d3s2a1',
-        'HOST': 'localhost',
+        'NAME': 'sifcol$inv_manaudi',
+        'USER': 'sifcol',
+        'PASSWORD': '3R4SO3orvj*1',
+        'HOST': 'sifcol.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }
