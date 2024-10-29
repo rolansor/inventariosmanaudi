@@ -32,23 +32,21 @@
                         <th>Precio</th>
                         <th>Tipo</th>
                         <th>Categoría/Subcategoria</th>
+                        <th>Empresa</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in productos %}
-                        <tr>
-                            <td>{{ producto.codigo }}</td>
-                            <td>{{ producto.nombre }}</td>
-                            <td>{{ producto.descripcion|default:"Sin descripción" }}</td>
-                            <td>{{ producto.precio }}</td>
-                            <td>{{ producto.get_tipo_producto_display }}</td>
-                            <td>{{ producto.categoria.categoria.nombre }}--{{ producto.categoria.nombre }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="6">No hay productos disponibles para esta empresa.</td>
-                        </tr>
-                    {% endfor %}
+                {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.codigo }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.descripcion|default:"Sin descripción" }}</td>
+                        <td>{{ producto.precio }}</td>
+                        <td>{{ producto.get_tipo_producto_display }}</td>
+                        <td>{{ producto.categoria.categoria.nombre }}--{{ producto.categoria.nombre }}</td>
+                        <td>{{ producto.empresa.nombre }}</td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
     </div>

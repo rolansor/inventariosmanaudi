@@ -3,6 +3,11 @@ from categorias.models import Subcategoria
 from usuarios.models import Empresa
 
 
+class ProductoManager(models.Manager):
+    def para_empresa(self, empresa):
+        return self.filter(empresa=empresa)
+
+
 class Producto(models.Model):
     TIPO_PRODUCTO_CHOICES = [
         ('unidad', 'Unidad'),
@@ -21,6 +26,7 @@ class Producto(models.Model):
     categoria = models.ForeignKey(Subcategoria, related_name='productos', on_delete=models.SET_NULL, null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_PRODUCTO_CHOICES, default='activo')
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
+    objects = ProductoManager()
 
     def __str__(self):
         return f'{self.codigo} - {self.nombre} ({self.get_tipo_producto_display()})'

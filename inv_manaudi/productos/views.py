@@ -12,7 +12,7 @@ from .forms import ProductoForm
 
 @control_acceso('Supervisor')
 def crear_producto(request):
-    empresa_actual = request.user.perfil.empresa  # Obtener la empresa actual del usuario logueado
+    empresa_actual = obtener_empresa(request)
     subcategorias = Subcategoria.objects.filter(categoria__empresa=empresa_actual)
 
     if request.method == 'POST':
@@ -64,10 +64,10 @@ def crear_producto(request):
 @control_acceso('Supervisor')
 def lista_productos(request):
     # Obtener la empresa del perfil del usuario actual
-    empresa = obtener_empresa(request)
+    empresa_actual = obtener_empresa(request)
 
     # Filtrar los productos asociados a la empresa
-    productos = Producto.objects.filter(empresa=empresa)
+    productos = Producto.objects.para_empresa(empresa_actual)
 
     # Pasar los productos al contexto de la plantilla
     return render(request, 'lista_productos.html', {'productos': productos})
@@ -75,15 +75,14 @@ def lista_productos(request):
 
 @control_acceso('Encargado')
 def busqueda_producto(request):
-    empresa_actual = request.user.perfil.empresa
+    empresa_actual = obtener_empresa(request)
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria')
 
-    # Filtrar los productos por código, nombre o categoría
-    productos = None
-    if query or categoria_id:
-        productos = Producto.objects.all()
+    # Filtrar los productos solo por la empresa actual desde el inicio
+    productos = Producto.objects.para_empresa(empresa_actual)
 
+    if query or categoria_id:
         if query:
             productos = productos.filter(Q(codigo__icontains=query) | Q(nombre__icontains=query))
 
@@ -91,7 +90,7 @@ def busqueda_producto(request):
         if categoria_id:
             try:
                 # Obtener la categoría seleccionada
-                categoria = Categoria.objects.get(id=categoria_id)
+                categoria = Categoria.objects.get(id=categoria_id, empresa=empresa_actual)
 
                 # Obtener todas las subcategorías asociadas a la categoría seleccionada
                 subcategorias = Subcategoria.objects.filter(categoria=categoria)
@@ -115,30 +114,6 @@ def busqueda_producto(request):
     return render(request, 'busqueda_producto.html', context)
 
 
-def buscar_producto_por_codigo(request):
-    """
-    Vista para buscar un producto por su código y devolver sus datos en JSON.
-    """
-    codigo = request.GET.get('codigo')
-
-    try:
-        producto = Producto.objects.get(codigo=codigo)
-        # Devolver los datos del producto en JSON
-        data = {
-            'id': producto.pk,
-            'codigo': producto.codigo,
-            'nombre': producto.nombre,
-            'descripcion': producto.descripcion,
-            'precio': producto.precio,
-            'tipo_producto': producto.tipo_producto,
-            'categoria_id': producto.categoria.pk if producto.categoria else None
-        }
-        return JsonResponse(data)
-    except Producto.DoesNotExist:
-        # Si no se encuentra el producto, devolver un error
-        return JsonResponse({'error': 'Producto no encontrado'}, status=404)
-
-
 @control_acceso('Supervisor')
 def editar_producto(request, pk=None):
     """
@@ -147,10 +122,11 @@ def editar_producto(request, pk=None):
     - Si no se pasa un pk, muestra un formulario vacío y permite buscar el producto por AJAX.
     """
     subcategorias = Subcategoria.objects.all().order_by('nombre')
+    empresa_actual = obtener_empresa(request)
 
     if pk:
         # Escenario 1: Se pasa un pk, busca el producto
-        producto = get_object_or_404(Producto, pk=pk)
+        producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
 
         if request.method == 'POST':
             # Procesar la edición del producto
@@ -177,7 +153,7 @@ def editar_producto(request, pk=None):
             # Buscar el producto por código
             codigo = request.POST.get('codigo')
             try:
-                producto = Producto.objects.get(codigo=codigo)
+                producto = Producto.objects.para_empresa(empresa_actual).get(codigo=codigo)
                 form = ProductoForm(request.POST, instance=producto)
                 if form.is_valid():
                     form.save()
@@ -203,9 +179,11 @@ def bsq_por_codigo(request):
     Vista para buscar un producto por su código y devolver sus datos en JSON.
     """
     codigo = request.GET.get('codigo')
+    # Obtener la empresa del usuario logueado
+    empresa_actual = obtener_empresa(request)
 
     try:
-        producto = Producto.objects.get(codigo=codigo)
+        producto = Producto.objects.para_empresa(empresa_actual).get(codigo=codigo)
         # Devolver los datos del producto en JSON
         data = {
             'id': producto.pk,
@@ -224,7 +202,9 @@ def bsq_por_codigo(request):
 
 @control_acceso('Manaudi')
 def desactivar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
+    # Obtener la empresa del usuario logueado
+    empresa_actual = obtener_empresa(request)
+    producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
     if request.method == 'GET':
         producto.estado = 'inactivo'  # Cambiar el estado del producto
         producto.save()
@@ -235,7 +215,9 @@ def desactivar_producto(request, pk):
 
 @control_acceso('Manaudi')
 def activar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
+    # Obtener la empresa del usuario logueado
+    empresa_actual = obtener_empresa(request)
+    producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
     if request.method == 'GET':
         producto.estado = 'activo'  # Cambiar el estado del producto
         producto.save()
