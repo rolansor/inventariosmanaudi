@@ -40,27 +40,28 @@
     <label for="id_comentario">Comentario:</label>
     <input list="razones-sugeridas" class="form-control" name="comentario" id="id_comentario">
     <datalist id="razones-sugeridas">
-        <option value="Devolución de producto">
-        <option value="Corrección de stock">
-        <option value="Transferencia entre sucursales">
-        <option value="Ajuste por pérdida">
-        <option value="Ajuste por auditoría">
-        <option value="Producto defectuoso">
-        <option value="Cambio de modelo de lentes">
-        <option value="Cambio de montura">
-        <option value="Reparación de montura">
-        <option value="Ajuste de lentes">
-        <option value="Pedido especial">
-        <option value="Lentes de contacto no compatibles">
-        <option value="Reembolso por producto no entregado">
-        <option value="Descuento aplicado incorrectamente">
-        <option value="Error en la facturación">
-        <option value="Revisión de lentes por problemas de visión">
-        <option value="Actualización de prescripción">
-        <option value="Solicitud de revisión de stock">
-        <option value="Devolución por mal ajuste">
-        <option value="Ajuste por rotura del producto">
-        <option value="Reposición por pérdida">
+        <option value="INVENTARIO INICIAL">
+        <option value="DEVOLUCIÓN DE PRODUCTO">
+        <option value="CORRECCIÓN DE STOCK">
+        <option value="TRANSFERENCIA ENTRE SUCURSALES">
+        <option value="AJUSTE POR PÉRDIDA">
+        <option value="AJUSTE POR AUDITORÍA">
+        <option value="PRODUCTO DEFECTUOSO">
+        <option value="CAMBIO DE MODELO DE LENTES">
+        <option value="CAMBIO DE MONTURA">
+        <option value="REPARACIÓN DE MONTURA">
+        <option value="AJUSTE DE LENTES">
+        <option value="PEDIDO ESPECIAL">
+        <option value="LENTES DE CONTACTO NO COMPATIBLES">
+        <option value="REEMBOLSO POR PRODUCTO NO ENTREGADO">
+        <option value="DESCUENTO APLICADO INCORRECTAMENTE">
+        <option value="ERROR EN LA FACTURACIÓN">
+        <option value="REVISIÓN DE LENTES POR PROBLEMAS DE VISIÓN">
+        <option value="ACTUALIZACIÓN DE PRESCRIPCIÓN">
+        <option value="SOLICITUD DE REVISIÓN DE STOCK">
+        <option value="DEVOLUCIÓN POR MAL AJUSTE">
+        <option value="AJUSTE POR ROTURA DEL PRODUCTO">
+        <option value="REPOSICIÓN POR PÉRDIDA">
     </datalist>
 </div>
     <div class="form-group">
@@ -125,7 +126,17 @@
             $('#id_tipo_documento').select2({
                 placeholder: 'Seleccione un tipo de documento',
                 allowClear: true
-            });id_tipo_documento
+            });
+            // Detect when "INVENTARIO INICIAL" is selected in the comentario field
+            document.getElementById('id_comentario').addEventListener('input', function() {
+                if (this.value === 'INVENTARIO INICIAL') {
+                    // Set "OTROS" as the value for tipo_documento
+                    // document.getElementById('id_tipo_documento').value = 'Otros';
+
+                    // Set "000-000-000000000" as the value for documento_respaldo
+                    document.getElementById('id_documento_respaldo').value = '000-000-000000000';
+                }
+            });
         });
     </script>
 {% endblock %}
