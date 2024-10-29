@@ -32,6 +32,7 @@
                         <th>Precio</th>
                         <th>Tipo</th>
                         <th>Categoría/Subcategoria</th>
+                        <th>Empresa</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,6 +44,7 @@
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.get_tipo_producto_display }}</td>
                         <td>{{ producto.categoria.categoria.nombre }}--{{ producto.categoria.nombre }}</td>
+                        <td>{{ producto.empresa.nombre }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
