@@ -9,6 +9,11 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+    def save(self, *args, **kwargs):
+        # Convertir el nombre a mayúsculas antes de guardar
+        self.nombre = self.nombre.upper()
+        super(Categoria, self).save(*args, **kwargs)
+
 
 class Subcategoria(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias')
@@ -16,3 +21,8 @@ class Subcategoria(models.Model):
 
     def __str__(self):
         return f'{self.nombre} (Categoría: {self.categoria.nombre})'
+
+    def save(self, *args, **kwargs):
+        # Convertir el nombre a mayúsculas antes de guardar
+        self.nombre = self.nombre.upper()
+        super(Subcategoria, self).save(*args, **kwargs)

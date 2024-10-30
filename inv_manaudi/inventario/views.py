@@ -1,19 +1,18 @@
-from django.db.models import Q
 from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from productos.models import Producto
 from usuarios.models import Sucursal
+from usuarios.views import obtener_empresa
 from usuarios.templatetags.tags import control_acceso
 from .models import MovimientoInventario, Traslado
-from .forms import MovimientoInventarioForm, ProductoSelectForm, SucursalSelectForm, \
-    TrasladoForm, ConfirmarRecepcionForm
+from .forms import MovimientoInventarioForm, ProductoSelectForm, SucursalSelectForm, TrasladoForm, \
+    ConfirmarRecepcionForm
 
 
 @control_acceso('Encargado')
 def movimiento_inventario(request):
-    empresa_actual = request.user.perfil.empresa
-    sucursal_actual = getattr(request.user.perfil, 'sucursal', None)  # Obtener sucursal si tiene
+    empresa_actual = obtener_empresa(request)
 
     if request.method == 'POST':
         # Inicializar el formulario con los datos del POST y los archivos
@@ -35,7 +34,7 @@ def movimiento_inventario(request):
         form = MovimientoInventarioForm(user=request.user)
 
     # Mostrar solo los últimos 10 movimientos de la empresa del usuario logueado
-    movimientos = MovimientoInventario.objects.filter(producto__empresa=empresa_actual).order_by('-fecha')[:10]
+    movimientos = MovimientoInventario.objects.filter(producto__empresa=empresa_actual).order_by('-fecha')[:20]
 
     return render(request, 'movimiento_inventario.html', {
         'form': form,
@@ -45,7 +44,7 @@ def movimiento_inventario(request):
 
 @control_acceso('Supervisor')
 def iniciar_traslado(request):
-    empresa_actual = request.user.perfil.empresa
+    empresa_actual = obtener_empresa(request)
 
     if request.method == 'POST':
         form = TrasladoForm(request.POST)
@@ -124,19 +123,19 @@ def movimientos_por_empresa(request):
     """
     Vista para mostrar todos los movimientos y traslados de una empresa, solo accesible para usuarios del grupo 'Manaudi'.
     """
-    empresa = request.user.perfil.empresa  # Se asume que el perfil del usuario tiene el campo 'empresa'
-    sucursales = Sucursal.objects.filter(empresa=empresa)
+    empresa_actual = obtener_empresa(request)
+    sucursales = Sucursal.objects.filter(empresa=empresa_actual)
 
     # Movimientos de inventario (entradas y salidas)
     movimientos = MovimientoInventario.objects.filter(sucursal__in=sucursales).order_by('-fecha')
 
     # Traslados de salida (traslados realizados desde la empresa actual)
-    traslados = Traslado.objects.filter(producto__empresa=empresa).order_by('-fecha_creacion')
+    traslados = Traslado.objects.filter(producto__empresa=empresa_actual).order_by('-fecha_creacion')
 
     return render(request, 'movimientos_por_empresa.html', {
         'movimientos': movimientos,
         'traslados': traslados,
-        'empresa': empresa,
+        'empresa': empresa_actual,
     })
 
 
@@ -146,15 +145,15 @@ def movimientos_por_sucursal(request):
     Vista que muestra los movimientos de inventario y traslados para una sucursal específica.
     """
     # Obtener la empresa del usuario actual
-    empresa = request.user.perfil.empresa
+    empresa_actual = obtener_empresa(request)
 
     # Inicializar formulario para seleccionar sucursal
-    form = SucursalSelectForm(empresa=empresa)
+    form = SucursalSelectForm(empresa=empresa_actual)
     movimientos = None
     traslados = None
 
     if request.method == 'POST':
-        form = SucursalSelectForm(request.POST, empresa=empresa)
+        form = SucursalSelectForm(request.POST, empresa=empresa_actual)
         if form.is_valid():
             sucursal = form.cleaned_data['sucursal']
 
@@ -174,10 +173,10 @@ def movimientos_por_sucursal(request):
 @control_acceso('Encargado')
 def movimientos_por_producto(request):
     # Obtener la empresa del usuario actual
-    empresa = request.user.perfil.empresa
+    empresa_actual = obtener_empresa(request)
 
     # Inicializar el formulario con los productos filtrados por empresa
-    form = ProductoSelectForm(empresa=empresa)
+    form = ProductoSelectForm(empresa=empresa_actual)
 
     entradas = None
     salidas = None
@@ -198,7 +197,7 @@ def movimientos_por_producto(request):
     }
 
     if request.method == 'POST':
-        form = ProductoSelectForm(request.POST, empresa=empresa)
+        form = ProductoSelectForm(request.POST, empresa=empresa_actual)
         if form.is_valid():
             producto = form.cleaned_data['producto']
 

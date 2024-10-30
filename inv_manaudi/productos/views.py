@@ -116,62 +116,31 @@ def busqueda_producto(request):
 
 @control_acceso('Supervisor')
 def editar_producto(request, pk=None):
-    """
-    Vista para editar un producto.
-    - Si se pasa un pk, edita un producto existente.
-    - Si no se pasa un pk, muestra un formulario vacío y permite buscar el producto por AJAX.
-    """
-    subcategorias = Subcategoria.objects.all().order_by('nombre')
+    empresa_actual = obtener_empresa(request)
+    subcategorias = Subcategoria.objects.filter(categoria__empresa=empresa_actual).order_by('nombre')
     empresa_actual = obtener_empresa(request)
 
-    if pk:
-        # Escenario 1: Se pasa un pk, busca el producto
-        producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
+    # Escenario 1: Se pasa un pk, busca el producto
+    producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
 
-        if request.method == 'POST':
-            # Procesar la edición del producto
-            form = ProductoForm(request.POST, instance=producto)
-            if form.is_valid():
-                producto = form.save()
-                messages.success(request, 'Producto actualizado con éxito.')
-                return redirect('editar_producto')
-            else:
-                messages.error(request, 'Error al actualizar el producto.')
+    if request.method == 'POST':
+        # Procesar la edición del producto
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Producto actualizado con éxito.')
+            return redirect('editar_producto', pk=producto.pk)
         else:
-            form = ProductoForm(instance=producto)
-
-        # Renderizar el formulario para la edición
-        return render(request, 'editar_producto.html', {
-            'form': form,
-            'producto': producto,
-            'subcategorias': subcategorias
-        })
-
+            messages.error(request, 'Error al actualizar el producto.')
     else:
-        # Escenario 2: No se pasa pk, mostrar formulario vacío para buscar por código
-        if request.method == 'POST':
-            # Buscar el producto por código
-            codigo = request.POST.get('codigo')
-            try:
-                producto = Producto.objects.para_empresa(empresa_actual).get(codigo=codigo)
-                form = ProductoForm(request.POST, instance=producto)
-                if form.is_valid():
-                    form.save()
-                    messages.success(request, 'Producto actualizado con éxito.')
-                    return redirect('editar_producto')
-                else:
-                    messages.error(request, 'Error al actualizar el producto.')
-                    return render(request, 'editar_producto.html', {
-                        'form': form,
-                        'producto': producto,
-                        'subcategorias': subcategorias
-                    })
-            except Producto.DoesNotExist:
-                messages.error(request, 'No se encontró un producto con el código proporcionado.')
-                return redirect('editar_producto')
+        form = ProductoForm(instance=producto)
 
-        # Formulario vacío para que el usuario ingrese el código
-        return render(request, 'editar_producto.html', {'subcategorias': subcategorias})
+    # Renderizar el formulario para la edición
+    return render(request, 'editar_producto.html', {
+        'form': form,
+        'producto': producto,
+        'subcategorias': subcategorias
+    })
 
 
 def bsq_por_codigo(request):

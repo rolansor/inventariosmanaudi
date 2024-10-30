@@ -62,7 +62,7 @@ class MovimientoInventarioForm(forms.ModelForm):
     def clean_documento_respaldo(self):
         documento_respaldo = self.cleaned_data.get('documento_respaldo')
         if not documento_respaldo:
-            raise forms.ValidationError("El documento de respaldo es obligatorio.")
+            raise forms.ValidationError("El # de documento de respaldo es obligatorio.")
         return documento_respaldo
 
 

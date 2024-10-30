@@ -10,6 +10,17 @@
 {% block contenido %}
 <h1>Registrar Movimiento de Inventario</h1>
 
+<!-- Mostrar mensajes de éxito o error -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-dismissible fade show alert-{{ message.tags }} shadow-sm mb-4">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>{{ message|capfirst }}</strong>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Mostrar errores no relacionados a campos específicos -->
 {% if form.non_field_errors %}
     <div class="alert alert-danger">
         {% for error in form.non_field_errors %}
@@ -20,22 +31,60 @@
 
 <form method="post" id="movimiento-form" enctype="multipart/form-data">
     {% csrf_token %}
+
+    <!-- Campo Sucursal Origen -->
     <div class="form-group">
         <label for="id_sucursal">Sucursal Origen:</label>
         {{ form.sucursal }}
+        {% if form.sucursal.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.sucursal.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Campo Producto -->
     <div class="form-group">
         <label for="id_producto">Producto:</label>
         {{ form.producto }}
+        {% if form.producto.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.producto.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Campo Tipo Movimiento -->
     <div class="form-group">
-        <label for="id_tipo_movimiento">Tipo movimiento:</label>
+        <label for="id_tipo_movimiento">Tipo Movimiento:</label>
         {{ form.tipo_movimiento }}
+        {% if form.tipo_movimiento.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.tipo_movimiento.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Campo Cantidad -->
     <div class="form-group">
         <label for="id_cantidad">Cantidad:</label>
         {{ form.cantidad }}
+        {% if form.cantidad.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.cantidad.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Campo Comentario -->
     <div class="form-group">
     <label for="id_comentario">Comentario:</label>
     <input list="razones-sugeridas" class="form-control" name="comentario" id="id_comentario">
@@ -63,19 +112,52 @@
         <option value="AJUSTE POR ROTURA DEL PRODUCTO">
         <option value="REPOSICIÓN POR PÉRDIDA">
     </datalist>
+    {% if form.comentario.errors %}
+        <div class="alert alert-danger">
+            {% for error in form.comentario.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
     <div class="form-group">
         <label for="id_tipo_documento">Tipo de Documento:</label>
         {{ form.tipo_documento }}
+        {% if form.tipo_documento.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.tipo_documento.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Campo Documento Respaldo -->
     <div class="form-group">
         <label for="id_documento_respaldo">Documento Respaldo:</label>
         {{ form.documento_respaldo }}
+        {% if form.documento_respaldo.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.documento_respaldo.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Campo Documento Soporte -->
     <div class="form-group">
         <label for="id_documento_soporte">Documento Soporte:</label>
         {{ form.documento_soporte }}
+        {% if form.documento_soporte.errors %}
+            <div class="alert alert-danger">
+                {% for error in form.documento_soporte.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
     <br>
     <button type="submit" class="btn btn-primary">Registrar Movimiento</button>
 </form>
