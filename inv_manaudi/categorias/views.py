@@ -5,7 +5,7 @@ from .models import Categoria, Subcategoria
 from usuarios.templatetags.tags import control_acceso
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def nueva_categoria(request):
     if request.method == 'POST':
         form = CategoriaForm(request.POST)
@@ -26,7 +26,7 @@ def lista_categorias(request):
     return render(request, 'lista_categorias.html', {'categorias': categorias})
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def editar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
 
@@ -48,7 +48,7 @@ def editar_categoria(request, pk):
     })
 
 
-@control_acceso('Encargado')
+@control_acceso('Administrador')
 def eliminar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
     if request.method == 'POST':
@@ -58,7 +58,7 @@ def eliminar_categoria(request, pk):
     return redirect('lista_categorias')
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def nueva_subcategoria(request, pk):
     categoria = get_object_or_404(Categoria, id=pk)
     if request.method == 'POST':
@@ -88,7 +88,7 @@ def lista_subcategorias(request, pk):
     return render(request, 'lista_subcategorias.html', {'subcategorias': subcategorias, 'categoria': categoria})
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def editar_subcategoria(request, pk):
     subcategoria = get_object_or_404(Subcategoria, pk=pk)
 
@@ -111,7 +111,7 @@ def editar_subcategoria(request, pk):
     })
 
 
-@control_acceso('Encargado')
+@control_acceso('Administrador')
 def eliminar_subcategoria(request, pk):
     subcategoria = get_object_or_404(Subcategoria, pk=pk)
     if request.method == 'POST':

@@ -42,9 +42,11 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ subcategoria.nombre }}</td>
                         <td>
-                            {% if request.user|pertenece_grupo:"Encargado" %}
+                            {% if request.user|pertenece_grupo:"Administrador" %}
                                 <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.id }}">Editar</button>
                                 <button class="btn btn-danger delete-subcategoria" data-id="{{ subcategoria.id }}">Eliminar</button>
+                            {% elif request.user|pertenece_grupo:"Encargado" %}
+                                <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.id }}">Editar</button>
                             {% endif %}
                         </td>
                     </tr>
@@ -115,11 +117,6 @@
 
 {% block extra_js %}
 <script>
-    // Redirigir a la página después de la creación de subcategoría
-    $('#create-subcategoria-form').on('submit', function (event) {
-        // No se usa Ajax aquí, se deja el envío estándar del formulario para redireccionar
-    });
-
     // Manejar la edición de subcategoría abriendo el modal
     $('#subcategoria-list').on('click', '.edit-subcategoria', function () {
         var subcategoriaId = $(this).data('id');
@@ -137,9 +134,27 @@
         });
     });
 
-    // Redirigir a la página después de la edición de subcategoría
+    // Enviar el formulario de edición de subcategoría usando AJAX
     $('#edit-subcategoria-form').on('submit', function (event) {
-        // No se usa Ajax aquí, se deja el envío estándar del formulario para redireccionar
+        event.preventDefault();  // Evitar el envío estándar del formulario
+        var subcategoriaId = $(this).attr('action').split('/').slice(-2, -1)[0];
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    // Actualizar el nombre en la tabla sin recargar
+                    $('#subcategoria-' + subcategoriaId + ' td:nth-child(2)').text(response.nombre);
+                    $('#editSubcategoriaModal').modal('hide'); // Cerrar modal
+                } else if (response.errors) {
+                    alert('Errores: ' + Object.values(response.errors).join(', '));
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error al guardar la subcategoría: ' + error);
+            }
+        });
     });
 
     // Manejar la eliminación de subcategoría con redirección

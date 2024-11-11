@@ -35,10 +35,13 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ categoria.nombre }}</td>
                         <td>
-                            {% if request.user|pertenece_grupo:"Encargado" %}
+                            {% if request.user|pertenece_grupo:"Administrador" %}
                                 <button class="btn btn-primary edit-categoria" data-id="{{ categoria.pk }}">Editar</button>
                                 <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
                                 <button class="btn btn-danger delete-categoria" data-id="{{ categoria.pk }}">Eliminar</button>
+                            {% elif request.user|pertenece_grupo:"Encargado" %}
+                                <button class="btn btn-primary edit-categoria" data-id="{{ categoria.pk }}">Editar</button>
+                                <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
                             {% else %}
                                 <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
                             {% endif %}
@@ -101,10 +104,27 @@
         });
     });
 
-    // Redirigir a la página después de la edición de categoría
+    // Enviar el formulario de edición por AJAX
     $('#edit-categoria-form').on('submit', function (event) {
-        // El formulario se envía de manera estándar, por lo que no se usa Ajax aquí.
-        // La página se recargará automáticamente tras el envío.
+        event.preventDefault(); // Evitar el envío estándar
+        var categoriaId = $(this).attr('action').split('/').slice(-2, -1)[0];
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    // Actualizar el nombre en la lista de categorías
+                    $('#categoria-' + categoriaId + ' td:nth-child(2)').text(response.nombre);
+                    $('#editCategoriaModal').modal('hide'); // Cerrar el modal
+                } else if (response.errors) {
+                    alert('Errores: ' + Object.values(response.errors).join(', '));
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error al guardar la categoría: ' + error);
+            }
+        });
     });
 
     // Manejar la eliminación de categoría con redirección

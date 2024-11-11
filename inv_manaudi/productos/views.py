@@ -73,18 +73,17 @@ def lista_productos(request):
     return render(request, 'lista_productos.html', {'productos': productos})
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def busqueda_producto(request):
     empresa_actual = obtener_empresa(request)
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria')
-
-    # Filtrar los productos solo por la empresa actual desde el inicio
-    productos = Producto.objects.para_empresa(empresa_actual)
+    productos = None
 
     if query or categoria_id:
+        productos_empresa = Producto.objects.para_empresa(empresa_actual)
         if query:
-            productos = productos.filter(Q(codigo__icontains=query) | Q(nombre__icontains=query))
+            productos = productos_empresa.filter(Q(codigo__icontains=query) | Q(nombre__icontains=query))
 
             # Filtro por categoría (incluye todas las subcategorías de la categoría seleccionada)
         if categoria_id:
@@ -96,7 +95,7 @@ def busqueda_producto(request):
                 subcategorias = Subcategoria.objects.filter(categoria=categoria)
 
                 # Filtrar los productos que pertenezcan a las subcategorías de la categoría seleccionada
-                productos = productos.filter(categoria__in=subcategorias)
+                productos = productos_empresa.filter(categoria__in=subcategorias)
 
             except Categoria.DoesNotExist:
                 productos = Producto.objects.none()  # En caso de que no exista la categoría
@@ -143,6 +142,7 @@ def editar_producto(request, pk=None):
     })
 
 
+@control_acceso('Supervisor')
 def bsq_por_codigo(request):
     """
     Vista para buscar un producto por su código y devolver sus datos en JSON.
@@ -169,7 +169,7 @@ def bsq_por_codigo(request):
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
-@control_acceso('Manaudi')
+@control_acceso('Administrador')
 def desactivar_producto(request, pk):
     # Obtener la empresa del usuario logueado
     empresa_actual = obtener_empresa(request)
@@ -182,7 +182,7 @@ def desactivar_producto(request, pk):
     return redirect('lista_productos')
 
 
-@control_acceso('Manaudi')
+@control_acceso('Administrador')
 def activar_producto(request, pk):
     # Obtener la empresa del usuario logueado
     empresa_actual = obtener_empresa(request)
