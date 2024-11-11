@@ -39,7 +39,7 @@
                                 <button class="btn btn-primary edit-categoria" data-id="{{ categoria.pk }}">Editar</button>
                                 <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
                                 <button class="btn btn-danger delete-categoria" data-id="{{ categoria.pk }}">Eliminar</button>
-                            {% elif request.user|pertenece_grupo:"Encargado" %}
+                            {% elif request.user|pertenece_grupo:"Supervisor" %}
                                 <button class="btn btn-primary edit-categoria" data-id="{{ categoria.pk }}">Editar</button>
                                 <a href="{% url 'lista_subcategorias' categoria.pk %}" class="btn btn-warning">Subcategorias</a>
                             {% else %}

@@ -45,7 +45,7 @@
                             {% if request.user|pertenece_grupo:"Administrador" %}
                                 <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.id }}">Editar</button>
                                 <button class="btn btn-danger delete-subcategoria" data-id="{{ subcategoria.id }}">Eliminar</button>
-                            {% elif request.user|pertenece_grupo:"Encargado" %}
+                            {% elif request.user|pertenece_grupo:"Supervisor" %}
                                 <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.id }}">Editar</button>
                             {% endif %}
                         </td>
