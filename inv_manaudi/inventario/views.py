@@ -83,11 +83,55 @@ def iniciar_traslado(request):
 
 
 @control_acceso('Encargado')
+def iniciar_traslado_laboratorio(request):
+    empresa_actual = obtener_empresa(request)
+    sucursal_usuario = request.user.perfil.sucursal
+    tipo_sucursal_usuario = sucursal_usuario.tipo_sucursal if sucursal_usuario else None
+
+    if request.method == 'POST':
+        form = TrasladoForm(request.POST)
+        if form.is_valid():
+            traslado = form.save(commit=False)
+            traslado.usuario = request.user
+            traslado.save()
+            messages.success(request, 'Traslado registrado exitosamente.')
+            return redirect('traslados_pendientes')
+        else:
+            messages.error(request, 'Por favor, corrige los errores indicados.')
+    else:
+        form = TrasladoForm()
+        # Filtrado dinámico de opciones de sucursales de origen y destino
+        if tipo_sucursal_usuario == 'laboratorio':
+            # Si el usuario está en un laboratorio, sólo puede hacer traslados de regreso a bodegas o puntos de venta
+            form.fields['sucursal_origen'].queryset = Sucursal.objects.filter(id=sucursal_usuario.id)
+            form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual, tipo_sucursal__in=['bodega', 'punto_venta'])
+        else:
+            # Si el usuario está en una bodega o punto de venta, puede enviar a laboratorios
+            form.fields['sucursal_origen'].queryset = Sucursal.objects.filter(id=sucursal_usuario.id)
+            form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual, tipo_sucursal='laboratorio')
+            # Filtrar productos con stock en la sucursal del usuario (sucursal_origen)
+            # Filtrar productos con inventario disponible en la sucursal actual del usuario
+            form.fields['producto'].queryset = Producto.objects.filter(
+                inventarios__sucursal=sucursal_usuario,
+                inventarios__cantidad__gt=0
+            ).distinct()
+        form.fields['tipo_documento'].choices = [choice for choice in Traslado.TIPO_DOCUMENTO_CHOICES if choice[0] == 'orden_trabajo']
+    return render(request, 'iniciar_traslado_laboratorio.html', {'form': form})
+
+
+@control_acceso('Encargado')
 def traslados_pendientes(request):
-    # Filtrar solo los traslados pendientes donde la sucursal destino es la del usuario
-    movimientos_pendientes = Traslado.objects.filter(estado='pendiente').order_by('-fecha_creacion')
-    return render(request, 'traslados_pendientes.html', {
-        'movimientos_pendientes': movimientos_pendientes,})
+    empresa_actual = obtener_empresa(request)
+    sucursal_usuario = request.user.perfil.sucursal
+
+    # Verificar si el usuario pertenece al grupo "Supervisor"
+    if request.user.groups.filter(name="Supervisor").exists():
+        # Si es supervisor, mostrar todos los traslados de la empresa actual
+        movimientos_pendientes = Traslado.objects.filter(producto__empresa=empresa_actual, estado='pendiente').order_by('-fecha_creacion')
+    else:
+        # Si no es supervisor, mostrar solo los traslados asociados al usuario actual
+        movimientos_pendientes = Traslado.objects.filter(producto__empresa=empresa_actual, sucursal_destino=sucursal_usuario, estado='pendiente').order_by('-fecha_creacion')
+    return render(request, 'traslados_pendientes.html', {'movimientos_pendientes': movimientos_pendientes})
 
 
 @control_acceso('Encargado')

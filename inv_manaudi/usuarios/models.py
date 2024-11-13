@@ -16,11 +16,17 @@ class Empresa(models.Model):
 
 
 class Sucursal(models.Model):
+    TIPO_SUCURSAL_CHOICES = [
+        ('bodega', 'Bodega'),
+        ('punto_venta', 'Punto de Venta'),
+        ('laboratorio', 'Laboratorio'),
+    ]
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='sucursales')
     nombre = models.CharField(max_length=255)
     abreviatura = models.CharField(max_length=3)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
+    tipo_sucursal = models.CharField(max_length=20, choices=TIPO_SUCURSAL_CHOICES)
 
     def __str__(self):
         return f'{self.nombre} - {self.empresa.nombre}'

@@ -29,7 +29,7 @@ def inicio(request):
         productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad=0).count()
 
         # Filtrar los movimientos recientes solo de la sucursal del usuario
-        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:10]
+        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:50]
 
         # Productos más movidos solo para la sucursal del usuario
         productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).values('producto__nombre').annotate(
@@ -42,7 +42,7 @@ def inicio(request):
         productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad=0).count()
 
         # Filtrar los movimientos recientes para toda la empresa
-        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:10]
+        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:50]
 
         # Productos más movidos para toda la empresa
         productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).values('producto__nombre').annotate(

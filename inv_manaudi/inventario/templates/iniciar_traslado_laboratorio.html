@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tags %}
+
+{% block title %}Registrar Traslado a Laboratorio o Viceversa{% endblock %}
+{% block extra_css %}
+    <link href="{% static "plugins/select2/dist/css/select2.min.css" %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block contenido %}
+<h1>Registrar Traslado de Inventario a Laboratorio o Viceversa</h1>
+
+{% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="post" id="traslado-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_sucursal_origen">Sucursal Origen:</label>
+        {{ form.sucursal_origen }}
+    </div>
+    <div class="form-group">
+        <label for="id_sucursal_destino">Sucursal Destino:</label>
+        {{ form.sucursal_destino }}
+    </div>
+    <div class="form-group">
+        <label for="id_producto">Producto:</label>
+        {{ form.producto }}
+    </div>
+    <div class="form-group">
+        <label for="id_cantidad">Cantidad Entregada:</label>
+        {{ form.cantidad_entregada }}
+    </div>
+    <div class="form-group">
+        <label for="id_tipo_documento">Tipo de Documento:</label>
+        {{ form.tipo_documento }}
+    </div>
+    <div class="form-group">
+        <label for="id_documento_respaldo">Documento Respaldo:</label>
+        {{ form.documento_respaldo }}
+    </div>
+    <div class="form-group">
+        <label for="id_documento_soporte">Documento Soporte:</label>
+        {{ form.documento_soporte }} <!-- Campo para subir el archivo -->
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Registrar Traslado</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'plugins/select2/dist/js/select2.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aplicar Select2 a los campos select
+            $('#id_producto').select2({
+                placeholder: 'Seleccione un producto',
+                allowClear: true
+            });
+
+            $('#id_sucursal_origen').select2({
+                placeholder: 'Seleccione la sucursal de origen',
+                allowClear: true
+            });
+
+            $('#id_sucursal_destino').select2({
+                placeholder: 'Seleccione la sucursal de destino',
+                allowClear: true
+            });
+
+            $('#id_tipo_documento').select2({
+                placeholder: 'Seleccione un tipo de documento',
+                allowClear: true
+            });
+        });
+    </script>
+{% endblock %}

@@ -27,6 +27,7 @@
                         <table id="movimientos-table" class="table mb-0">
                             <thead>
                             <tr>
+                                <th>Codigo</th>
                                 <th>Producto</th>
                                 <th>Sucursal</th>
                                 <th>Cantidad</th>
@@ -39,7 +40,8 @@
                             <tbody>
                                 {% for movimiento in movimientos %}
                                     <tr>
-                                        <td>{{ movimiento.producto.codigo }} -- {{ movimiento.producto.nombre }}</td>
+                                        <td>{{ movimiento.producto.codigo }}</td>
+                                        <td>{{ movimiento.producto.nombre }}</td>
                                         <td>{{ movimiento.sucursal.nombre }}</td>
                                         <td>{{ movimiento.cantidad }}</td>
                                         <td>{{ movimiento.get_tipo_movimiento_display }}</td>
@@ -73,6 +75,7 @@
                         <table id="traslados-table" class="table mb-0">
                             <thead>
                             <tr>
+                                <th>Codigo</th>
                                 <th>Producto</th>
                                 <th>Sucursal Origen</th>
                                 <th>Sucursal Destino</th>
@@ -85,6 +88,7 @@
                             <tbody>
                             {% for traslado in traslados %}
                                 <tr>
+                                    <td>{{ traslado.producto.codigo }}</td>
                                     <td>{{ traslado.producto.nombre }}</td>
                                     <td>{{ traslado.sucursal_origen.nombre }}</td>
                                     <td>{{ traslado.sucursal_destino.nombre }}</td>
