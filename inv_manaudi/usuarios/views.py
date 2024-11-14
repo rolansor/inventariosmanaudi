@@ -13,40 +13,24 @@ from .models import Empresa, Sucursal
 
 @login_required
 def inicio(request):
-    # Obtener la empresa del usuario logueado a través de su perfil
+    # Obtener la empresa del usuario logueado
     empresa_usuario = obtener_empresa(request)
-
-    # Intentar obtener la sucursal del usuario, si existe
     sucursal_usuario = getattr(request.user.perfil, 'sucursal', None)
 
-    # Filtrar productos y movimientos según la empresa y, si aplica, la sucursal
-    total_productos = Producto.objects.para_empresa(empresa_usuario).count()
-
+    # Si el usuario no es supervisor, muestra solo los datos de la sucursal actual
     if sucursal_usuario:
-        # Si el usuario tiene una sucursal, filtrar por sucursal
+        total_productos = Producto.objects.filter(empresa=empresa_usuario, inventarios__sucursal=sucursal_usuario).distinct().count()
         total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
         productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad__lt=F('stock_minimo')).count()
         productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad=0).count()
-
-        # Filtrar los movimientos recientes solo de la sucursal del usuario
         movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:50]
-
-        # Productos más movidos solo para la sucursal del usuario
-        productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).values('producto__nombre').annotate(
-            total=Sum('cantidad')).order_by('-total')[:5]
-
     else:
-        # Si el usuario no tiene sucursal pero tiene empresa, filtrar por la empresa
-        total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
-        productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad__lt=F('stock_minimo')).count()
-        productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad=0).count()
-
-        # Filtrar los movimientos recientes para toda la empresa
-        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:50]
-
-        # Productos más movidos para toda la empresa
-        productos_mas_movidos = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).values('producto__nombre').annotate(
-            total=Sum('cantidad')).order_by('-total')[:5]
+        # Si el usuario no tiene sucursal asignada, inicializar variables
+        total_productos = 0
+        total_stock = 0
+        productos_bajo_stock = 0
+        productos_agotados = 0
+        movimientos_recientes = []
 
     return render(request, 'inicio.html', {
         'total_productos': total_productos,
@@ -54,7 +38,6 @@ def inicio(request):
         'productos_bajo_stock': productos_bajo_stock,
         'productos_agotados': productos_agotados,
         'movimientos_recientes': movimientos_recientes,
-        'productos_mas_movidos': productos_mas_movidos,
     })
 
 

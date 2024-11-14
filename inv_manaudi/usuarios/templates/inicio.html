@@ -23,7 +23,7 @@
 
 {% block contenido %}
 <div id="content" class="content">
-    <h1 class="page-header">Resumen de inventarios para: <b> {{ request.user.perfil.empresa.nombre }}</b></h1>
+    <h1 class="page-header">Resumen de inventarios para: <b> {{ request.user.perfil.empresa.nombre }}</b> <b> {{ request.user.perfil.sucursal.nombre }}</b></h1>
 
     <!-- Resumen general -->
     <div class="row">
