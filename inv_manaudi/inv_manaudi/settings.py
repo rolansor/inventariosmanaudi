@@ -67,10 +67,10 @@ WSGI_APPLICATION = 'inv_manaudi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sifcol$inv_manaudi',
-        'USER': 'sifcol',
-        'PASSWORD': '3R4SO3orvj*1',
-        'HOST': 'sifcol.mysql.pythonanywhere-services.com',
+        'NAME': 'inv_manaudi',
+        'USER': 'root',
+        'PASSWORD': 'f4d3s2a1',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }

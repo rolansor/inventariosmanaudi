@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reporte de Movimientos del Día{% endblock %}
+
+{% block contenido %}
+<h1>Reporte de Movimientos del Día - {{ fecha_hoy }}</h1>
+
+<!-- Resumen por usuario -->
+<h2>Resumen por Usuario</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Total Movimientos</th>
+            <th>Total Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in resumen_por_usuario %}
+        <tr>
+            <td>{{ usuario.usuario__username }}</td>
+            <td>{{ usuario.total_movimientos }}</td>
+            <td>{{ usuario.total_cantidad }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Resumen por tipo de movimiento -->
+<h2>Resumen por Tipo de Movimiento</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tipo de Movimiento</th>
+            <th>Total Movimientos</th>
+            <th>Total Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tipo in resumen_por_tipo %}
+        <tr>
+            <td>{{ tipo.tipo_movimiento|capfirst }}</td>
+            <td>{{ tipo.total_movimientos }}</td>
+            <td>{{ tipo.total_cantidad }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Detalles completos -->
+<h2>Detalles de Movimientos</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Sucursal</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Tipo de Movimiento</th>
+            <th>Comentario</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for movimiento in detalles_movimientos %}
+        <tr>
+            <td>{{ movimiento.fecha }}</td>
+            <td>{{ movimiento.usuario.username }}</td>
+            <td>{{ movimiento.sucursal.nombre }}</td>
+            <td>{{ movimiento.producto.nombre }}</td>
+            <td>{{ movimiento.cantidad }}</td>
+            <td>{{ movimiento.get_tipo_movimiento_display }}</td>
+            <td>{{ movimiento.comentario|default:"Sin comentarios" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
