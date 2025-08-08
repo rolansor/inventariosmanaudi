@@ -1,0 +1,3149 @@
+{
+  "auth_group": [
+    [
+      1,
+      "Administrador"
+    ],
+    [
+      4,
+      "Encargado"
+    ],
+    [
+      2,
+      "Manaudi"
+    ],
+    [
+      3,
+      "Supervisor"
+    ]
+  ],
+  "auth_permission": [
+    [
+      1,
+      "Can add log entry",
+      1,
+      "add_logentry"
+    ],
+    [
+      2,
+      "Can change log entry",
+      1,
+      "change_logentry"
+    ],
+    [
+      3,
+      "Can delete log entry",
+      1,
+      "delete_logentry"
+    ],
+    [
+      4,
+      "Can view log entry",
+      1,
+      "view_logentry"
+    ],
+    [
+      5,
+      "Can add permission",
+      2,
+      "add_permission"
+    ],
+    [
+      6,
+      "Can change permission",
+      2,
+      "change_permission"
+    ],
+    [
+      7,
+      "Can delete permission",
+      2,
+      "delete_permission"
+    ],
+    [
+      8,
+      "Can view permission",
+      2,
+      "view_permission"
+    ],
+    [
+      9,
+      "Can add group",
+      3,
+      "add_group"
+    ],
+    [
+      10,
+      "Can change group",
+      3,
+      "change_group"
+    ],
+    [
+      11,
+      "Can delete group",
+      3,
+      "delete_group"
+    ],
+    [
+      12,
+      "Can view group",
+      3,
+      "view_group"
+    ],
+    [
+      13,
+      "Can add content type",
+      4,
+      "add_contenttype"
+    ],
+    [
+      14,
+      "Can change content type",
+      4,
+      "change_contenttype"
+    ],
+    [
+      15,
+      "Can delete content type",
+      4,
+      "delete_contenttype"
+    ],
+    [
+      16,
+      "Can view content type",
+      4,
+      "view_contenttype"
+    ],
+    [
+      17,
+      "Can add session",
+      5,
+      "add_session"
+    ],
+    [
+      18,
+      "Can change session",
+      5,
+      "change_session"
+    ],
+    [
+      19,
+      "Can delete session",
+      5,
+      "delete_session"
+    ],
+    [
+      20,
+      "Can view session",
+      5,
+      "view_session"
+    ],
+    [
+      21,
+      "Can add user",
+      6,
+      "add_usuario"
+    ],
+    [
+      22,
+      "Can change user",
+      6,
+      "change_usuario"
+    ],
+    [
+      23,
+      "Can delete user",
+      6,
+      "delete_usuario"
+    ],
+    [
+      24,
+      "Can view user",
+      6,
+      "view_usuario"
+    ],
+    [
+      25,
+      "Can add empresa",
+      7,
+      "add_empresa"
+    ],
+    [
+      26,
+      "Can change empresa",
+      7,
+      "change_empresa"
+    ],
+    [
+      27,
+      "Can delete empresa",
+      7,
+      "delete_empresa"
+    ],
+    [
+      28,
+      "Can view empresa",
+      7,
+      "view_empresa"
+    ],
+    [
+      29,
+      "Can add sucursal",
+      8,
+      "add_sucursal"
+    ],
+    [
+      30,
+      "Can change sucursal",
+      8,
+      "change_sucursal"
+    ],
+    [
+      31,
+      "Can delete sucursal",
+      8,
+      "delete_sucursal"
+    ],
+    [
+      32,
+      "Can view sucursal",
+      8,
+      "view_sucursal"
+    ],
+    [
+      33,
+      "Can add usuario perfil",
+      9,
+      "add_usuarioperfil"
+    ],
+    [
+      34,
+      "Can change usuario perfil",
+      9,
+      "change_usuarioperfil"
+    ],
+    [
+      35,
+      "Can delete usuario perfil",
+      9,
+      "delete_usuarioperfil"
+    ],
+    [
+      36,
+      "Can view usuario perfil",
+      9,
+      "view_usuarioperfil"
+    ],
+    [
+      37,
+      "Can add inventario",
+      10,
+      "add_inventario"
+    ],
+    [
+      38,
+      "Can change inventario",
+      10,
+      "change_inventario"
+    ],
+    [
+      39,
+      "Can delete inventario",
+      10,
+      "delete_inventario"
+    ],
+    [
+      40,
+      "Can view inventario",
+      10,
+      "view_inventario"
+    ],
+    [
+      41,
+      "Can add movimiento inventario",
+      11,
+      "add_movimientoinventario"
+    ],
+    [
+      42,
+      "Can change movimiento inventario",
+      11,
+      "change_movimientoinventario"
+    ],
+    [
+      43,
+      "Can delete movimiento inventario",
+      11,
+      "delete_movimientoinventario"
+    ],
+    [
+      44,
+      "Can view movimiento inventario",
+      11,
+      "view_movimientoinventario"
+    ],
+    [
+      45,
+      "Can add traslado",
+      12,
+      "add_traslado"
+    ],
+    [
+      46,
+      "Can change traslado",
+      12,
+      "change_traslado"
+    ],
+    [
+      47,
+      "Can delete traslado",
+      12,
+      "delete_traslado"
+    ],
+    [
+      48,
+      "Can view traslado",
+      12,
+      "view_traslado"
+    ],
+    [
+      49,
+      "Can add categoria",
+      13,
+      "add_categoria"
+    ],
+    [
+      50,
+      "Can change categoria",
+      13,
+      "change_categoria"
+    ],
+    [
+      51,
+      "Can delete categoria",
+      13,
+      "delete_categoria"
+    ],
+    [
+      52,
+      "Can view categoria",
+      13,
+      "view_categoria"
+    ],
+    [
+      53,
+      "Can add subcategoria",
+      14,
+      "add_subcategoria"
+    ],
+    [
+      54,
+      "Can change subcategoria",
+      14,
+      "change_subcategoria"
+    ],
+    [
+      55,
+      "Can delete subcategoria",
+      14,
+      "delete_subcategoria"
+    ],
+    [
+      56,
+      "Can view subcategoria",
+      14,
+      "view_subcategoria"
+    ],
+    [
+      57,
+      "Can add producto",
+      15,
+      "add_producto"
+    ],
+    [
+      58,
+      "Can change producto",
+      15,
+      "change_producto"
+    ],
+    [
+      59,
+      "Can delete producto",
+      15,
+      "delete_producto"
+    ],
+    [
+      60,
+      "Can view producto",
+      15,
+      "view_producto"
+    ]
+  ],
+  "categorias_categoria": [
+    [
+      1,
+      "LUNAS",
+      1
+    ]
+  ],
+  "categorias_subcategoria": [
+    [
+      1,
+      "MONOFOCALES",
+      1
+    ]
+  ],
+  "django_admin_log": [
+    [
+      1,
+      "2024-10-23 06:34:42.661799",
+      "7",
+      "rolansor",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Username\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      2,
+      "2024-10-23 06:35:51.330275",
+      "2",
+      "silme_inventarios",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      3,
+      "2024-10-23 06:36:43.224711",
+      "7",
+      "nadmin_inventarios",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Username\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      4,
+      "2024-10-24 04:19:42.458203",
+      "8",
+      "mancero_manaudi",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      5,
+      "2024-10-24 04:20:27.832476",
+      "8",
+      "mancero_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      6,
+      "2024-10-24 04:20:48.516383",
+      "9",
+      "mancero_administrador",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      7,
+      "2024-10-24 04:21:02.756072",
+      "9",
+      "mancero_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      8,
+      "2024-10-24 04:21:44.031645",
+      "10",
+      "mancero_empalme",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      9,
+      "2024-10-24 04:21:51.416798",
+      "10",
+      "rolansor",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Username\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      10,
+      "2024-10-24 04:22:26.477596",
+      "10",
+      "mancero_empalme",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Username\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      11,
+      "2024-10-24 04:22:47.562996",
+      "11",
+      "mancero_milagro",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      12,
+      "2024-10-24 04:23:12.218996",
+      "11",
+      "mancero_milagro",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      13,
+      "2024-10-24 04:23:34.516150",
+      "12",
+      "mancero_quitocalderon",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      14,
+      "2024-10-24 04:23:45.244333",
+      "12",
+      "mancero_quitocalderon",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      15,
+      "2024-10-24 04:24:05.355183",
+      "13",
+      "mancero_quitosanrafael",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      16,
+      "2024-10-24 04:24:24.757184",
+      "13",
+      "mancero_quitosanrafael",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      17,
+      "2024-10-24 04:24:41.084040",
+      "14",
+      "mancero_chone",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      18,
+      "2024-10-24 04:25:00.352605",
+      "14",
+      "mancero_chone",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      19,
+      "2024-10-24 04:25:18.455184",
+      "7",
+      "'mancero_administrador - MANCERO S.A.S (Sin Sucursal"
+    ],
+    [
+      20,
+      "2024-10-24 04:25:32.932409",
+      "8",
+      "'mancero_manaudi - MANCERO S.A.S (Sin Sucursal"
+    ],
+    [
+      21,
+      "2024-10-24 04:25:40.383341",
+      "9",
+      "'mancero_chone - MANCERO S.A.S (Chone"
+    ],
+    [
+      22,
+      "2024-10-24 04:25:52.366490",
+      "10",
+      "'mancero_milagro - MANCERO S.A.S (Milagro"
+    ],
+    [
+      23,
+      "2024-10-24 04:26:09.833458",
+      "11",
+      "'mancero_empalme - MANCERO S.A.S (El Empalme"
+    ],
+    [
+      24,
+      "2024-10-24 04:26:30.679516",
+      "12",
+      "'mancero_quitocalderon - MANCERO S.A.S (Quito-Calderon"
+    ],
+    [
+      25,
+      "2024-10-24 04:26:42.471411",
+      "13",
+      "'mancero_quitosanrafael - MANCERO S.A.S (Quito-San Rafael"
+    ],
+    [
+      26,
+      "2024-10-24 04:29:18.357932",
+      "9",
+      "mancero_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      27,
+      "2024-10-24 04:30:28.269661",
+      "8",
+      "mancero_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      28,
+      "2024-10-24 23:42:02.120385",
+      "4",
+      "LENSCORP S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      7,
+      1
+    ],
+    [
+      29,
+      "2024-10-24 23:42:50.479041",
+      "4",
+      "LENSCORP S.A.S",
+      3,
+      "",
+      7,
+      1
+    ],
+    [
+      30,
+      "2024-10-24 23:44:17.624343",
+      "20",
+      "Portoviejo - LENSCORP S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      31,
+      "2024-10-24 23:44:18.351984",
+      "21",
+      "Portoviejo - LENSCORP S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      32,
+      "2024-10-24 23:44:50.112000",
+      "21",
+      "Portoviejo - LENSCORP S.A.S",
+      3,
+      "",
+      8,
+      1
+    ],
+    [
+      33,
+      "2024-10-24 23:45:10.083432",
+      "22",
+      "Loja - LENSCORP S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      34,
+      "2024-10-24 23:45:32.427468",
+      "23",
+      "Esmeraldas - LENSCORP S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      35,
+      "2024-10-24 23:47:00.760438",
+      "22",
+      "Loja - LENSCORP S.A.S",
+      3,
+      "",
+      8,
+      1
+    ],
+    [
+      36,
+      "2024-10-24 23:47:00.772594",
+      "20",
+      "Portoviejo - LENSCORP S.A.S",
+      3,
+      "",
+      8,
+      1
+    ],
+    [
+      37,
+      "2024-10-24 23:50:11.481648",
+      "15",
+      "lenscorp_admin",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      38,
+      "2024-10-24 23:52:20.960849",
+      "15",
+      "lenscorp_admin",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      39,
+      "2024-10-24 23:53:49.212420",
+      "16",
+      "lenscorp_portoviejo",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      40,
+      "2024-10-24 23:54:10.328344",
+      "16",
+      "lenscorp_portoviejo",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      41,
+      "2024-10-24 23:54:38.435019",
+      "17",
+      "lenscorp_loja",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      42,
+      "2024-10-24 23:54:48.325520",
+      "17",
+      "lenscorp_loja",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      43,
+      "2024-10-24 23:55:09.792552",
+      "18",
+      "lenscorp_quevedo",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      44,
+      "2024-10-24 23:55:21.452399",
+      "18",
+      "lenscorp_quevedo",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      45,
+      "2024-10-24 23:56:03.598527",
+      "19",
+      "lenscorp_ibarra",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      46,
+      "2024-10-24 23:56:14.855292",
+      "19",
+      "lenscorp_ibarra",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      47,
+      "2024-10-24 23:56:39.060362",
+      "20",
+      "lenscorp_esmeraldas",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      48,
+      "2024-10-24 23:56:47.938778",
+      "20",
+      "lenscorp_esmeraldas",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      49,
+      "2024-10-24 23:57:11.448868",
+      "21",
+      "lenscorp_quito",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      50,
+      "2024-10-24 23:57:20.344825",
+      "21",
+      "lenscorp_quito",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      51,
+      "2024-10-24 23:57:44.907245",
+      "22",
+      "lenscorp_manta",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      52,
+      "2024-10-24 23:57:55.257034",
+      "22",
+      "lenscorp_manta",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      53,
+      "2024-10-24 23:58:13.560051",
+      "23",
+      "lenscorp_babahoyo",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      54,
+      "2024-10-24 23:58:21.173152",
+      "23",
+      "lenscorp_babahoyo",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      55,
+      "2024-10-24 23:59:52.103773",
+      "24",
+      "lenscorp_admin_general",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      56,
+      "2024-10-25 00:00:03.853754",
+      "24",
+      "lenscorp_admin_general",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      57,
+      "2024-10-25 00:01:03.351627",
+      "14",
+      "'lenscorp_admin - LENSCORP S.A.S (Guayaquil"
+    ],
+    [
+      58,
+      "2024-10-25 00:01:19.963873",
+      "15",
+      "'lenscorp_admin_general - LENSCORP S.A.S (Guayaquil"
+    ],
+    [
+      59,
+      "2024-10-25 00:02:09.292096",
+      "16",
+      "'lenscorp_babahoyo - LENSCORP S.A.S (Babahoyo"
+    ],
+    [
+      60,
+      "2024-10-25 00:02:23.310225",
+      "17",
+      "'lenscorp_esmeraldas - LENSCORP S.A.S (Esmeraldas"
+    ],
+    [
+      61,
+      "2024-10-25 00:02:35.368820",
+      "18",
+      "'lenscorp_ibarra - LENSCORP S.A.S (Ibarra"
+    ],
+    [
+      62,
+      "2024-10-25 00:02:44.779538",
+      "19",
+      "'lenscorp_loja - LENSCORP S.A.S (Loja"
+    ],
+    [
+      63,
+      "2024-10-25 00:02:54.875582",
+      "20",
+      "'lenscorp_manta - LENSCORP S.A.S (Manta"
+    ],
+    [
+      64,
+      "2024-10-25 00:03:05.456985",
+      "21",
+      "'lenscorp_portoviejo - LENSCORP S.A.S (Portoviejo"
+    ],
+    [
+      65,
+      "2024-10-25 00:03:15.936621",
+      "22",
+      "'lenscorp_quevedo - LENSCORP S.A.S (Quevedo"
+    ],
+    [
+      66,
+      "2024-10-25 00:03:35.567645",
+      "23",
+      "'lenscorp_quito - LENSCORP S.A.S (Quito"
+    ],
+    [
+      67,
+      "2024-10-25 17:24:28.319982",
+      "24",
+      "lenscorp_admin_general",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"First name\\\", \\\"Last name\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      68,
+      "2024-10-25 17:24:45.862424",
+      "15",
+      "lenscorp_admin",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"First name\\\", \\\"Last name\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      69,
+      "2024-10-25 17:46:09.570444",
+      "7",
+      "Guayaquil Bodega - LENSCORP S.A.S",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Nombre\\\"]}}]",
+      8,
+      1
+    ],
+    [
+      70,
+      "2024-10-25 17:46:36.606519",
+      "24",
+      "Guayaquil - LENSCORP S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      71,
+      "2024-10-25 17:46:57.605644",
+      "7",
+      "Guayaquil Bodega - LENSCORP S.A.S",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Abreviatura\\\"]}}]",
+      8,
+      1
+    ],
+    [
+      72,
+      "2024-10-25 17:47:29.068249",
+      "25",
+      "lenscorp_guayaquil",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      73,
+      "2024-10-25 17:47:50.176853",
+      "25",
+      "lenscorp_guayaquil",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"First name\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      74,
+      "2024-10-25 17:48:14.472975",
+      "24",
+      "'lenscorp_guayaquil - LENSCORP S.A.S (Guayaquil"
+    ],
+    [
+      75,
+      "2024-10-25 17:50:17.025363",
+      "25",
+      "Guayaquil - MANCERO S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      76,
+      "2024-10-25 17:50:40.686115",
+      "26",
+      "Guayaquil Bodega - MANCERO S.A.S",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      77,
+      "2024-10-25 17:51:42.518980",
+      "26",
+      "mancero_guayaquil",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      78,
+      "2024-10-25 17:52:05.238652",
+      "26",
+      "mancero_guayaquil",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      79,
+      "2024-10-25 17:52:44.481815",
+      "27",
+      "mancero_operador",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      80,
+      "2024-10-25 17:52:56.965525",
+      "27",
+      "mancero_operador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      81,
+      "2024-10-25 17:54:19.945078",
+      "25",
+      "'mancero_operador - MANCERO S.A.S (Guayaquil Bodega"
+    ],
+    [
+      82,
+      "2024-10-25 17:54:29.626493",
+      "7",
+      "'mancero_administrador - MANCERO S.A.S (Guayaquil Bodega"
+    ],
+    [
+      83,
+      "2024-10-28 17:22:04.805350",
+      "9",
+      "mancero_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      84,
+      "2024-10-28 18:38:09.535924",
+      "4033",
+      "'ECO- - ARMAZON ECONOMICO (Unidad"
+    ],
+    [
+      85,
+      "2024-10-28 19:00:15.398695",
+      "4071",
+      "'ECO-S31732 - ARMAZON ECONOMICO (Unidad"
+    ],
+    [
+      86,
+      "2024-10-28 19:32:39.199676",
+      "4110",
+      "'ECO-PR2181 - ARMAZON ECONOMICO (Unidad"
+    ],
+    [
+      87,
+      "2024-10-28 21:53:19.265099",
+      "4162",
+      "'ECO-ASM103 - ARMAZON ECONOMICO (Unidad"
+    ],
+    [
+      88,
+      "2024-10-29 04:16:22.924380",
+      "22",
+      "lenscorp_manta",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"First name\\\", \\\"Last name\\\", \\\"Email address\\\", \\\"Telefono\\\", \\\"Direccion\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      89,
+      "2024-10-29 05:05:07.737807",
+      "26",
+      "'mancero_guayaquil - MANCERO S.A.S (Guayaquil"
+    ],
+    [
+      90,
+      "2024-11-11 04:22:47.939228",
+      "2",
+      "ninefifteen_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      91,
+      "2024-11-11 04:23:07.295259",
+      "2",
+      "ninefifteen_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      92,
+      "2024-11-11 04:23:22.145861",
+      "8",
+      "mancero_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      93,
+      "2024-11-11 04:23:58.371509",
+      "28",
+      "lenscorp_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      94,
+      "2024-11-11 04:24:30.102765",
+      "28",
+      "lenscorp_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      95,
+      "2024-11-11 04:24:34.574629",
+      "8",
+      "mancero_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      96,
+      "2024-11-11 04:24:39.936581",
+      "2",
+      "ninefifteen_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      97,
+      "2024-11-11 04:27:50.263564",
+      "3",
+      "Cuenca - NINEFIFTEEN",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Nombre\\\"]}}]",
+      8,
+      1
+    ],
+    [
+      98,
+      "2024-11-11 04:27:57.105088",
+      "2",
+      "Quito - NINEFIFTEEN",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Nombre\\\"]}}]",
+      8,
+      1
+    ],
+    [
+      99,
+      "2024-11-11 04:28:02.868957",
+      "1",
+      "Guayaquil - NINEFIFTEEN",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Nombre\\\"]}}]",
+      8,
+      1
+    ],
+    [
+      100,
+      "2024-11-11 04:28:29.768481",
+      "27",
+      "Bodega Principal - NINEFIFTEEN",
+      1,
+      "[{\\\"added\\\": {}}]",
+      8,
+      1
+    ],
+    [
+      101,
+      "2024-11-11 04:28:55.208549",
+      "27",
+      "Guayaquil Bodega - NINEFIFTEEN",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Nombre\\\", \\\"Abreviatura\\\"]}}]",
+      8,
+      1
+    ],
+    [
+      102,
+      "2024-11-11 04:31:31.276182",
+      "3",
+      "'ninefifteen_administrador - NINEFIFTEEN (Guayaquil Bodega"
+    ],
+    [
+      103,
+      "2024-11-11 04:32:19.592606",
+      "27",
+      "'lenscorp_manaudi - LENSCORP S.A.S (Sin Sucursal"
+    ],
+    [
+      104,
+      "2024-11-11 05:54:45.790295",
+      "27",
+      "mancero_operador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      105,
+      "2024-11-11 06:01:55.715643",
+      "15",
+      "lenscorp_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      106,
+      "2024-11-11 06:02:15.006720",
+      "2",
+      "ninefifteen_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      107,
+      "2024-11-11 06:07:17.911005",
+      "7",
+      "ninefifteen_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      108,
+      "2024-11-11 06:08:22.523736",
+      "5",
+      "ninefifteen_cuenca",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      109,
+      "2024-11-11 06:08:39.126801",
+      "6",
+      "ninefifteen_quito",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      110,
+      "2024-11-11 06:09:00.759181",
+      "3",
+      "ninefifteen_guayaquil",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      111,
+      "2024-11-11 06:11:10.248003",
+      "13",
+      "mancero_quitosanrafael",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      112,
+      "2024-11-11 06:11:18.815982",
+      "12",
+      "mancero_quitocalderon",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      113,
+      "2024-11-11 06:11:32.685432",
+      "27",
+      "mancero_operador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      114,
+      "2024-11-11 06:11:53.730558",
+      "11",
+      "mancero_milagro",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      115,
+      "2024-11-11 06:12:08.592440",
+      "8",
+      "mancero_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      116,
+      "2024-11-11 06:12:25.311018",
+      "26",
+      "mancero_guayaquil",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      117,
+      "2024-11-11 06:12:37.274976",
+      "10",
+      "mancero_empalme",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      118,
+      "2024-11-11 06:12:48.406495",
+      "14",
+      "mancero_chone",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      119,
+      "2024-11-11 06:13:05.328186",
+      "9",
+      "mancero_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      120,
+      "2024-11-11 06:15:27.295503",
+      "24",
+      "lenscorp_admin_general",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      121,
+      "2024-11-11 06:15:40.253760",
+      "24",
+      "lenscorp_admin_general",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      122,
+      "2024-11-11 06:16:00.883519",
+      "28",
+      "lenscorp_manaudi",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      123,
+      "2024-11-11 06:16:23.346310",
+      "23",
+      "lenscorp_babahoyo",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      124,
+      "2024-11-11 06:19:52.725146",
+      "15",
+      "lenscorp_administrador",
+      2,
+      "[]",
+      6,
+      1
+    ],
+    [
+      125,
+      "2024-11-11 06:20:06.412034",
+      "15",
+      "lenscorp_administrador",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      126,
+      "2024-11-11 06:20:30.179276",
+      "24",
+      "lenscorp_admin_general",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      127,
+      "2024-11-11 07:11:59.373009",
+      "1",
+      "administrador_inventarios",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"password\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      128,
+      "2024-11-12 20:14:20.581803",
+      "29",
+      "ninefifteen_labgye",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      129,
+      "2024-11-12 20:14:35.701632",
+      "30",
+      "ninefifteen_labcue",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      130,
+      "2024-11-12 20:14:46.775963",
+      "31",
+      "ninefifteen_labuio",
+      1,
+      "[{\\\"added\\\": {}}]",
+      6,
+      1
+    ],
+    [
+      131,
+      "2024-11-12 20:15:32.765314",
+      "30",
+      "rolansor",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Username\\\", \\\"First name\\\", \\\"Last name\\\", \\\"Email address\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      132,
+      "2024-11-12 20:16:09.493575",
+      "30",
+      "ninefifteen_labcue",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"Username\\\", \\\"First name\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      133,
+      "2024-11-12 20:16:40.528828",
+      "29",
+      "ninefifteen_labgye",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"First name\\\", \\\"Last name\\\", \\\"Email address\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      134,
+      "2024-11-12 20:17:05.794639",
+      "31",
+      "ninefifteen_labuio",
+      2,
+      "[{\\\"changed\\\": {\\\"fields\\\": [\\\"First name\\\", \\\"Last name\\\", \\\"Email address\\\", \\\"Groups\\\"]}}]",
+      6,
+      1
+    ],
+    [
+      135,
+      "2024-11-12 20:17:32.093448",
+      "28",
+      "'ninefifteen_labcue - NINEFIFTEEN (Laboratorio Cuenca"
+    ],
+    [
+      136,
+      "2024-11-12 20:17:42.465066",
+      "28",
+      "'ninefifteen_labgye - NINEFIFTEEN (Laboratorio Guayaquil"
+    ],
+    [
+      137,
+      "2024-11-12 20:18:10.139804",
+      "29",
+      "'ninefifteen_labcue - NINEFIFTEEN (Laboratorio Cuenca"
+    ],
+    [
+      138,
+      "2024-11-12 20:18:27.591270",
+      "30",
+      "'ninefifteen_labuio - NINEFIFTEEN (Laboratorio Quito"
+    ]
+  ],
+  "django_content_type": [
+    [
+      1,
+      "admin",
+      "logentry"
+    ],
+    [
+      3,
+      "auth",
+      "group"
+    ],
+    [
+      2,
+      "auth",
+      "permission"
+    ],
+    [
+      13,
+      "categorias",
+      "categoria"
+    ],
+    [
+      14,
+      "categorias",
+      "subcategoria"
+    ],
+    [
+      4,
+      "contenttypes",
+      "contenttype"
+    ],
+    [
+      10,
+      "inventario",
+      "inventario"
+    ],
+    [
+      11,
+      "inventario",
+      "movimientoinventario"
+    ],
+    [
+      12,
+      "inventario",
+      "traslado"
+    ],
+    [
+      15,
+      "productos",
+      "producto"
+    ],
+    [
+      5,
+      "sessions",
+      "session"
+    ],
+    [
+      7,
+      "usuarios",
+      "empresa"
+    ],
+    [
+      8,
+      "usuarios",
+      "sucursal"
+    ],
+    [
+      6,
+      "usuarios",
+      "usuario"
+    ],
+    [
+      9,
+      "usuarios",
+      "usuarioperfil"
+    ]
+  ],
+  "django_migrations": [
+    [
+      1,
+      "contenttypes",
+      "0001_initial",
+      "2024-10-19 03:03:55.862176"
+    ],
+    [
+      2,
+      "contenttypes",
+      "0002_remove_content_type_name",
+      "2024-10-19 03:03:55.900188"
+    ],
+    [
+      3,
+      "auth",
+      "0001_initial",
+      "2024-10-19 03:03:56.012613"
+    ],
+    [
+      4,
+      "auth",
+      "0002_alter_permission_name_max_length",
+      "2024-10-19 03:03:56.040703"
+    ],
+    [
+      5,
+      "auth",
+      "0003_alter_user_email_max_length",
+      "2024-10-19 03:03:56.044702"
+    ],
+    [
+      6,
+      "auth",
+      "0004_alter_user_username_opts",
+      "2024-10-19 03:03:56.047700"
+    ],
+    [
+      7,
+      "auth",
+      "0005_alter_user_last_login_null",
+      "2024-10-19 03:03:56.052212"
+    ],
+    [
+      8,
+      "auth",
+      "0006_require_contenttypes_0002",
+      "2024-10-19 03:03:56.053211"
+    ],
+    [
+      9,
+      "auth",
+      "0007_alter_validators_add_error_messages",
+      "2024-10-19 03:03:56.056218"
+    ],
+    [
+      10,
+      "auth",
+      "0008_alter_user_username_max_length",
+      "2024-10-19 03:03:56.059222"
+    ],
+    [
+      11,
+      "auth",
+      "0009_alter_user_last_name_max_length",
+      "2024-10-19 03:03:56.063584"
+    ],
+    [
+      12,
+      "auth",
+      "0010_alter_group_name_max_length",
+      "2024-10-19 03:03:56.071075"
+    ],
+    [
+      13,
+      "auth",
+      "0011_update_proxy_permissions",
+      "2024-10-19 03:03:56.074083"
+    ],
+    [
+      14,
+      "auth",
+      "0012_alter_user_first_name_max_length",
+      "2024-10-19 03:03:56.078076"
+    ],
+    [
+      15,
+      "usuarios",
+      "0001_initial",
+      "2024-10-19 03:03:56.327236"
+    ],
+    [
+      16,
+      "admin",
+      "0001_initial",
+      "2024-10-19 03:03:56.392626"
+    ],
+    [
+      17,
+      "admin",
+      "0002_logentry_remove_auto_add",
+      "2024-10-19 03:03:56.398663"
+    ],
+    [
+      18,
+      "admin",
+      "0003_logentry_add_action_flag_choices",
+      "2024-10-19 03:03:56.403212"
+    ],
+    [
+      19,
+      "categorias",
+      "0001_initial",
+      "2024-10-19 03:03:56.442121"
+    ],
+    [
+      20,
+      "categorias",
+      "0002_categoria_empresa",
+      "2024-10-19 03:03:56.466210"
+    ],
+    [
+      21,
+      "productos",
+      "0001_initial",
+      "2024-10-19 03:03:56.523967"
+    ],
+    [
+      22,
+      "inventario",
+      "0001_initial",
+      "2024-10-19 03:03:56.601952"
+    ],
+    [
+      23,
+      "inventario",
+      "0002_traslado_producto",
+      "2024-10-19 03:03:56.638168"
+    ],
+    [
+      24,
+      "inventario",
+      "0003_initial",
+      "2024-10-19 03:03:56.930688"
+    ],
+    [
+      25,
+      "productos",
+      "0002_producto_empresa",
+      "2024-10-19 03:03:56.970481"
+    ],
+    [
+      26,
+      "sessions",
+      "0001_initial",
+      "2024-10-19 03:03:56.989008"
+    ]
+  ],
+  "django_session": [
+    [
+      "1m1ffms1h1ut83j108uw9gdyo4kkdcq4",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tgoKB:mMdLBIjCXGu2B9SfdyRoNJQgZvO7zHkeRFtPs4K-_Hw",
+      "2025-02-22 17:08:59.292727"
+    ],
+    [
+      "1tyna599es7jx6608oia3je8gyjma0zw",
+      ".eJxVjDsOwjAQBe_iGlnBG_8o6XMGa71r4wCypTipEHeHSCmgfTPzXiLgtpaw9bSEmcVFKC1Ov2NEeqS6E75jvTVJra7LHOWuyIN2OTVOz-vh_h0U7OVboyfynrNRJquso9UEbgAbwVpkM5qRHSm0HjyBYpdsZDgrN-iUAMGJ9wcPRjfy:1t960y:mgDpkJPw5g1ThWubeUgbEx7XQB2Maqt4gPUa5Zy8XP8",
+      "2024-11-21 17:09:48.595479"
+    ],
+    [
+      "21onoph59s4dc05ayuj582juzo4jkxeh",
+      ".eJxVjDsOwjAQBe_iGlnOxl9K-pzB8q4XHEC2FCcV4u4QKQW0b2beS8S0rSVunZc4Z3EWoMXpd8RED647yfdUb01Sq-syo9wVedAup5b5eTncv4OSevnWhiizDcrbEQ1aAjLELqDnPDBpcDpD0jbAwN4pgDGQRkeoLF559F68PxmqOEM:1t9TVj:cXfJ9khZP-kHR3oANahp12U5WDxlK400Or47O5L98rQ",
+      "2024-11-22 18:15:07.393859"
+    ],
+    [
+      "23tt5zzmxlcrb7abhhsa0u3m9wlx017w",
+      ".eJxVjMsOwiAQRf-FtSFAebp07zeQYWCkaiAp7cr479qkC93ec859sQjbWuM2yhLnzM5Manb6HRPgo7Sd5Du0W-fY27rMie8KP-jg157L83K4fwcVRv3WKmhhHGSB1kKeiHIKyVsoZIyWqKQWkwuGkvSEAnwyXhOiMhTC5Jxn7w8P4zga:1tC1Iw:oeQeeLOaDeHSzo9ygZ4D7eh4IeBzpvbglul2G49s5Kk",
+      "2024-11-29 18:44:26.896976"
+    ],
+    [
+      "242gul1eodjomrupgn8vsib3ffm5q6d9",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tBj6k:jLA8mUBLN3_tEMhhMxeiDgr2lJOlKzcX428S5XITF1A",
+      "2024-11-28 23:18:38.723405"
+    ],
+    [
+      "28h99ozqt4q5ia7ykti8fu2mp1ud48zv",
+      ".eJxVjMsOwiAQRf-FtSEDQ3m4dO83NMwAUjU0Ke3K-O_apAvd3nPOfYkxbmsdt56XcUriLLQTp9-RIj9y20m6x3abJc9tXSaSuyIP2uV1Tvl5Ody_gxp7_dZgCikCFzyxLxrJFK3RwTAYw4AIqmDmaFxmBGIaAoCDgMpa8FYp8f4A8Ak2xw:1t98jb:csb1DOM_owsOyz9KgW4yAh435uYiPnuaZ3qEhgdaskQ",
+      "2024-11-21 20:04:03.087763"
+    ],
+    [
+      "3d6bmy1tkha3btfs5glhbf08d9ooaian",
+      ".eJxVjEEOwiAQRe_C2pAWKAMu3XuGhhlmbNVAUtqV8e7apAvd_vfef6kxbes0bo2Xcc7qrECdfjdM9OCyg3xP5VY11bIuM-pd0Qdt-lozPy-H-3cwpTZ968F0bEJ0hrpsSULoxA5IFjILCljnUnDMYiGC9J7RUI8--gwBsCdR7w_o_ThP:1tIuLb:bBhnBAobkPZIElH2tblu_xDOiRpouzc4eBRmhmIS2jM",
+      "2024-12-18 18:43:39.642914"
+    ],
+    [
+      "3e8ksse7161rgfsrhzc8o57i09cuvcb5",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1u2asm:PCRoe4ivIyS4XlIA31xq9Pbz1nrIvNpn8x8ss6ocox4",
+      "2025-04-23 19:14:44.746126"
+    ],
+    [
+      "3n4q4ip24w7ino5j6fl4ytshb6eeab19",
+      ".eJxVjEEOwiAQRe_C2pAigoxL9z0DmWEGqRpISrsy3l2bdKHb_977LxVxXUpcu8xxYnVRoA6_G2F6SN0A37Hemk6tLvNEelP0TrseG8vzurt_BwV7-dY--5QZJYlYJ2dnLOd8CuAZyWFgPg7AxhAgApABJOt9CGJo8CCW1PsDJck5Cw:1tD1ko:7UT3917Vvk4HH0JjjOBRBYoWxosBLZPPmzWcgCTdP9Y",
+      "2024-12-02 13:25:22.037724"
+    ],
+    [
+      "4jp614x7ccna9jhr2i4v7eanrecn9l75",
+      ".eJxVjEEOwiAQRe_C2pAWKAMu3XuGhhlmbNVAUtqV8e7apAvd_vfef6kxbes0bo2Xcc7qrECdfjdM9OCyg3xP5VY11bIuM-pd0Qdt-lozPy-H-3cwpTZ968F0bEJ0hrpsSULoxA5IFjILCljnUnDMYiGC9J7RUI8--gwBsCdR7w_o_ThP:1uUp5E:TJzgfWtEvoS3TsaLXk_x6tSFcLQnaB1xCkV3MWny890",
+      "2025-07-10 16:04:16.121036"
+    ],
+    [
+      "5k0870yig3mdl64lr0nzwr78qv0si074",
+      ".eJxVjEEOwiAQRe_C2pAWKAMu3XuGhhlmbNVAUtqV8e7apAvd_vfef6kxbes0bo2Xcc7qrECdfjdM9OCyg3xP5VY11bIuM-pd0Qdt-lozPy-H-3cwpTZ968F0bEJ0hrpsSULoxA5IFjILCljnUnDMYiGC9J7RUI8--gwBsCdR7w_o_ThP:1tIZCV:AXZBZdTF9TqcyyUnrcZRoRmTXzmoMt71gYtCuV0QN4U",
+      "2024-12-17 20:08:51.541416"
+    ],
+    [
+      "6h5xu959qmdmei2w4cwzg9g3vdtj38i7",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1u2AgH:dJdgyywrupw7jJMKT2rLaMagdnUt96kLhve8mVHECak",
+      "2025-04-22 15:16:05.873121"
+    ],
+    [
+      "6nenyktkl33a5v2zzh2qnl0jto0vb1xn",
+      ".eJxVjEEOwiAQRe_C2hBoB7Au3XsGMjCDVA0kpV0Z7y5NutDte-__t_C4rdlvjRc_k7gILU6_LGB8ctkFPbDcq4y1rMsc5J7IwzZ5q8Sv69H-HWRsua9ZW55MdJpMQgSweB5GIHbJKBVMt9GkNGqkhGFSSpOFFAHcYDt3Tny-8lo4Mw:1t4ONg:H7c3oAlggyQ28GXdd7oYvil7_H8TZo2J1K9qVoN7N_c",
+      "2024-11-08 17:45:48.588307"
+    ],
+    [
+      "71u1blchia63k9t6ttxrrkvlii1ac5gw",
+      ".eJxVjEEOwiAQRe_C2pAWKAMu3XuGhhlmbNVAUtqV8e7apAvd_vfef6kxbes0bo2Xcc7qrECdfjdM9OCyg3xP5VY11bIuM-pd0Qdt-lozPy-H-3cwpTZ968F0bEJ0hrpsSULoxA5IFjILCljnUnDMYiGC9J7RUI8--gwBsCdR7w_o_ThP:1uUpUv:8lVx2UXRfQ4h54-Zp1ggL6cSKcY-NJKXCndOcx2DpRc",
+      "2025-07-10 16:30:49.844241"
+    ],
+    [
+      "7f9ooo2w3ufaebpqqbdu2qstiitcunt2",
+      ".eJxVjEEOwiAQRe_C2pACA1SX7nsGMjCDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwk7gI5cTpd4yYHlx3QnestyZTq-syR7kr8qBdTo34eT3cv4OCvXxri5lU9MY68mcgHY3DbDkZ7QEJIBsHzoIbOJEZgQfFxFF5PVpFKaF4fwAP5Thh:1tBbKU:gSGQKBK7a2orDFa8PcfOSuP6eOYwfXEJzKmbKJr66Wo",
+      "2024-11-28 15:00:18.549104"
+    ],
+    [
+      "7lsm3g0cx34v5rv5ud3r3la4wetqzw1f",
+      ".eJxVjEsOAiEQBe_C2hCQ5tMu3c8ZCA2NM2ogmc_KeHedZBa6fVX1XiKmbR3jtvAcpyIuQovT70YpP7jtoNxTu3WZe1vnieSuyIMucuiFn9fD_TsY0zJ-a-WpAAY0aABtYGVA-UzKAiI4RZkhKHC1kHGczrpmstVb1GgNMWrx_gC0Pjb6:1uXPzy:gqFTvZKOquY2g8NlRDJQYVR4k80ipN3vMAmTUy3NGoA",
+      "2025-07-17 19:53:34.141910"
+    ],
+    [
+      "7lzzmjsq7m01w1oytb7ultkq10ujg8tm",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tvixn:dw0c71AP_TSF7heY1npPqJB8w1n1ThipwER_KraAvcc",
+      "2025-04-04 20:27:31.524428"
+    ],
+    [
+      "7ntenmlunngrw5gpe6wgqbx3ejm5umud",
+      ".eJxVjEsOAiEQBe_C2hCQ5tMu3c8ZCA2NM2ogmc_KeHedZBa6fVX1XiKmbR3jtvAcpyIuQovT70YpP7jtoNxTu3WZe1vnieSuyIMucuiFn9fD_TsY0zJ-a-WpAAY0aABtYGVA-UzKAiI4RZkhKHC1kHGczrpmstVb1GgNMWrx_gC0Pjb6:1uWRAC:FHn88OWbg-hzesIRlLI9ZvJ8MwE2cfWdDtuy5I5LEUA",
+      "2025-07-15 02:56:04.679230"
+    ],
+    [
+      "8a1fqgtg5ug4fbd8oppynl11r0ileqah",
+      ".eJxVjMsOwiAQRf-FtSE8ZqS4dO83kAEGqRqalHZl_HdD0oVu7znnvkWgfath77yGOYuL0FacfsdI6cltkPygdl9kWtq2zlEORR60y9uS-XU93L-DSr2OGrwFjNFHr0tRyrH2pliTWTnvJgQqaCMwWs_GWATImibUJSksZ3Di8wX1gzdT:1tD54h:vCzupblV1w7LNaXrw2PACF30KU9TdNv7y0K7xXnF40o",
+      "2024-12-02 16:58:07.558834"
+    ],
+    [
+      "8hirchvn0kx82enloaxkv9fz0fgw8p5i",
+      ".eJxVjEEOgjAQRe_StWk6lCnUpXvP0MxMO4IaSCisjHdXEha6_e-9_zKJtnVIWy1LGrM5G0Bz-h2Z5FGmneQ7TbfZyjyty8h2V-xBq73OuTwvh_t3MFAdvnXoQRrykYRVM3DxQbLHIL1EbhyiOgLstG0QBJx6r1EwtpA74ahg3h8efThf:1tJeWo:ibwPOL0oqfX4Oilr_VcqESLECMmBFxZEj5gfCZl7j6M",
+      "2024-12-20 20:02:18.030954"
+    ],
+    [
+      "8ipwmxb949psbzmhwgt7d3gdocelgnzo",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1uQASH:5dHltIux4s7zVlv0Ad9ezRULalRzHKMVj5Uf70-rXWs",
+      "2025-06-27 19:52:49.850598"
+    ],
+    [
+      "9fseb36si15k5gowc5ou4dxx3yunbrha",
+      ".eJxVjEEOwiAQRe_C2pACA1SX7nsGMjCDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwk7gIrcXpd4yYHlx3QnestyZTq-syR7kr8qBdTo34eT3cv4OCvXxri5lU9MY68mcgHY3DbDkZ7QEJIBsHzoIbOJEZgQfFxFF5PVpFKaF4fwAOGzhe:1tBIoB:VhDBTw-2WUTMQZ9ALHWkBsedC0FHgo8UD8e6aN8pa8I",
+      "2024-11-27 19:13:43.048174"
+    ],
+    [
+      "9iib7fyou2j0znqqxpzc7loj9a3n6wch",
+      ".eJxVjMEOwiAQRP-FsyHACl08evcbCLCLVA1NSnsy_rtt0oMeZ96beYsQ16WGtfMcRhIXAeL026WYn9x2QI_Y7pPMU1vmMcldkQft8jYRv66H-3dQY6_bWicXrXIDOaBUuBCqTNlCAcYtoDPI-mzJAyqfvYmEkFwaCqDJVrP4fAH89DhN:1tLOuK:HWWtpOmhpWHnEx4pB-XaX-muBNklYhV782aOOoaygAs",
+      "2024-12-25 15:45:48.496442"
+    ],
+    [
+      "ai2scl7zurnsvpf87mqigb4vgcetr2vp",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tBeEj:UU_ZZ6GWBHZnGAjiR--wsNb4SXSk126lRC_uVSzN-5E",
+      "2024-11-28 18:06:33.307572"
+    ],
+    [
+      "ar1dn711g8age6g1ra06yxacvr2os9gv",
+      ".eJxVjDsOwjAQBe_iGlms4y8lfc5gbbxrHEC2FCcV4u4QKQW0b2beS0Tc1hK3zkucSVyEEaffbcL04LoDumO9NZlaXZd5krsiD9rl2Iif18P9OyjYy7fOk0IG1v7stYasUBtQIfiAqIEy5pwBwdk02MBAyjKxQ2cGcuwGb8T7A-1NOBM:1tYprD:enXkfbcVP_vxK8ZFyeM9XvCBfsBQI0Wy6hdWLlxapkw",
+      "2025-01-31 17:10:07.928091"
+    ],
+    [
+      "by3ieax9j9e86y850o9lnrzktn3xkzsv",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tMA7v:2cY7PjKOFIkKGDSCrAQqxA4ExS1GdfZBhqgTpb5ErTc",
+      "2024-12-27 18:10:59.006441"
+    ],
+    [
+      "byc2yczz43wfua839mypr6bw6b2g3ne3",
+      ".eJxVjEEOwiAQRe_C2pACA7Qu3XsGMjCDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwkzgLNYnT7xgxPbjuhO5Yb02mVtdljnJX5EG7vDbi5-Vw_w4K9vKtLWZS0RvryE9AOhqH2XIy2gMSQDYOnAU3cCIzAg-KiaPyerSKUkLx_gARsDhk:1tIBS5:XqMqyxUhqv_lnaBudyY3i0JYpVh5-aH1YmaouoJKG9Q",
+      "2024-12-16 18:47:21.405270"
+    ],
+    [
+      "c1kenv89735jjvhxwucrc8d6h62ccpwu",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tlw6u:krCB8r_Re8aZoZMVnZjWKuD7iJVeUEL2epmIZv-EUKA",
+      "2025-03-08 20:28:28.854080"
+    ],
+    [
+      "dosdu8dhrb2equ03mdlwjgvxnhpw5de8",
+      ".eJxVjMEOwiAQRP-FsyHACl08evcbCLCLVA1NSnsy_rtt0oMeZ96beYsQ16WGtfMcRhIXAeL026WYn9x2QI_Y7pPMU1vmMcldkQft8jYRv66H-3dQY6_bWicXrXIDOaBUuBCqTNlCAcYtoDPI-mzJAyqfvYmEkFwaCqDJVrP4fAH89DhN:1tGJ4Y:18XNYVIdi1vtaYB7hGoIUM6lYFh9Ked6tfG-atP9O4k",
+      "2024-12-11 14:31:18.230057"
+    ],
+    [
+      "e5yqq5v79lsazk6vjzo5sxtjl0s2r5wa",
+      ".eJxVjEEOwiAQRe_C2hBoB7Au3XsGMjCDVA0kpV0Z7y5NutDte-__t_C4rdlvjRc_k7gILU6_LGB8ctkFPbDcq4y1rMsc5J7IwzZ5q8Sv69H-HWRsua9ZW55MdJpMQgSweB5GIHbJKBVMt9GkNGqkhGFSSpOFFAHcYDt3Tny-8lo4Mw:1t2016:9Vei0pik_hqRTioGq1kNu6zqCcp_RbC2h3Ieh9tsVYA",
+      "2024-11-02 03:20:36.848706"
+    ],
+    [
+      "f5zayubpgcno1dz35kqa2efbyzuzy67r",
+      ".eJxVjDsOwjAQBe_iGlnOxl9K-pzB8q4XHEC2FCcV4u4QKQW0b2beS8S0rSVunZc4Z3EWoMXpd8RED647yfdUb01Sq-syo9wVedAup5b5eTncv4OSevnWhiizDcrbEQ1aAjLELqDnPDBpcDpD0jbAwN4pgDGQRkeoLF559F68PxmqOEM:1t5X9c:-sSKVUeg2qYGIGs1a0FJYEZiHEzLrOzTI-kPIU31bZE",
+      "2024-11-11 21:20:00.847301"
+    ],
+    [
+      "fg2q6uasif4m8bur3opmxc15lkelekgf",
+      ".eJxVjD0OwjAUg--SGUXk0SZ5jOw9Q-X8kQJKpKadEHenlTrAYA_-bL_FiHXJ49riPE5BXAV14vQbOvhnLDsJD5R7lb6WZZ6c3CvyoE0ONcTX7ej-HWS0vK059R4MGy7Oa0vkktERpsMmZTazRrNjjzOxAmurEhN6wBETWy0-XxcQN_I:1tBck8:7HLp43V4UfKbOgVYzx2eD0YUtev1qCxMLNinJq5lqJM",
+      "2024-11-28 16:30:52.671926"
+    ],
+    [
+      "fqnn233inerwbz28fwiuicc0v4izmh6k",
+      ".eJxVjMsOwiAQRf-FtSFAebp07zeQYWCkaiAp7cr479qkC93ec859sQjbWuM2yhLnzM5Manb6HRPgo7Sd5Du0W-fY27rMie8KP-jg157L83K4fwcVRv3WKmhhHGSB1kKeiHIKyVsoZIyWqKQWkwuGkvSEAnwyXhOiMhTC5Jxn7w8P4zga:1tC1Fi:RMHOi8H9vuU262__XqjjkCyjGW7c2TeeG2AxfuKQluU",
+      "2024-11-29 18:41:06.433065"
+    ],
+    [
+      "gdwn237oldh146780o8pfoxjefbnn33c",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tqdin:InuLGdDLjr2MViIBgUVL8azLdrQrMNC7uz2sjw-W9w4",
+      "2025-03-21 19:51:01.308157"
+    ],
+    [
+      "ge67bo8i8zrigamng3zf97dig6j8hoda",
+      ".eJxVjEEOwiAQRe_C2hBoB7Au3XsGMjCDVA0kpV0Z7y5NutDte-__t_C4rdlvjRc_k7gILU6_LGB8ctkFPbDcq4y1rMsc5J7IwzZ5q8Sv69H-HWRsua9ZW55MdJpMQgSweB5GIHbJKBVMt9GkNGqkhGFSSpOFFAHcYDt3Tny-8lo4Mw:1t2EAm:u3H5qSHRGqu8u_1C5BN2wKzbl9UkMR3uNrz6-2Qxi50",
+      "2024-11-02 18:27:32.613189"
+    ],
+    [
+      "gf2osu3bnt0wdjb7n5a4wy502j1dpvex",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1uOeQz:giOPxuS3idTUlSMT5C9DbDFqA0R_LqxRlRcHsuwrUiU",
+      "2025-06-23 15:29:13.662713"
+    ],
+    [
+      "giqxk60weltc9zwnf5hll9dnsv6lu770",
+      ".eJxVjEEOwiAQRe_C2pAWKAMu3XuGhhlmbNVAUtqV8e7apAvd_vfef6kxbes0bo2Xcc7qrECdfjdM9OCyg3xP5VY11bIuM-pd0Qdt-lozPy-H-3cwpTZ968F0bEJ0hrpsSULoxA5IFjILCljnUnDMYiGC9J7RUI8--gwBsCdR7w_o_ThP:1tAx2E:dstiAVd20L91Erq883ta1i8x6gv9upsOoJ78-m-2UiE",
+      "2024-11-26 19:58:46.826510"
+    ],
+    [
+      "hl66fd5slf05c82lvkdzo85tmyjj0po2",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1u7FdX:a9HiCyQtd7jsp27RmJFHNFeaJJEIRYjUbmKFxX-VO60",
+      "2025-05-06 15:34:15.099764"
+    ],
+    [
+      "hvaerkfaf0wl5idur09k4mvgtacwlla1",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tH1Y5:NGkUkc3dURwD0alAUnpH47pcwt7RrBw3xJDqXHgw0Mg",
+      "2024-12-13 14:00:45.455252"
+    ],
+    [
+      "i5gi26tyssdsmxh7vh3f54xxwqs71ypi",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1u8PAj:6HmfbAUl1qVAimj9P-cmf6D_dgEHcUqxed2k0C1_B74",
+      "2025-05-09 19:57:17.356947"
+    ],
+    [
+      "ic8k77pyclto32sdwg7w8oqnx4suod3r",
+      ".eJxVjD0OwjAUg--SGUXk0SZ5jOw9Q-X8kQJKpKadEHenlTrAYA_-bL_FiHXJ49riPE5BXAV14vQbOvhnLDsJD5R7lb6WZZ6c3CvyoE0ONcTX7ej-HWS0vK059R4MGy7Oa0vkktERpsMmZTazRrNjjzOxAmurEhN6wBETWy0-XxcQN_I:1tLqOL:TilXyX-XIQYsDOhAek0Q-C269_ejBsQTcVN_X5RxEm8",
+      "2024-12-26 21:06:37.827715"
+    ],
+    [
+      "k3ll0qizuapjqmoamo3o3122w0h7xr0b",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tVu3J:mku1GTjW-SpRHu4FocOiIfdIRaCYnWzkAAlTRV_NE9U",
+      "2025-01-23 15:02:29.451712"
+    ],
+    [
+      "kslww665gtx7ksz69rkbxa6pr76p3y3v",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1uJZa5:xOEiR05NvrR8_xs0_-40vmOukr1162kNiAXSFX86eZk",
+      "2025-06-09 15:17:37.622405"
+    ],
+    [
+      "l8g4jhpmpm1mbouu02s06q77cqygcdun",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1uD2u4:uySXKhBvM169lgnwQZHxmuAn7U89NnxRXhJiXGFpyRc",
+      "2025-05-22 15:11:16.331130"
+    ],
+    [
+      "n1q6thy987or3tnpeg2tzoneliouui3h",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tSLYH:8BASzVoroTrV3HHciNevsUOv_KPn3kncdPhe4AqtimU",
+      "2025-01-13 19:35:45.116930"
+    ],
+    [
+      "naon7vsn36r7xcy5mbyt1dbxlwn84c4t",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tLpvN:hVz6BvJ19Vw5lpEfZcIWkGnCa2a3los47PdknQc3RWU",
+      "2024-12-26 20:36:41.955778"
+    ],
+    [
+      "nowzcqb7tkx519vxksr9hwmsrizeadol",
+      ".eJxVjEEOwiAQRe_C2hBoB7Au3XsGMjCDVA0kpV0Z7y5NutDte-__t_C4rdlvjRc_k7gILU6_LGB8ctkFPbDcq4y1rMsc5J7IwzZ5q8Sv69H-HWRsua9ZW55MdJpMQgSweB5GIHbJKBVMt9GkNGqkhGFSSpOFFAHcYDt3Tny-8lo4Mw:1t3Twl:i8QprbSbnSlBy9CoOivjA26PauNTl24V_BMa2r0bBAs",
+      "2024-11-06 05:30:15.335234"
+    ],
+    [
+      "ot1yztwm9tx1l12sclwmoorlu5uh742w",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tdaBy:j_HSshnjOA5o0GorNEpY6l4T9LtA3GvzczcUP-g_RyE",
+      "2025-02-13 19:27:10.468907"
+    ],
+    [
+      "p0og45epbtwn17jgmxfrjyhc3u667dm1",
+      ".eJxVjEEOgjAQRe_StWk6lCnUpXvP0MxMO4IaSCisjHdXEha6_e-9_zKJtnVIWy1LGrM5G0Bz-h2Z5FGmneQ7TbfZyjyty8h2V-xBq73OuTwvh_t3MFAdvnXoQRrykYRVM3DxQbLHIL1EbhyiOgLstG0QBJx6r1EwtpA74ahg3h8efThf:1tD7pM:4urgHdjD_mvBqA3KGnp-ZpQtfdpwxBdlp4q9bpcL4sY",
+      "2024-12-02 19:54:28.600863"
+    ],
+    [
+      "phuzq0azvii81unh1lj3c1g40lks35rg",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tlCfI:sl55u55mYenYA8qH1H474mYf0qjRQcQ-TXn0HFhI6Qc",
+      "2025-03-06 19:56:56.937892"
+    ],
+    [
+      "pjuli6hv4osxubd3wcxlxl05kfnapr03",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tGl5k:UBx37H5Uoc6hIQ79X_PxFiE5Gxx2k-33w3BH32lLh0I",
+      "2024-12-12 20:26:24.448721"
+    ],
+    [
+      "qfo034wkaizoxysw2h7ilqlk7czyqlhx",
+      ".eJxVjDsOwjAQBe_iGlnOxl9K-pzB8q4XHEC2FCcV4u4QKQW0b2beS8S0rSVunZc4Z3EWoMXpd8RED647yfdUb01Sq-syo9wVedAup5b5eTncv4OSevnWhiizDcrbEQ1aAjLELqDnPDBpcDpD0jbAwN4pgDGQRkeoLF559F68PxmqOEM:1t69Tu:06zBEFdOpbzyZqvGlpZVB_hPcj75KKY2SDxgWaQeq9Y",
+      "2024-11-13 14:15:30.238089"
+    ],
+    [
+      "r63pfcctmnvqoz3jhyoxolfafjecwqdb",
+      ".eJxVjEEOwiAQRe_C2pAWKAMu3XuGhhlmbNVAUtqV8e7apAvd_vfef6kxbes0bo2Xcc7qrECdfjdM9OCyg3xP5VY11bIuM-pd0Qdt-lozPy-H-3cwpTZ968F0bEJ0hrpsSULoxA5IFjILCljnUnDMYiGC9J7RUI8--gwBsCdR7w_o_ThP:1tBxQz:nx-uqAr1Ps8h45h_6hK5QgBMmBWxoVUsH7RJbudoIu8",
+      "2024-11-29 14:36:29.496670"
+    ],
+    [
+      "r97iabccjn8fefu5b5qlbdppb9l3d7kt",
+      ".eJxVjD0OwjAUg--SGUXk0SZ5jOw9Q-X8kQJKpKadEHenlTrAYA_-bL_FiHXJ49riPE5BXAV14vQbOvhnLDsJD5R7lb6WZZ6c3CvyoE0ONcTX7ej-HWS0vK059R4MGy7Oa0vkktERpsMmZTazRrNjjzOxAmurEhN6wBETWy0-XxcQN_I:1tCjZm:DigWuT-qNFDzuK719Nylvjs4iX7hst5-AvNuH0riBf0",
+      "2024-12-01 18:00:46.360493"
+    ],
+    [
+      "sfslhg5fe2hbpaoqxb8qx6iyozietoqr",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1tXmXO:_zYfKzqCf452khFq20BLCP23OtvPDRxU8TBesA75J3c",
+      "2025-01-28 19:25:18.386495"
+    ],
+    [
+      "smmcxtvy9dhil7i21rge1yoem1egpbcb",
+      ".eJxVjDsOwjAQBe_iGlms4y8lfc5gbbxrHEC2FCcV4u4QKQW0b2beS0Tc1hK3zkucSVyEEaffbcL04LoDumO9NZlaXZd5krsiD9rl2Iif18P9OyjYy7fOk0IG1v7stYasUBtQIfiAqIEy5pwBwdk02MBAyjKxQ2cGcuwGb8T7A-1NOBM:1tCL9S:Cbjde9lgCM5FamdgsMFr9VreRZDehDRSiCRBmo7OLjw",
+      "2024-11-30 15:55:58.165897"
+    ],
+    [
+      "spf0vremt1zabmua3fjjv3440k026yt7",
+      ".eJxVjDsOwjAQBe_iGlnBG_8o6XMGa71r4wCypTipEHeHSCmgfTPzXiLgtpaw9bSEmcVFKC1Ov2NEeqS6E75jvTVJra7LHOWuyIN2OTVOz-vh_h0U7OVboyfynrNRJquso9UEbgAbwVpkM5qRHSm0HjyBYpdsZDgrN-iUAMGJ9wcPRjfy:1t8izC:nvpAB7MCZtUNnUQ5izhXQt4tCBIGhrRGMJQ-tnFlR6I",
+      "2024-11-20 16:34:26.260823"
+    ],
+    [
+      "tm3rrvp165qch0zbvuanjez5winv4y43",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1trfbB:N2Re1BeG_fKv8M6kNQplt8PnDgxGCAlWC6sGtmvn41w",
+      "2025-03-24 16:03:25.901951"
+    ],
+    [
+      "twvkvrrcrpf8yfhblczbfk4cvw5a3j12",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1uEywd:b-YUsEOXG9KV_6qSkA25JvcbBasOBv3VjP28szpWcX0",
+      "2025-05-27 23:21:55.166625"
+    ],
+    [
+      "v4vf9eexzlddec9v0z6jy4q8wjttpnx7",
+      ".eJxVjEEOwiAQRe_C2hBoB7Au3XsGMjCDVA0kpV0Z7y5NutDte-__t_C4rdlvjRc_k7gILU6_LGB8ctkFPbDcq4y1rMsc5J7IwzZ5q8Sv69H-HWRsua9ZW55MdJpMQgSweB5GIHbJKBVMt9GkNGqkhGFSSpOFFAHcYDt3Tny-8lo4Mw:1t47No:_eAVlv213-sj6oApezj5FkBelw0uTGjyvUxFUwy-nIg",
+      "2024-11-07 23:36:48.470465"
+    ],
+    [
+      "vaemzncc0e9sfhmvrlial3njd1wcwc1f",
+      ".eJxVjMEOwiAQRP-FsyHACl08evcbCLCLVA1NSnsy_rtt0oMeZ96beYsQ16WGtfMcRhIXAeL026WYn9x2QI_Y7pPMU1vmMcldkQft8jYRv66H-3dQY6_bWicXrXIDOaBUuBCqTNlCAcYtoDPI-mzJAyqfvYmEkFwaCqDJVrP4fAH89DhN:1tAwcR:M9kbEdeDcbIeLtH8xYUES3LDmFJgaf6R3qHIxefXCJE",
+      "2024-11-26 19:32:07.613398"
+    ],
+    [
+      "w17vkobryizzvptrbf0kylhwkq5zq4up",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1uTq00:rluNM0j1qMVKqEQm2oj7aw3PWlmQmcl_aNMrnoF4dc0",
+      "2025-07-07 22:50:48.250169"
+    ],
+    [
+      "wejr395obadr238r98btunrw6vzqjh3t",
+      ".eJxVjDEOwjAMRe-SGUVN6yYyIztniOzYIQXUSk07VdwdReoA63_v_cNE2rcS96prnMRcjevN5XdkSi-dG5EnzY_FpmXe1oltU-xJq70vou_b6f4dFKql1eJzYoTMeWQQD8FRytipC-Id9YwjIQ65IwHCbgwSPOjgOAF6JTCfLzTzOM0:1uL4Sv:IXVIPceywPqdV5TdzVoTawlsxFIroIpuL5m-yq2FcP8",
+      "2025-06-13 18:28:25.585680"
+    ],
+    [
+      "x05gfp8ai6oatz5pfy88t6h9dwx8pcpy",
+      ".eJxVjEEOwiAQRe_C2pACA1SX7nsGMjCDVA0kpV0Z765NutDtf-_9lwi4rSVsnZcwk7gIrcXpd4yYHlx3QnestyZTq-syR7kr8qBdTo34eT3cv4OCvXxri5lU9MY68mcgHY3DbDkZ7QEJIBsHzoIbOJEZgQfFxFF5PVpFKaF4fwAOGzhe:1tGQBJ:Dxx7wGHV5FfGWwxHUMug5MJNfeBHX7YUesCzgauqTOc",
+      "2024-12-11 22:06:45.101845"
+    ],
+    [
+      "x8vhf70t28f3ip0umzzmji63zayq412q",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1tbOq7:Bhwit4BgKkpB_2WV9LmyLWd8duA7X3X44kQqyP2Ce9I",
+      "2025-02-07 18:55:35.826674"
+    ],
+    [
+      "yel6emxn2j4xvkz1dkl61q27zx3pj1o8",
+      ".eJxVjD0OwjAUg--SGUXk0SZ5jOw9Q-X8kQJKpKadEHenlTrAYA_-bL_FiHXJ49riPE5BXAV14vQbOvhnLDsJD5R7lb6WZZ6c3CvyoE0ONcTX7ej-HWS0vK059R4MGy7Oa0vkktERpsMmZTazRrNjjzOxAmurEhN6wBETWy0-XxcQN_I:1txXSz:df8vhnhLQvsa5DGLX3aSMiV87Llciwk_SQyFJXtv-aQ",
+      "2025-04-09 20:35:13.452388"
+    ],
+    [
+      "yf42p0tx22v0h26mi0pa60wngdnmv87l",
+      ".eJxVjMsOwiAQRf-FtSF0gIFx6d5vIDxGqRqalHZl_HfbpAvd3nPOfYsQ16WGtfMcxiLOAsXpd0sxP7ntoDxiu08yT22ZxyR3RR60y-tU-HU53L-DGnvdauW8UZlzItAG7IA0AIO1zDoWjeh0NspCISDyDrW3wJRUKltxQ2PE5wu1eTbI:1twnkv:iSe-YROkG9jkbkqoYPfzwaozyEcZMniYp5jkJY5syJ8",
+      "2025-04-07 19:46:41.923670"
+    ],
+    [
+      "zk35ew2ik0rqulkxar68tg6dl7ia3lm2",
+      ".eJxVjD0OwjAUg--SGUXk0SZ5jOw9Q-X8kQJKpKadEHenlTrAYA_-bL_FiHXJ49riPE5BXAV14vQbOvhnLDsJD5R7lb6WZZ6c3CvyoE0ONcTX7ej-HWS0vK059R4MGy7Oa0vkktERpsMmZTazRrNjjzOxAmurEhN6wBETWy0-XxcQN_I:1tAXKf:aqyiBD8YkuFk6U2qc5ZNuJtGT5Rm9_MJwnZanfY9OCk",
+      "2024-11-25 16:32:05.168985"
+    ]
+  ],
+  "usuarios_empresa": [
+    [
+      1,
+      "NINEFIFTEEN",
+      "Guayaquil",
+      "042222222",
+      "ninefifteen@hotmail.com",
+      "2024-08-27 04:22:40.247436"
+    ]
+  ],
+  "usuarios_sucursal": [
+    [
+      1,
+      "Guayaquil",
+      "GYQ",
+      "Guayaquil",
+      "042222222",
+      1,
+      "punto_venta"
+    ],
+    [
+      2,
+      "Quito",
+      "UIO",
+      "Quito",
+      "042222222",
+      1,
+      "punto_venta"
+    ],
+    [
+      3,
+      "Cuenca",
+      "CUE",
+      "Cuenca",
+      "042222222",
+      1,
+      "punto_venta"
+    ],
+    [
+      4,
+      "Laboratorio Guayaquil",
+      "LGQ",
+      "Guayaquil",
+      "042222222",
+      1,
+      "laboratorio"
+    ],
+    [
+      5,
+      "Laboratorio Cuenca",
+      "LCU",
+      "Cuenca",
+      "042222222",
+      1,
+      "laboratorio"
+    ],
+    [
+      6,
+      "Laboratorio Quito",
+      "LQU",
+      "Quito",
+      "042222222",
+      1,
+      "laboratorio"
+    ],
+    [
+      27,
+      "Guayaquil Bodega",
+      "GQB",
+      "Guayaquil",
+      "042222222",
+      1,
+      "bodega"
+    ]
+  ],
+  "usuarios_usuario": [
+    [
+      1,
+      "pbkdf2_sha256$260000$vYoxyuRU3urQDqfrnmavfS$hldlZ6craFgm2RwJ0YYCXGJlyjVTpreL9tdQSPKx1A8=",
+      "2025-07-03 19:53:34.140905",
+      1,
+      "administrador_inventarios",
+      "Edgar",
+      "Rivas",
+      "edgar.rivas@manaudi.com.ec",
+      1,
+      1,
+      "2024-08-27 05:14:55.000000",
+      "0990464145",
+      "ayacucho 714 y Callejon Octava"
+    ],
+    [
+      2,
+      "pbkdf2_sha256$260000$4UvUqdEFm8qnkPBKGqJvr4$pY0nQxFPjn0jdXe79zKf4mEHFE9O5B0UPdvDggKIeAs=",
+      "2024-11-11 06:09:31.829175",
+      0,
+      "ninefifteen_manaudi",
+      "Manaudi",
+      "Ninefifteen",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-08-30 14:49:47.000000",
+      "042222222",
+      "Guayaquil"
+    ],
+    [
+      3,
+      "pbkdf2_sha256$260000$hsSTpipvC9N93sGrU88QBZ$ZQrzJSwmKfu9LRxJsfOZRldIqzP8R5ytijtkac3VtY0=",
+      "2025-01-17 16:49:51.639237",
+      0,
+      "ninefifteen_guayaquil",
+      "Usuario",
+      "Guayaquil",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-08-30 14:49:59.000000",
+      "042222222",
+      "Guayaquil"
+    ],
+    [
+      5,
+      "pbkdf2_sha256$260000$U8sXAZ8gmTXV3YvY2eQnnm$VeMOdO45aE3UbscMJwscue+Gn8/SBV7nvvMaOSzeF3E=",
+      "2025-06-26 15:53:46.553620",
+      0,
+      "ninefifteen_cuenca",
+      "Usuario",
+      "Cuenca",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-09-20 21:14:11.000000",
+      "042222222",
+      "Cuenca"
+    ],
+    [
+      6,
+      "pbkdf2_sha256$260000$LADckPWbpBsd4Mc4XlO0zx$4reMNj3YcgT5WgfmLlv+PwxeGwADSTyrR+c3oL65lks=",
+      "2025-06-23 22:50:48.240957",
+      0,
+      "ninefifteen_quito",
+      "Usuario",
+      "Quito",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-09-20 21:15:30.000000",
+      "042222222",
+      "Quito"
+    ],
+    [
+      7,
+      "pbkdf2_sha256$260000$DhJq8PNrQQ8KYNt6XGLo0l$6Ku25Q4J7fqM79zvipvjt1mCIDBX24TUK8PDnod+/Jg=",
+      "2025-06-26 16:30:49.825663",
+      0,
+      "ninefifteen_administrador",
+      "Stephanny",
+      "",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-10-04 14:58:28.000000",
+      "042222222",
+      "Guayaquil"
+    ],
+    [
+      29,
+      "pbkdf2_sha256$260000$XKFqnNLXQHLzjj7dOmlEDj$eanUfS9y40GfDP4v4dK/FjEPgQMAkTY7pUKhqDVkfP4=",
+      "2025-06-26 16:03:42.454983",
+      0,
+      "ninefifteen_labgye",
+      "Laboratorio Guayaquil",
+      "Ninefifteen",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-11-12 20:14:20.000000",
+      null,
+      null
+    ],
+    [
+      30,
+      "pbkdf2_sha256$260000$ccuwausoha2o1Zv7fHvdTO$E7PDVO11R43bJ/c2DnPJm4Td/+XXviP0Ovt1IR34ShU=",
+      null,
+      0,
+      "ninefifteen_labcue",
+      "Laboratorio Cuenca",
+      "NineFifteen",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-11-12 20:14:35.000000",
+      null,
+      null
+    ],
+    [
+      31,
+      "pbkdf2_sha256$260000$7zpnXcdk8nIRAI4Ujb0Q86$hZCWJNYYNYIfKbpsnmlWTsavNjXYl6vl+sQ9xfQNy+s=",
+      null,
+      0,
+      "ninefifteen_labuio",
+      "Laboratorio Quito",
+      "Ninefifteen",
+      "ninefifteen@hotmail.com",
+      0,
+      1,
+      "2024-11-12 20:14:46.000000",
+      null,
+      null
+    ]
+  ],
+  "usuarios_usuario_groups": [
+    [
+      1,
+      1,
+      1
+    ],
+    [
+      2,
+      1,
+      2
+    ],
+    [
+      3,
+      1,
+      3
+    ],
+    [
+      4,
+      1,
+      4
+    ],
+    [
+      5,
+      2,
+      2
+    ],
+    [
+      6,
+      2,
+      3
+    ],
+    [
+      7,
+      2,
+      4
+    ],
+    [
+      10,
+      3,
+      4
+    ],
+    [
+      11,
+      5,
+      4
+    ],
+    [
+      12,
+      6,
+      4
+    ],
+    [
+      8,
+      7,
+      3
+    ],
+    [
+      9,
+      7,
+      4
+    ],
+    [
+      13,
+      8,
+      2
+    ],
+    [
+      14,
+      8,
+      3
+    ],
+    [
+      15,
+      8,
+      4
+    ],
+    [
+      16,
+      9,
+      3
+    ],
+    [
+      17,
+      9,
+      4
+    ],
+    [
+      18,
+      10,
+      4
+    ],
+    [
+      19,
+      11,
+      4
+    ],
+    [
+      20,
+      12,
+      4
+    ],
+    [
+      21,
+      13,
+      4
+    ],
+    [
+      22,
+      14,
+      4
+    ],
+    [
+      23,
+      15,
+      3
+    ],
+    [
+      24,
+      15,
+      4
+    ],
+    [
+      25,
+      16,
+      4
+    ],
+    [
+      26,
+      17,
+      4
+    ],
+    [
+      27,
+      18,
+      4
+    ],
+    [
+      28,
+      19,
+      4
+    ],
+    [
+      29,
+      20,
+      4
+    ],
+    [
+      30,
+      21,
+      4
+    ],
+    [
+      31,
+      22,
+      4
+    ],
+    [
+      32,
+      23,
+      4
+    ],
+    [
+      33,
+      24,
+      3
+    ],
+    [
+      34,
+      24,
+      4
+    ],
+    [
+      35,
+      25,
+      4
+    ],
+    [
+      36,
+      26,
+      4
+    ],
+    [
+      37,
+      27,
+      3
+    ],
+    [
+      38,
+      27,
+      4
+    ],
+    [
+      39,
+      28,
+      2
+    ],
+    [
+      40,
+      28,
+      3
+    ],
+    [
+      41,
+      28,
+      4
+    ],
+    [
+      43,
+      29,
+      4
+    ],
+    [
+      42,
+      30,
+      4
+    ],
+    [
+      44,
+      31,
+      4
+    ]
+  ],
+  "usuarios_usuario_user_permissions": [
+    [
+      1,
+      1,
+      1
+    ],
+    [
+      2,
+      1,
+      2
+    ],
+    [
+      3,
+      1,
+      3
+    ],
+    [
+      4,
+      1,
+      4
+    ],
+    [
+      5,
+      1,
+      5
+    ],
+    [
+      6,
+      1,
+      6
+    ],
+    [
+      7,
+      1,
+      7
+    ],
+    [
+      8,
+      1,
+      8
+    ],
+    [
+      9,
+      1,
+      9
+    ],
+    [
+      10,
+      1,
+      10
+    ],
+    [
+      11,
+      1,
+      11
+    ],
+    [
+      12,
+      1,
+      12
+    ],
+    [
+      13,
+      1,
+      13
+    ],
+    [
+      14,
+      1,
+      14
+    ],
+    [
+      15,
+      1,
+      15
+    ],
+    [
+      16,
+      1,
+      16
+    ],
+    [
+      17,
+      1,
+      17
+    ],
+    [
+      18,
+      1,
+      18
+    ],
+    [
+      19,
+      1,
+      19
+    ],
+    [
+      20,
+      1,
+      20
+    ],
+    [
+      21,
+      1,
+      21
+    ],
+    [
+      22,
+      1,
+      22
+    ],
+    [
+      23,
+      1,
+      23
+    ],
+    [
+      24,
+      1,
+      24
+    ],
+    [
+      25,
+      1,
+      25
+    ],
+    [
+      26,
+      1,
+      26
+    ],
+    [
+      27,
+      1,
+      27
+    ],
+    [
+      28,
+      1,
+      28
+    ],
+    [
+      29,
+      1,
+      29
+    ],
+    [
+      30,
+      1,
+      30
+    ],
+    [
+      31,
+      1,
+      31
+    ],
+    [
+      32,
+      1,
+      32
+    ],
+    [
+      33,
+      1,
+      33
+    ],
+    [
+      34,
+      1,
+      34
+    ],
+    [
+      35,
+      1,
+      35
+    ],
+    [
+      36,
+      1,
+      36
+    ],
+    [
+      37,
+      1,
+      37
+    ],
+    [
+      38,
+      1,
+      38
+    ],
+    [
+      39,
+      1,
+      39
+    ],
+    [
+      40,
+      1,
+      40
+    ],
+    [
+      41,
+      1,
+      41
+    ],
+    [
+      42,
+      1,
+      42
+    ],
+    [
+      43,
+      1,
+      43
+    ],
+    [
+      44,
+      1,
+      44
+    ],
+    [
+      45,
+      1,
+      45
+    ],
+    [
+      46,
+      1,
+      46
+    ],
+    [
+      47,
+      1,
+      47
+    ],
+    [
+      48,
+      1,
+      48
+    ],
+    [
+      49,
+      1,
+      49
+    ],
+    [
+      50,
+      1,
+      50
+    ],
+    [
+      51,
+      1,
+      51
+    ],
+    [
+      52,
+      1,
+      52
+    ],
+    [
+      53,
+      1,
+      53
+    ],
+    [
+      54,
+      1,
+      54
+    ],
+    [
+      55,
+      1,
+      55
+    ],
+    [
+      56,
+      1,
+      56
+    ],
+    [
+      57,
+      1,
+      57
+    ],
+    [
+      58,
+      1,
+      58
+    ],
+    [
+      59,
+      1,
+      59
+    ],
+    [
+      60,
+      1,
+      60
+    ]
+  ],
+  "usuarios_usuarioperfil": [
+    [
+      1,
+      1,
+      null,
+      1
+    ],
+    [
+      2,
+      1,
+      null,
+      2
+    ],
+    [
+      3,
+      1,
+      27,
+      7
+    ],
+    [
+      4,
+      1,
+      1,
+      3
+    ],
+    [
+      5,
+      1,
+      2,
+      6
+    ],
+    [
+      6,
+      1,
+      3,
+      5
+    ],
+    [
+      7,
+      3,
+      26,
+      9
+    ],
+    [
+      8,
+      3,
+      null,
+      8
+    ],
+    [
+      9,
+      3,
+      11,
+      14
+    ],
+    [
+      10,
+      3,
+      14,
+      11
+    ],
+    [
+      11,
+      3,
+      15,
+      10
+    ],
+    [
+      12,
+      3,
+      13,
+      12
+    ],
+    [
+      13,
+      3,
+      12,
+      13
+    ],
+    [
+      14,
+      2,
+      7,
+      15
+    ],
+    [
+      15,
+      2,
+      7,
+      24
+    ],
+    [
+      16,
+      2,
+      10,
+      23
+    ],
+    [
+      17,
+      2,
+      23,
+      20
+    ],
+    [
+      18,
+      2,
+      9,
+      19
+    ],
+    [
+      19,
+      2,
+      19,
+      17
+    ],
+    [
+      20,
+      2,
+      18,
+      22
+    ],
+    [
+      21,
+      2,
+      17,
+      16
+    ],
+    [
+      22,
+      2,
+      8,
+      18
+    ],
+    [
+      23,
+      2,
+      16,
+      21
+    ],
+    [
+      24,
+      2,
+      24,
+      25
+    ],
+    [
+      25,
+      3,
+      26,
+      27
+    ],
+    [
+      26,
+      3,
+      25,
+      26
+    ],
+    [
+      27,
+      2,
+      null,
+      28
+    ],
+    [
+      28,
+      1,
+      4,
+      29
+    ],
+    [
+      29,
+      1,
+      5,
+      30
+    ],
+    [
+      30,
+      1,
+      6,
+      31
+    ]
+  ]
+}

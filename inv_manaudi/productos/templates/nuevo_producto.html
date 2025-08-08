@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Nuevo Producto{% endblock %}
+{% block title %}Nuevo Producto Óptica{% endblock %}
 
 {% block encabezado %}
 <ol class="breadcrumb float-xl-end">
     <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
-    <li class="breadcrumb-item active">Nuevo Producto</li>
+    <li class="breadcrumb-item active">Nuevo Producto Óptica</li>
 </ol>
-<h1 class="page-header">Nuevo Producto</h1>
+<h1 class="page-header">Nuevo Producto Óptica</h1>
 {% endblock %}
 
 {% block contenido %}
     <div class="panel panel-inverse">
         <div class="panel-heading">
-            <h4 class="panel-title">Nuevo Producto</h4>
+            <h4 class="panel-title">Nuevo Producto Óptica - Generación Automática de Código</h4>
         </div>
         <div class="panel-body">
            <!-- Mostrar mensajes de éxito/error -->
@@ -22,7 +22,7 @@
                 {% for message in messages %}
                     <div class="alert alert-dismissible fade show alert-{{ message.tags }} shadow-sm mb-4">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        <strong>{{ message|capfirst }}</strong> <!-- Capitaliza el mensaje -->
+                        <strong>{{ message|capfirst }}</strong>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -30,44 +30,102 @@
             <!-- Formulario para creación de producto -->
             <form method="POST" action="{% url 'crear_producto' %}" id="producto-form">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="codigo">Código</label>
-                    <input type="text" class="form-control" id="codigo" name="codigo" required>
+                
+                <!-- Código generado automáticamente -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <h5>Código Generado: <span id="codigo-display" class="badge bg-primary fs-6">------</span></h5>
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+
+                <!-- Primera fila: Características para generar código -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="id_linea" class="form-label fw-bold">Línea *</label>
+                            {{ form.linea }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="id_sublinea" class="form-label fw-bold">Sublínea *</label>
+                            {{ form.sublinea }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="id_clase" class="form-label fw-bold">Clase *</label>
+                            {{ form.clase }}
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+
+                <!-- Segunda fila: Marca y Modelo -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_marca" class="form-label fw-bold">Marca *</label>
+                            {{ form.marca }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_modelo" class="form-label fw-bold">Modelo *</label>
+                            {{ form.modelo }}
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <div class="form-group">
-                    <label for="precio">Precio</label>
-                    <input type="text" class="form-control" id="precio" name="precio" required>
+
+                <!-- Tercera fila: Precio, Tipo y Material -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="id_precio" class="form-label fw-bold">Precio *</label>
+                            {{ form.precio }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="id_tipo_producto" class="form-label fw-bold">Tipo *</label>
+                            {{ form.tipo_producto }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label for="id_material" class="form-label">Material</label>
+                            {{ form.material }}
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <div class="form-group">
-                    <label for="tipo_producto">Tipo</label>
-                    <select class="form-control" id="tipo_producto" name="tipo_producto" required>
-                        <option value="unidad">Unidad</option>
-                        <option value="juego">Juego</option>
-                    </select>
+
+                <!-- Cuarta fila: Campos opcionales -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_nombre" class="form-label">Nombre (Opcional)</label>
+                            {{ form.nombre }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_descripcion" class="form-label">Descripción (Opcional)</label>
+                            {{ form.descripcion }}
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <div class="form-group">
-                    <label for="categoria">Subcategoría</label>
-                    <select class="form-control" id="categoria" name="categoria" required>
-                        {% for subcategoria in subcategorias %}
-                            <option value="{{ subcategoria.pk }}">{{ subcategoria.categoria.nombre }} - {{ subcategoria.nombre }}</option>
-                        {% endfor %}
-                    </select>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                            <i class="fa fa-save"></i> Crear Producto
+                        </button>
+                        <a href="{% url 'lista_productos' %}" class="btn btn-secondary btn-lg">
+                            <i class="fa fa-times"></i> Cancelar
+                        </a>
+                    </div>
                 </div>
-                <br>
-                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
             </form>
         </div>
     </div>
@@ -77,15 +135,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         $(document).ready(function(){
-            $('#precio').mask('00000000.00', {
+            // Máscara para el precio
+            $('#id_precio').mask('00000000.00', {
                 reverse: true,
-                placeholder: "____.__"
+                placeholder: "0.00"
             });
-        });
-        document.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
-            input.addEventListener('input', function() {
+            
+            // Función para actualizar el código generado
+            function actualizarCodigo() {
+                var linea = $('#id_linea').val();
+                var sublinea = $('#id_sublinea').val();
+                var clase = $('#id_clase').val();
+                
+                if (linea && sublinea && clase) {
+                    var codigo = linea + sublinea + clase;
+                    $('#codigo-display').text(codigo);
+                    $('#codigo-display').removeClass('bg-secondary').addClass('bg-success');
+                } else {
+                    $('#codigo-display').text('------');
+                    $('#codigo-display').removeClass('bg-success').addClass('bg-secondary');
+                }
+            }
+            
+            // Actualizar código cuando cambien los selectores
+            $('#id_linea, #id_sublinea, #id_clase').on('change', actualizarCodigo);
+            
+            // Convertir texto a mayúsculas automáticamente
+            $('#id_marca, #id_modelo').on('input', function() {
                 this.value = this.value.toUpperCase();
             });
+            
+            // También para campos opcionales
+            $('#id_nombre, #id_descripcion').on('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+            
+            // Actualizar código al cargar la página (por si viene con datos)
+            actualizarCodigo();
         });
     </script>
 {% endblock %}
