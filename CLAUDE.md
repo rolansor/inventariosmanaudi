@@ -62,8 +62,10 @@ inventariosmanaudi/
 - **Subcategoria**: Subcategorías dentro de categorías
 
 ### productos/models.py
-- **Producto**: Productos con código único por empresa
+- **Producto**: Productos ópticos con código generado automáticamente
 - **ProductoManager**: Manager personalizado para filtrado por empresa
+- **Campos ópticos**: linea, sublinea, clase, material, marca, modelo
+- **Generación de código**: Combinación automática de linea+sublinea+clase
 
 ## Funcionalidades Principales
 
@@ -85,11 +87,12 @@ inventariosmanaudi/
 - Traslados especiales para laboratorio
 - Generación automática de movimientos
 
-### 4. Gestión de Productos
-- CRUD completo de productos
-- Categorización jerárquica
+### 4. Gestión de Productos Ópticos
+- CRUD completo de productos especializados en óptica
+- Generación automática de códigos (Línea + Sublínea + Clase)
+- Campos específicos: marca, modelo, material, línea, sublínea, clase
 - Estados: activo/inactivo
-- Búsqueda por código, nombre o categoría
+- Búsqueda por filtros de clasificación óptica (línea, sublínea, clase)
 
 ### 5. Integración Externa
 - Conexión con SRI (Servicio de Rentas Internas de Ecuador)
@@ -115,6 +118,8 @@ inventariosmanaudi/
 
 ### APIs Internas
 - `/productos/bsq_por_codigo/` - Búsqueda de productos por código (JSON)
+- `/productos/busqueda/` - Búsqueda con filtros de clasificación óptica
+- `/productos/busqueda_modelo/` - Búsqueda específica por modelo
 - `/auxiliares/consulta_id/` - Consulta información tributaria
 
 ## Configuración
@@ -181,6 +186,15 @@ python manage.py collectstatic
 ```
 
 ## Características Especiales
+
+### Sistema de Productos Ópticos
+- **Códigos automáticos**: Generación basada en Línea + Sublínea + Clase
+- **Clasificación especializada**: 
+  - Líneas: ACCESORIO, MARCO ECONOMICO, MARCO EXCLUSIVO, MARCO GAMA ALTA
+  - Sublíneas: GAFA, HOMBRE, KID NINA, KID NINO, MUJER, UNISEX
+  - Clases: AL AIRE, BASICA, CLIP, INTERMEDIA, PREMIUM
+- **Búsqueda avanzada**: Filtros combinables por clasificación
+- **Gestión de marca/modelo**: Campos específicos con conversión automática a mayúsculas
 
 ### Multi-Tenancy
 - Soporte para múltiples empresas en una instancia
