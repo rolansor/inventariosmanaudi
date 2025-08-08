@@ -163,13 +163,87 @@ inventariosmanaudi/
 
 ## Comandos de Gestión
 
+### Configuración Inicial (IMPORTANTE: Ejecutar en este orden)
+
+1. **Crear base de datos MySQL** (si no existe):
+   ```sql
+   CREATE DATABASE inv_manaudi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+2. **Instalar dependencias**
+3. **Crear y aplicar migraciones**
+4. **Poblar base de datos** (opcional, para datos de prueba)
+
+### Windows
+
+#### Opción 1: Activar entorno virtual en CMD
 ```bash
 # Activar entorno virtual
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate
 
 # Instalar dependencias
 pip install -r requirements.txt
+
+# Cambiar al directorio del proyecto
+cd inv_manaudi
+
+# IMPORTANTE: Primero crear las migraciones
+python manage.py makemigrations usuarios productos inventario reportes auxiliares
+
+# Aplicar migraciones (esto crea las tablas en la BD)
+python manage.py migrate
+
+# SOLO DESPUÉS de las migraciones, poblar con datos de prueba
+python manage.py poblar_bd
+
+# Crear superusuario (opcional)
+python manage.py createsuperuser
+
+# Ejecutar servidor de desarrollo
+python manage.py runserver
+
+# Recolectar archivos estáticos
+python manage.py collectstatic
+```
+
+#### Opción 2: Usar PowerShell con rutas directas (sin activar venv)
+```powershell
+# Instalar dependencias usando el pip del venv
+venv\Scripts\pip.exe install -r requirements.txt
+
+# IMPORTANTE: Primero crear migraciones para todas las apps
+powershell -Command "venv\Scripts\python.exe inv_manaudi\manage.py makemigrations usuarios productos inventario reportes auxiliares"
+
+# Aplicar migraciones (esto crea las tablas en la BD)
+powershell -Command "venv\Scripts\python.exe inv_manaudi\manage.py migrate"
+
+# SOLO DESPUÉS de las migraciones, poblar base de datos
+powershell -Command "venv\Scripts\python.exe inv_manaudi\manage.py poblar_bd"
+
+# Limpiar base de datos (usar con precaución)
+powershell -Command "venv\Scripts\python.exe inv_manaudi\manage.py limpiar_bd --confirm"
+
+# Crear superusuario
+powershell -Command "venv\Scripts\python.exe inv_manaudi\manage.py createsuperuser"
+
+# Ejecutar servidor de desarrollo
+powershell -Command "venv\Scripts\python.exe inv_manaudi\manage.py runserver"
+```
+
+**Nota importante**: 
+- La opción de PowerShell es útil cuando hay problemas con la activación del entorno virtual o cuando se ejecutan comandos desde scripts automatizados
+- SIEMPRE ejecutar las migraciones antes de poblar la base de datos, de lo contrario obtendrás errores de tablas no existentes
+
+### Linux/Mac
+```bash
+# Activar entorno virtual
+source venv/bin/activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Cambiar al directorio del proyecto
+cd inv_manaudi
 
 # Migraciones de base de datos
 python manage.py makemigrations
@@ -183,6 +257,98 @@ python manage.py runserver
 
 # Recolectar archivos estáticos
 python manage.py collectstatic
+```
+
+## Población de Base de Datos
+
+### Comandos de Gestión de Datos
+
+El proyecto incluye comandos personalizados para gestionar la población de la base de datos:
+
+#### Limpiar Base de Datos
+```bash
+# Windows
+cd inv_manaudi
+python manage.py limpiar_bd --confirm
+
+# Linux/Mac
+cd inv_manaudi
+python manage.py limpiar_bd --confirm
+```
+⚠️ **ADVERTENCIA**: Este comando elimina TODOS los datos de usuarios, productos, inventarios, etc.
+
+#### Poblar Base de Datos con Datos Iniciales
+```bash
+cd inv_manaudi
+python manage.py poblar_bd
+```
+
+#### Reseteo Completo (Limpiar + Poblar)
+```bash
+cd inv_manaudi
+python manage.py limpiar_bd --confirm
+python manage.py poblar_bd
+```
+
+### Datos Creados por `poblar_bd`
+
+#### Empresa Principal
+- **NINEFIFTEEN**
+  - Dirección: Guayaquil
+  - Teléfono: 042222222
+  - Email: ninefifteen@hotmail.com
+
+#### Sucursales Creadas
+1. **Guayaquil** (GYQ) - Punto de Venta
+2. **Quito** (UIO) - Punto de Venta  
+3. **Cuenca** (CUE) - Punto de Venta
+4. **Laboratorio Guayaquil** (LGQ) - Laboratorio
+5. **Laboratorio Cuenca** (LCU) - Laboratorio
+6. **Laboratorio Quito** (LQU) - Laboratorio
+
+#### Usuarios de Prueba (Contraseña: `1234`)
+
+| Usuario | Nombre | Rol | Sucursal |
+|---------|---------|-----|----------|
+| `administrador_inventarios` | Edgar Rivas | Administrador | - |
+| `ninefifteen_manaudi` | Manaudi Ninefifteen | Manaudi | - |
+| `ninefifteen_guayaquil` | Usuario Guayaquil | Supervisor | Guayaquil |
+| `ninefifteen_quito` | Usuario Quito | Encargado | Quito |
+| `ninefifteen_cuenca` | Usuario Cuenca | Encargado | Cuenca |
+| `ninefifteen_administrador` | Stephanny | Supervisor | Guayaquil |
+| `ninefifteen_labgye` | Laboratorio Guayaquil | Encargado | Lab Guayaquil |
+
+#### Productos de Ejemplo
+
+| Código | Línea | Sublínea | Clase | Marca | Modelo | Precio |
+|--------|--------|----------|-------|--------|---------|---------|
+| 900101 | Marco Económico | Hombre | Básica | RAY-BAN | RB3025 | $89.99 |
+| 900201 | Marco Económico | Mujer | Básica | VOGUE | VO5239 | $75.50 |
+| 900502 | Marco Económico | Unisex | Intermedia | OAKLEY | OX8046 | $120.00 |
+| 910103 | Marco Exclusivo | Hombre | Premium | PRADA | PR17WS | $350.00 |
+| 910203 | Marco Exclusivo | Mujer | Premium | CHANEL | CH5380 | $450.00 |
+| 920503 | Marco Gama Alta | Unisex | Premium | TOM FORD | TF5634 | $580.00 |
+| 930501 | Accesorio | Unisex | Básica | GENERIC | CASE-001 | $10.00 |
+
+#### Datos de Inventario
+- Inventarios aleatorios (5-50 unidades) en sucursales tipo "punto_venta"
+- Stock mínimo aleatorio (3-10 unidades)
+- Traslados de ejemplo (pendientes y confirmados)
+- Movimientos de inventario de ejemplo
+
+### Flujo de Desarrollo con Datos de Prueba
+
+```bash
+# 1. Hacer cambios en modelos
+python manage.py makemigrations
+python manage.py migrate
+
+# 2. Resetear y poblar con datos de prueba
+python manage.py limpiar_bd --confirm
+python manage.py poblar_bd
+
+# 3. Crear superusuario si necesitas acceso al admin
+python manage.py createsuperuser
 ```
 
 ## Características Especiales
