@@ -28,123 +28,204 @@
             {% endif %}
 
             <!-- Formulario para edición de producto -->
-            <form method="POST" action="{% url 'editar_producto' producto.pk %}"
-                  id="producto-form">
+            <form method="POST" action="{% url 'editar_producto' producto.pk %}" id="producto-form">
                 {% csrf_token %}
-                <!-- Campo Código -->
-                <div class="form-group">
-                    <label for="codigo">Código</label>
-                    <input type="text" class="form-control {% if form.codigo.errors %}is-invalid{% endif %}" id="codigo"
-                           name="codigo"
-                           value="{{ form.codigo.value }}" required>
-                    {% if form.codigo.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.codigo.errors|striptags }}
+                
+                <div class="row">
+                    <!-- Código Generado (Solo lectura) -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            {{ form.codigo_generado.label_tag }}
+                            {{ form.codigo_generado }}
+                            {% if form.codigo_generado.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.codigo_generado.errors|striptags }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Código actual: {{ producto.codigo }}</small>
                         </div>
-                    {% endif %}
-                </div>
-                <br>
+                    </div>
 
-                <!-- Campo Nombre -->
-                <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control {% if form.nombre.errors %}is-invalid{% endif %}" id="nombre"
-                           name="nombre"
-                           value="{{ form.nombre.value }}" required>
-                    {% if form.nombre.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.nombre.errors|striptags }}
+                    <!-- Línea -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            {{ form.linea.label_tag }}
+                            {{ form.linea }}
+                            {% if form.linea.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.linea.errors|striptags }}
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </div>
-                <br>
+                    </div>
 
-                <!-- Campo Descripción -->
-                <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea class="form-control {% if form.descripcion.errors %}is-invalid{% endif %}"
-                              id="descripcion"
-                              name="descripcion">{{ form.descripcion.value }}</textarea>
+                    <!-- Sublínea -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            {{ form.sublinea.label_tag }}
+                            {{ form.sublinea }}
+                            {% if form.sublinea.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.sublinea.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Clase -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            {{ form.clase.label_tag }}
+                            {{ form.clase }}
+                            {% if form.clase.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.clase.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Material -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            {{ form.material.label_tag }}
+                            {{ form.material }}
+                            {% if form.material.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.material.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tipo de Producto -->
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            {{ form.tipo_producto.label_tag }}
+                            {{ form.tipo_producto }}
+                            {% if form.tipo_producto.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.tipo_producto.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Marca -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            {{ form.marca.label_tag }}
+                            {{ form.marca }}
+                            {% if form.marca.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.marca.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Modelo -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            {{ form.modelo.label_tag }}
+                            {{ form.modelo }}
+                            {% if form.modelo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.modelo.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Precio -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            {{ form.precio.label_tag }}
+                            {{ form.precio }}
+                            {% if form.precio.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.precio.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Nombre (Opcional) -->
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            {{ form.nombre.label_tag }}
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.nombre.errors|striptags }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción (Opcional) -->
+                <div class="form-group mb-4">
+                    {{ form.descripcion.label_tag }}
+                    {{ form.descripcion }}
                     {% if form.descripcion.errors %}
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback d-block">
                             {{ form.descripcion.errors|striptags }}
                         </div>
                     {% endif %}
                 </div>
-                <br>
 
-                <!-- Campo Precio -->
-                <div class="form-group">
-                    <label for="precio">Precio</label>
-                    <input type="text" class="form-control {% if form.precio.errors %}is-invalid{% endif %}" id="precio"
-                           name="precio"
-                           value="{{ form.precio.value }}" required>
-                    {% if form.precio.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.precio.errors|striptags }}
-                        </div>
-                    {% endif %}
-                </div>
-                <br>
-
-                <!-- Campo Tipo de Producto -->
-                <div class="form-group">
-                    <label for="tipo_producto">Tipo de Producto</label>
-                    <select class="form-control {% if form.tipo_producto.errors %}is-invalid{% endif %}"
-                            id="tipo_producto" name="tipo_producto" required>
-                        <option value="unidad"
-                                {% if producto and producto.tipo_producto == "unidad" %}selected{% endif %}>Unidad
-                        </option>
-                        <option value="juego"
-                                {% if producto and producto.tipo_producto == "juego" %}selected{% endif %}>Juego
-                        </option>
-                    </select>
-                    {% if form.tipo_producto.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.tipo_producto.errors|striptags }}
-                        </div>
-                    {% endif %}
-                </div>
-                <br>
-
-                <!-- Campo Subcategoría -->
-                <div class="form-group">
-                    <label for="categoria">Subcategoría</label>
-                    <select class="form-control {% if form.categoria.errors %}is-invalid{% endif %}" id="categoria"
-                            name="categoria" required>
-                        {% for subcategoria in subcategorias %}
-                            <option value="{{ subcategoria.pk }}"
-                                    {% if producto and producto.categoria.pk == subcategoria.pk %}selected{% endif %}>
-                                {{ subcategoria.categoria.nombre }} - {{ subcategoria.nombre }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    {% if form.categoria.errors %}
-                        <div class="invalid-feedback">
-                            {{ form.categoria.errors|striptags }}
-                        </div>
-                    {% endif %}
-                </div>
-                <br>
                 <!-- Botón de actualización -->
-                <button type="submit" class="btn btn-primary" id="submit-btn">Actualizar</button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Actualizar Producto</button>
+                    <a href="{% url 'lista_productos' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
             </form>
         </div>
     </div>
 {% endblock %}
 
 {% block extra_js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#precio').mask('00000000.00', {
-                reverse: true,
-                placeholder: "____.__"
+        function actualizarCodigo() {
+            const linea = document.getElementById('id_linea').value;
+            const sublinea = document.getElementById('id_sublinea').value;
+            const clase = document.getElementById('id_clase').value;
+            
+            if (linea && sublinea && clase) {
+                const codigo = linea + sublinea + clase;
+                document.getElementById('id_codigo_generado').value = codigo;
+            } else {
+                document.getElementById('id_codigo_generado').value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el código al cargar la página
+            actualizarCodigo();
+            
+            // Agregar event listeners para actualizar el código
+            ['id_linea', 'id_sublinea', 'id_clase'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', actualizarCodigo);
+                }
             });
-            document.querySelectorAll('input[type="text"], textarea').forEach(function (input) {
-                input.addEventListener('input', function () {
-                    this.value = this.value.toUpperCase();
-                });
+            
+            // Convertir marca y modelo a mayúsculas automáticamente
+            ['id_marca', 'id_modelo'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        this.value = this.value.toUpperCase();
+                    });
+                }
             });
         });
     </script>

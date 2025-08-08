@@ -53,26 +53,15 @@ def lista_productos(request):
 @control_acceso('Supervisor')
 def busqueda_producto(request):
     empresa_actual = obtener_empresa(request)
-    query = request.GET.get('q', '')
     linea = request.GET.get('linea')
     sublinea = request.GET.get('sublinea')
     clase = request.GET.get('clase')
     productos = None
 
-    if query or linea or sublinea or clase:
-        productos_empresa = Producto.objects.para_empresa(empresa_actual)
+    if linea or sublinea or clase:
+        productos = Producto.objects.para_empresa(empresa_actual)
         
-        if query:
-            # Buscar por código, modelo o marca
-            productos = productos_empresa.filter(
-                Q(codigo__icontains=query) | 
-                Q(modelo__icontains=query) | 
-                Q(marca__icontains=query)
-            )
-        else:
-            productos = productos_empresa
-        
-        # Filtros adicionales
+        # Filtros por campos de óptica
         if linea:
             productos = productos.filter(linea=linea)
         if sublinea:
@@ -82,7 +71,6 @@ def busqueda_producto(request):
 
     context = {
         'productos': productos,
-        'query': query,
         'linea_choices': Producto.LINEA_CHOICES,
         'sublinea_choices': Producto.SUBLINEA_CHOICES,
         'clase_choices': Producto.CLASE_CHOICES,

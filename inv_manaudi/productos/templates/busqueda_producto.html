@@ -12,23 +12,45 @@
     <div class="panel-body">
         <form method="GET" action="{% url 'busqueda_producto' %}">
             <div class="row">
-                <!-- Campo de búsqueda de código/nombre -->
-                <div class="col-md-4">
+                <!-- Filtro por línea -->
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label for="q">Buscar por código o nombre</label>
-                        <input type="text" class="form-control" id="q" name="q" value="{{ query }}" placeholder="Código o nombre">
+                        <label for="linea">Línea</label>
+                        <select id="linea" name="linea" class="form-control">
+                            <option value="">Todas</option>
+                            {% for value, display in linea_choices %}
+                                <option value="{{ value }}" {% if linea_selected == value %}selected{% endif %}>
+                                    {{ display }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
-                <!-- Filtro por categoría -->
-                <div class="col-md-4">
+                <!-- Filtro por sublínea -->
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label for="categoria">Categoría</label>
-                        <select id="categoria" name="categoria" class="form-control">
-                            <option value="">Todas las categorías</option>
-                            {% for categoria in categorias %}
-                                <option value="{{ categoria.id }}" {% if categoria_id == categoria.id|stringformat:"s" %}selected{% endif %}>
-                                    {{ categoria.nombre }}
+                        <label for="sublinea">Sublínea</label>
+                        <select id="sublinea" name="sublinea" class="form-control">
+                            <option value="">Todas</option>
+                            {% for value, display in sublinea_choices %}
+                                <option value="{{ value }}" {% if sublinea_selected == value %}selected{% endif %}>
+                                    {{ display }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filtro por clase -->
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="clase">Clase</label>
+                        <select id="clase" name="clase" class="form-control">
+                            <option value="">Todas</option>
+                            {% for value, display in clase_choices %}
+                                <option value="{{ value }}" {% if clase_selected == value %}selected{% endif %}>
+                                    {{ display }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -36,8 +58,9 @@
                 </div>
 
                 <!-- Botón de búsqueda -->
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">Buscar</button>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Buscar</button>
+                    <a href="{% url 'busqueda_producto' %}" class="btn btn-secondary">Limpiar</a>
                 </div>
             </div>
         </form>
