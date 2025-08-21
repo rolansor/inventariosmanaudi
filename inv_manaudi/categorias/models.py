@@ -26,3 +26,17 @@ class Subcategoria(models.Model):
         # Convertir el nombre a mayúsculas antes de guardar
         self.nombre = self.nombre.upper()
         super(Subcategoria, self).save(*args, **kwargs)
+
+
+class Clase(models.Model):
+    subcategoria = models.ForeignKey(Subcategoria, on_delete=models.CASCADE, related_name='clases')
+    nombre = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.nombre} ({self.subcategoria.categoria.nombre} > {self.subcategoria.nombre})'
+
+    def save(self, *args, **kwargs):
+        # Convertir el nombre a mayúsculas antes de guardar
+        self.nombre = self.nombre.upper()
+        super(Clase, self).save(*args, **kwargs)
+

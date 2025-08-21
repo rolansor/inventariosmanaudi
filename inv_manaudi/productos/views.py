@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from categorias.models import Subcategoria, Categoria
+from categorias.models import Subcategoria, Categoria, Clase
 from usuarios.templatetags.tags import control_acceso
 from usuarios.views import obtener_empresa
 from .models import Producto
@@ -13,7 +13,7 @@ from .forms import ProductoForm
 @control_acceso('Supervisor')
 def crear_producto(request):
     empresa_actual = obtener_empresa(request)
-    subcategorias = Subcategoria.objects.filter(categoria__empresa=empresa_actual)
+    clases = Clase.objects.filter(subcategoria__categoria__empresa=empresa_actual)
 
     if request.method == 'POST':
         codigo = request.POST.get('codigo')
@@ -21,10 +21,10 @@ def crear_producto(request):
         descripcion = request.POST.get('descripcion')
         precio = request.POST.get('precio')
         tipo_producto = request.POST.get('tipo_producto')
-        subcategoria_id = request.POST.get('categoria')
+        clase_id = request.POST.get('clase')
 
         try:
-            subcategoria = Subcategoria.objects.get(pk=subcategoria_id, categoria__empresa=empresa_actual)
+            clase = Clase.objects.get(pk=clase_id, subcategoria__categoria__empresa=empresa_actual)
 
             # Validar que el precio esté en el formato correcto
             if float(precio) <= 0:
@@ -37,14 +37,14 @@ def crear_producto(request):
                 descripcion=descripcion,
                 precio=precio,
                 tipo_producto=tipo_producto,
-                categoria=subcategoria,
+                clase=clase,
                 empresa=obtener_empresa(request)  # Asumimos que el usuario tiene una empresa relacionada
             )
             messages.success(request, 'Producto creado exitosamente.')
             return redirect('lista_productos')  # Redirigir a la lista de productos
 
-        except Subcategoria.DoesNotExist:
-            messages.error(request, 'Subcategoría no encontrada.')
+        except Clase.DoesNotExist:
+            messages.error(request, 'Clase no encontrada.')
             return redirect('crear_producto')
 
         except DataError as e:
@@ -58,7 +58,7 @@ def crear_producto(request):
             else:
                 messages.error(request, 'Ocurrió un error al crear el producto. Inténtalo de nuevo.')
 
-    return render(request, 'nuevo_producto.html', {'subcategorias': subcategorias})
+    return render(request, 'nuevo_producto.html', {'clases': clases})
 
 
 @control_acceso('Supervisor')
@@ -95,7 +95,9 @@ def busqueda_producto(request):
                 subcategorias = Subcategoria.objects.filter(categoria=categoria)
 
                 # Filtrar los productos que pertenezcan a las subcategorías de la categoría seleccionada
-                productos = productos_empresa.filter(categoria__in=subcategorias)
+                # Filtrar los productos que pertenezcan a las clases de las subcategorías de la categoría seleccionada
+                clases = Clase.objects.filter(subcategoria__in=subcategorias)
+                productos = productos_empresa.filter(clase__in=clases)
 
             except Categoria.DoesNotExist:
                 productos = Producto.objects.none()  # En caso de que no exista la categoría
@@ -116,7 +118,7 @@ def busqueda_producto(request):
 @control_acceso('Supervisor')
 def editar_producto(request, pk=None):
     empresa_actual = obtener_empresa(request)
-    subcategorias = Subcategoria.objects.filter(categoria__empresa=empresa_actual).order_by('nombre')
+    clases = Clase.objects.filter(subcategoria__categoria__empresa=empresa_actual).order_by('nombre')
     empresa_actual = obtener_empresa(request)
 
     # Escenario 1: Se pasa un pk, busca el producto
@@ -138,7 +140,7 @@ def editar_producto(request, pk=None):
     return render(request, 'editar_producto.html', {
         'form': form,
         'producto': producto,
-        'subcategorias': subcategorias
+        'clases': clases
     })
 
 
@@ -161,7 +163,7 @@ def bsq_por_codigo(request):
             'descripcion': producto.descripcion,
             'precio': producto.precio,
             'tipo_producto': producto.tipo_producto,
-            'categoria_id': producto.categoria.pk if producto.categoria else None
+            'clase_id': producto.clase.pk if producto.clase else None
         }
         return JsonResponse(data)
     except Producto.DoesNotExist:

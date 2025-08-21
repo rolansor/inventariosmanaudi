@@ -107,21 +107,21 @@
                 </div>
                 <br>
 
-                <!-- Campo Subcategoría -->
+                <!-- Campo Clase -->
                 <div class="form-group">
-                    <label for="categoria">Subcategoría</label>
-                    <select class="form-control {% if form.categoria.errors %}is-invalid{% endif %}" id="categoria"
-                            name="categoria" required>
-                        {% for subcategoria in subcategorias %}
-                            <option value="{{ subcategoria.pk }}"
-                                    {% if producto and producto.categoria.pk == subcategoria.pk %}selected{% endif %}>
-                                {{ subcategoria.categoria.nombre }} - {{ subcategoria.nombre }}
+                    <label for="clase">Clase</label>
+                    <select class="form-control {% if form.clase.errors %}is-invalid{% endif %}" id="clase"
+                            name="clase" required>
+                        {% for clase in clases %}
+                            <option value="{{ clase.pk }}"
+                                    {% if producto and producto.clase.pk == clase.pk %}selected{% endif %}>
+                                {{ clase.subcategoria.categoria.nombre }} > {{ clase.subcategoria.nombre }} > {{ clase.nombre }}
                             </option>
                         {% endfor %}
                     </select>
-                    {% if form.categoria.errors %}
+                    {% if form.clase.errors %}
                         <div class="invalid-feedback">
-                            {{ form.categoria.errors|striptags }}
+                            {{ form.clase.errors|striptags }}
                         </div>
                     {% endif %}
                 </div>

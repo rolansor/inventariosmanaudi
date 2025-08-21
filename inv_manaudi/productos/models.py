@@ -1,5 +1,5 @@
 from django.db import models
-from categorias.models import Subcategoria
+from categorias.models import Clase
 from usuarios.models import Empresa
 
 
@@ -23,7 +23,7 @@ class Producto(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     tipo_producto = models.CharField(max_length=10, choices=TIPO_PRODUCTO_CHOICES, default='unidad')
-    categoria = models.ForeignKey(Subcategoria, related_name='productos', on_delete=models.SET_NULL, null=True)
+    clase = models.ForeignKey(Clase, related_name='productos', on_delete=models.SET_NULL, null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_PRODUCTO_CHOICES, default='activo')
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
     class Meta:

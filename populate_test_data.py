@@ -15,7 +15,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from usuarios.models import Usuario, Empresa, Sucursal, UsuarioPerfil
 from productos.models import Producto
-from categorias.models import Categoria, Subcategoria
+from categorias.models import Categoria, Subcategoria, Clase
 from inventario.models import Inventario, MovimientoInventario, Traslado
 
 def ejecutar_migraciones():
@@ -261,81 +261,115 @@ def crear_usuarios(empresas, grupos):
     return usuarios_creados
 
 def crear_categorias_y_productos(empresas):
-    """Crea categorías y productos de ejemplo para cada empresa"""
-    print("\nCreando categorias y productos...")
+    """Crea categorías, subcategorías, clases y productos de ejemplo para cada empresa"""
+    print("\nCreando categorias, subcategorias, clases y productos...")
     
+    # Estructura jerárquica: Categoría > Subcategoría > Clase
     categorias_base = [
-        {'nombre': 'ELECTRÓNICA', 'subcategorias': ['COMPUTADORAS', 'CELULARES', 'ACCESORIOS']},
-        {'nombre': 'OFICINA', 'subcategorias': ['PAPELERÍA', 'MOBILIARIO', 'SUMINISTROS']},
-        {'nombre': 'LIMPIEZA', 'subcategorias': ['DETERGENTES', 'DESINFECTANTES', 'UTENSILIOS']},
+        {
+            'nombre': 'ELECTRÓNICA',
+            'subcategorias': [
+                {'nombre': 'COMPUTADORAS', 'clases': ['LAPTOPS', 'DESKTOPS', 'TABLETS']},
+                {'nombre': 'CELULARES', 'clases': ['SMARTPHONES', 'BASICOS', 'ACCESORIOS CELULAR']},
+                {'nombre': 'ACCESORIOS', 'clases': ['MOUSE', 'TECLADOS', 'CABLES']}
+            ]
+        },
+        {
+            'nombre': 'OFICINA',
+            'subcategorias': [
+                {'nombre': 'PAPELERÍA', 'clases': ['PAPEL', 'CUADERNOS', 'CARPETAS']},
+                {'nombre': 'MOBILIARIO', 'clases': ['SILLAS', 'ESCRITORIOS', 'ARCHIVADORES']},
+                {'nombre': 'SUMINISTROS', 'clases': ['TONERS', 'TINTAS', 'GRAPAS']}
+            ]
+        },
+        {
+            'nombre': 'LIMPIEZA',
+            'subcategorias': [
+                {'nombre': 'DETERGENTES', 'clases': ['LIQUIDOS', 'POLVO', 'CONCENTRADOS']},
+                {'nombre': 'DESINFECTANTES', 'clases': ['ALCOHOL', 'CLORO', 'ANTIBACTERIAL']},
+                {'nombre': 'UTENSILIOS', 'clases': ['ESCOBAS', 'TRAPEADORES', 'PAÑOS']}
+            ]
+        }
     ]
     
+    # Productos actualizados con clases
     productos_base = [
         # Electrónica
-        {'codigo': 'LAP001', 'nombre': 'Laptop Dell Inspiron', 'precio': 850.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'COMPUTADORAS'},
-        {'codigo': 'CEL001', 'nombre': 'iPhone 13', 'precio': 999.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'CELULARES'},
-        {'codigo': 'ACC001', 'nombre': 'Mouse Inalámbrico', 'precio': 25.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'ACCESORIOS'},
+        {'codigo': 'LAP001', 'nombre': 'Laptop Dell Inspiron', 'precio': 850.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'COMPUTADORAS', 'clase': 'LAPTOPS'},
+        {'codigo': 'CEL001', 'nombre': 'iPhone 13', 'precio': 999.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'CELULARES', 'clase': 'SMARTPHONES'},
+        {'codigo': 'MOU001', 'nombre': 'Mouse Inalámbrico', 'precio': 25.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'ACCESORIOS', 'clase': 'MOUSE'},
         # Oficina
-        {'codigo': 'PAP001', 'nombre': 'Resma Papel A4', 'precio': 4.50, 'categoria': 'OFICINA', 'subcategoria': 'PAPELERÍA'},
-        {'codigo': 'MOB001', 'nombre': 'Silla Ejecutiva', 'precio': 150.00, 'categoria': 'OFICINA', 'subcategoria': 'MOBILIARIO'},
-        {'codigo': 'SUM001', 'nombre': 'Toner HP', 'precio': 75.00, 'categoria': 'OFICINA', 'subcategoria': 'SUMINISTROS'},
+        {'codigo': 'PAP001', 'nombre': 'Resma Papel A4', 'precio': 4.50, 'categoria': 'OFICINA', 'subcategoria': 'PAPELERÍA', 'clase': 'PAPEL'},
+        {'codigo': 'SIL001', 'nombre': 'Silla Ejecutiva', 'precio': 150.00, 'categoria': 'OFICINA', 'subcategoria': 'MOBILIARIO', 'clase': 'SILLAS'},
+        {'codigo': 'TON001', 'nombre': 'Toner HP', 'precio': 75.00, 'categoria': 'OFICINA', 'subcategoria': 'SUMINISTROS', 'clase': 'TONERS'},
         # Limpieza
-        {'codigo': 'DET001', 'nombre': 'Detergente Industrial 5L', 'precio': 12.00, 'categoria': 'LIMPIEZA', 'subcategoria': 'DETERGENTES'},
-        {'codigo': 'DES001', 'nombre': 'Alcohol 70% 1L', 'precio': 3.50, 'categoria': 'LIMPIEZA', 'subcategoria': 'DESINFECTANTES'},
-        {'codigo': 'UTE001', 'nombre': 'Escoba Industrial', 'precio': 8.00, 'categoria': 'LIMPIEZA', 'subcategoria': 'UTENSILIOS'},
+        {'codigo': 'DET001', 'nombre': 'Detergente Industrial 5L', 'precio': 12.00, 'categoria': 'LIMPIEZA', 'subcategoria': 'DETERGENTES', 'clase': 'LIQUIDOS'},
+        {'codigo': 'ALC001', 'nombre': 'Alcohol 70% 1L', 'precio': 3.50, 'categoria': 'LIMPIEZA', 'subcategoria': 'DESINFECTANTES', 'clase': 'ALCOHOL'},
+        {'codigo': 'ESC001', 'nombre': 'Escoba Industrial', 'precio': 8.00, 'categoria': 'LIMPIEZA', 'subcategoria': 'UTENSILIOS', 'clase': 'ESCOBAS'},
     ]
     
     for empresa_nombre, empresa_info in empresas.items():
         empresa = empresa_info['empresa']
         sucursales = empresa_info['sucursales']
         
-        # Crear categorías y subcategorías
-        categorias_map = {}
+        # Crear categorías, subcategorías y clases
+        clases_map = {}  # Mapa para encontrar clases fácilmente
+        
         for cat_data in categorias_base:
             categoria = Categoria.objects.create(
                 nombre=cat_data['nombre'],
                 empresa=empresa
             )
-            categorias_map[cat_data['nombre']] = categoria
             
-            for subcat_nombre in cat_data['subcategorias']:
-                Subcategoria.objects.create(
-                    nombre=subcat_nombre,
+            for subcat_data in cat_data['subcategorias']:
+                subcategoria = Subcategoria.objects.create(
+                    nombre=subcat_data['nombre'],
                     categoria=categoria
                 )
+                
+                for clase_nombre in subcat_data['clases']:
+                    clase = Clase.objects.create(
+                        nombre=clase_nombre,
+                        subcategoria=subcategoria
+                    )
+                    # Crear clave única para mapear
+                    clave = f"{cat_data['nombre']}_{subcat_data['nombre']}_{clase_nombre}"
+                    clases_map[clave] = clase
         
         # Crear productos
         productos_creados = []
-        for i, prod_data in enumerate(productos_base):
-            categoria = categorias_map[prod_data['categoria']]
-            subcategoria = Subcategoria.objects.get(
-                nombre=prod_data['subcategoria'],
-                categoria=categoria
-            )
+        for prod_data in productos_base:
+            # Buscar la clase correspondiente
+            clave = f"{prod_data['categoria']}_{prod_data['subcategoria']}_{prod_data['clase']}"
+            clase = clases_map.get(clave)
             
-            producto = Producto.objects.create(
-                codigo=f"{empresa_nombre[:3].upper()}-{prod_data['codigo']}",
-                nombre=prod_data['nombre'],
-                descripcion=f"{prod_data['nombre']} - {empresa_nombre}",
-                precio=Decimal(str(prod_data['precio'])),
-                tipo_producto='unidad',
-                categoria=subcategoria,  # El campo categoria en realidad apunta a Subcategoria
-                empresa=empresa,
-                estado='activo'
-            )
-            productos_creados.append(producto)
-            
-            # Crear inventario inicial en cada sucursal
-            for sucursal in sucursales:
-                cantidad_inicial = random.randint(10, 100)
-                Inventario.objects.create(
-                    producto=producto,
-                    sucursal=sucursal,
-                    cantidad=cantidad_inicial,
-                    stock_minimo=10
+            if clase:
+                producto = Producto.objects.create(
+                    codigo=f"{empresa_nombre[:3].upper()}-{prod_data['codigo']}",
+                    nombre=prod_data['nombre'],
+                    descripcion=f"{prod_data['nombre']} - {empresa_nombre}",
+                    precio=Decimal(str(prod_data['precio'])),
+                    tipo_producto='unidad',
+                    clase=clase,  # Ahora apunta a Clase en lugar de Subcategoria
+                    empresa=empresa,
+                    estado='activo'
                 )
+                productos_creados.append(producto)
+                
+                # Crear inventario inicial en cada sucursal
+                for sucursal in sucursales:
+                    cantidad_inicial = random.randint(10, 100)
+                    Inventario.objects.create(
+                        producto=producto,
+                        sucursal=sucursal,
+                        cantidad=cantidad_inicial,
+                        stock_minimo=10
+                    )
         
         print(f"  [OK] {len(productos_creados)} productos creados para {empresa_nombre}")
+        print(f"      con {Categoria.objects.filter(empresa=empresa).count()} categorías,")
+        print(f"      {Subcategoria.objects.filter(categoria__empresa=empresa).count()} subcategorías y")
+        print(f"      {Clase.objects.filter(subcategoria__categoria__empresa=empresa).count()} clases")
     
     return productos_creados
 

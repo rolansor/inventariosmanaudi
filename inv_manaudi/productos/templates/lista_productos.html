@@ -30,8 +30,7 @@
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Precio</th>
-                        <th>Tipo</th>
-                        <th>Categoría/Subcategoria</th>
+                        <th>Tipo</th><th>Categoría > Subcategoría > Clase</th>
                         <th>Empresa</th>
                     </tr>
                 </thead>
@@ -43,7 +42,15 @@
                         <td>{{ producto.descripcion|default:"Sin descripción" }}</td>
                         <td>{{ producto.precio }}</td>
                         <td>{{ producto.get_tipo_producto_display }}</td>
-                        <td>{{ producto.categoria.categoria.nombre }}--{{ producto.categoria.nombre }}</td>
+                        <td>
+                            {% if producto.clase %}
+                                {{ producto.clase.subcategoria.categoria.nombre }} > 
+                                {{ producto.clase.subcategoria.nombre }} > 
+                                {{ producto.clase.nombre }}
+                            {% else %}
+                                Sin clasificación
+                            {% endif %}
+                        </td>
                         <td>{{ producto.empresa.nombre }}</td>
                     </tr>
                 {% endfor %}
