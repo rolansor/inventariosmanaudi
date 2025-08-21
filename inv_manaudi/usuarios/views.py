@@ -15,22 +15,29 @@ from .models import Empresa, Sucursal
 def inicio(request):
     # Obtener la empresa del usuario logueado
     empresa_usuario = obtener_empresa(request)
-    sucursal_usuario = getattr(request.user.perfil, 'sucursal', None)
+    sucursal_usuario = getattr(request.user.perfil, 'sucursal', None) if hasattr(request.user, 'perfil') else None
 
-    # Si el usuario no es supervisor, muestra solo los datos de la sucursal actual
+    # Si el usuario tiene sucursal específica, muestra solo los datos de su sucursal
     if sucursal_usuario:
         total_productos = Producto.objects.filter(empresa=empresa_usuario, inventarios__sucursal=sucursal_usuario).distinct().count()
         total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
         productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad__lt=F('stock_minimo')).count()
         productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad=0).count()
-        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:50]
+        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:10]
     else:
-        # Si el usuario no tiene sucursal asignada, inicializar variables
-        total_productos = 0
-        total_stock = 0
-        productos_bajo_stock = 0
-        productos_agotados = 0
-        movimientos_recientes = []
+        # Si el usuario no tiene sucursal (admin/supervisor), mostrar datos de toda la empresa
+        if empresa_usuario:
+            total_productos = Producto.objects.filter(empresa=empresa_usuario).distinct().count()
+            total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
+            productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad__lt=F('stock_minimo')).count()
+            productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad=0).count()
+            movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:10]
+        else:
+            total_productos = 0
+            total_stock = 0
+            productos_bajo_stock = 0
+            productos_agotados = 0
+            movimientos_recientes = []
 
     return render(request, 'inicio.html', {
         'total_productos': total_productos,
@@ -248,14 +255,35 @@ def sucursal_delete(request, pk):
 def obtener_empresa(request: HttpRequest):
     """
     Retorna la empresa asociadas al usuario que hace el request.
+    Para superadmins, permite cambiar entre empresas usando la sesión.
 
     :param request: HttpRequest objeto de Django
     :return: empresa
     """
-    usuario_perfil = request.user.perfil  # Accede al perfil del usuario
-    empresa = usuario_perfil.empresa  # Obtiene la empresa del perfil
-
-    return empresa
+    # Si es superadmin, puede ver cualquier empresa
+    if request.user.is_superuser:
+        # Buscar empresa en sesión
+        empresa_id = request.session.get('empresa_id')
+        if empresa_id:
+            try:
+                return Empresa.objects.get(id=empresa_id)
+            except Empresa.DoesNotExist:
+                pass
+        
+        # Si no hay empresa en sesión, usar la primera disponible
+        primera_empresa = Empresa.objects.first()
+        if primera_empresa:
+            request.session['empresa_id'] = primera_empresa.id
+            return primera_empresa
+        return None
+    
+    # Usuario normal - usar su empresa asignada
+    if hasattr(request.user, 'perfil'):
+        usuario_perfil = request.user.perfil  # Accede al perfil del usuario
+        empresa = usuario_perfil.empresa  # Obtiene la empresa del perfil
+        return empresa
+    
+    return None
 
 
 def obtener_sucursal(request: HttpRequest):
@@ -269,3 +297,27 @@ def obtener_sucursal(request: HttpRequest):
     sucursal = usuario_perfil.sucursal  # Obtiene la sucursal del perfil (puede ser None)
 
     return sucursal
+
+
+@login_required
+def cambiar_empresa(request, empresa_id):
+    """
+    Permite a los superadmins cambiar la empresa activa en la sesión.
+    
+    :param request: HttpRequest objeto de Django
+    :param empresa_id: ID de la empresa a seleccionar
+    :return: redirect a la página anterior o inicio
+    """
+    if request.user.is_superuser:
+        try:
+            empresa = Empresa.objects.get(id=empresa_id)
+            request.session['empresa_id'] = empresa.id
+            # Mensaje de éxito opcional
+            from django.contrib import messages
+            messages.success(request, f'Ahora estás viendo los datos de: {empresa.nombre}')
+        except Empresa.DoesNotExist:
+            from django.contrib import messages
+            messages.error(request, 'Empresa no encontrada')
+    
+    # Redirigir a la página anterior o al inicio
+    return redirect(request.META.get('HTTP_REFERER', 'inicio'))

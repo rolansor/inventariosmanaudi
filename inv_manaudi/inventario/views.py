@@ -10,7 +10,6 @@ from .forms import MovimientoInventarioForm, ProductoSelectForm, SucursalSelectF
     ConfirmarRecepcionForm
 
 
-@control_acceso('Encargado')
 def movimiento_inventario(request):
     empresa_actual = obtener_empresa(request)
 

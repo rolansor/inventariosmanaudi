@@ -31,8 +31,37 @@
         {% block menu_navegacion %}
             <!-- BEGIN navbar-header -->
             <div class="navbar-header">
-                <a href="/" class="navbar-brand"><span class="navbar-logo"></span>EMPRESA: <b class="me-3px"> {{ request.user.perfil.empresa.nombre }}</b></a>
-                <a href="/" class="navbar-brand">SUCURSAL:<b class="me-3px">{{ request.user.perfil.sucursal.nombre }}</b></a>
+                {% if request.user.is_superuser %}
+                    <!-- Selector de empresa para superadmin -->
+                    <div class="navbar-brand d-flex align-items-center">
+                        <span class="navbar-logo"></span>
+                        <span class="me-2">EMPRESA:</span>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="empresaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if empresa_actual %}
+                                    {{ empresa_actual.nombre }}
+                                {% else %}
+                                    Seleccionar Empresa
+                                {% endif %}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="empresaDropdown">
+                                {% for empresa in todas_las_empresas %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'cambiar_empresa' empresa.id %}">
+                                            {{ empresa.nombre }}
+                                            {% if empresa_actual and empresa.id == empresa_actual.id %}
+                                                <i class="fa fa-check ms-2"></i>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/" class="navbar-brand"><span class="navbar-logo"></span>EMPRESA: <b class="me-3px"> {{ request.user.perfil.empresa.nombre }}</b></a>
+                    <a href="/" class="navbar-brand">SUCURSAL:<b class="me-3px">{{ request.user.perfil.sucursal.nombre }}</b></a>
+                {% endif %}
                 <button type="button" class="navbar-mobile-toggler" data-toggle="app-sidebar-mobile">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
