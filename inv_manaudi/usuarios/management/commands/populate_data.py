@@ -43,7 +43,7 @@ class Command(BaseCommand):
             self.crear_inventario_inicial(empresas)
             self.crear_movimientos_ejemplo(empresas)
         
-        self.stdout.write(self.style.SUCCESS('\n✓ Población de datos completada exitosamente!'))
+        self.stdout.write(self.style.SUCCESS('\n[OK] Poblacion de datos completada exitosamente!'))
         self.stdout.write(self.style.SUCCESS('\nResumen:'))
         self.stdout.write(f'  - Empresas creadas: {Empresa.objects.count()}')
         self.stdout.write(f'  - Sucursales creadas: {Sucursal.objects.count()}')
@@ -343,18 +343,21 @@ class Command(BaseCommand):
             
             for cat_data in categorias_base:
                 categoria = Categoria.objects.create(
+                    codigo=cat_data['codigo'],
                     nombre=cat_data['nombre'],
                     empresa=empresa
                 )
                 
                 for subcat_data in cat_data['subcategorias']:
                     subcategoria = Subcategoria.objects.create(
+                        codigo=subcat_data['codigo'],
                         nombre=subcat_data['nombre'],
                         categoria=categoria
                     )
                     
                     for clase_data in subcat_data['clases']:
                         clase = Clase.objects.create(
+                            codigo=clase_data['codigo'],
                             nombre=clase_data['nombre'],
                             subcategoria=subcategoria
                         )
