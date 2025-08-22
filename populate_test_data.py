@@ -6,7 +6,7 @@ from decimal import Decimal
 import random
 
 # Configurar Django
-sys.path.insert(0, 'C:\\Users\\MSHOME\\PycharmProjects\\inventariosmanaudi\\inv_manaudi')
+sys.path.insert(0, 'C:\\Users\\rolan\\PycharmProjects\\inventariosmanaudi\\inv_manaudi')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'inv_manaudi.settings')
 django.setup()
 
@@ -18,41 +18,6 @@ from productos.models import Producto
 from categorias.models import Categoria, Subcategoria, Clase
 from inventario.models import Inventario, MovimientoInventario, Traslado
 
-def ejecutar_migraciones():
-    """Ejecuta makemigrations y migrate"""
-    import subprocess
-    
-    print("Ejecutando migraciones...")
-    
-    # Cambiar al directorio inv_manaudi
-    original_dir = os.getcwd()
-    os.chdir('C:\\Users\\MSHOME\\PycharmProjects\\inventariosmanaudi\\inv_manaudi')
-    
-    try:
-        # Ejecutar makemigrations para todas las aplicaciones
-        print("  Ejecutando makemigrations...")
-        apps = ['usuarios', 'inventario', 'productos', 'categorias', 'auxiliares', 'reportes']
-        result = subprocess.run(['python', 'manage.py', 'makemigrations'] + apps, 
-                              capture_output=True, text=True)
-        if result.returncode == 0:
-            print("  [OK] Migraciones creadas")
-            if "No changes detected" in result.stdout:
-                print("  [INFO] No se detectaron cambios")
-        else:
-            print(f"  [ERROR] {result.stderr}")
-            
-        # Ejecutar migrate
-        print("  Ejecutando migrate...")
-        result = subprocess.run(['python', 'manage.py', 'migrate'], 
-                              capture_output=True, text=True)
-        if result.returncode == 0:
-            print("  [OK] Migraciones aplicadas")
-        else:
-            print(f"  [ERROR] {result.stderr}")
-            
-    finally:
-        # Volver al directorio original
-        os.chdir(original_dir)
 
 def crear_grupos():
     """Crea los grupos de permisos si no existen"""
@@ -267,45 +232,165 @@ def crear_categorias_y_productos(empresas):
     # Estructura jerárquica: Categoría > Subcategoría > Clase
     categorias_base = [
         {
+            'codigo': 'ELE',
             'nombre': 'ELECTRÓNICA',
             'subcategorias': [
-                {'nombre': 'COMPUTADORAS', 'clases': ['LAPTOPS', 'DESKTOPS', 'TABLETS']},
-                {'nombre': 'CELULARES', 'clases': ['SMARTPHONES', 'BASICOS', 'ACCESORIOS CELULAR']},
-                {'nombre': 'ACCESORIOS', 'clases': ['MOUSE', 'TECLADOS', 'CABLES']}
+                {'codigo': 'COM', 'nombre': 'COMPUTADORAS', 'clases': [
+                    {'codigo': 'LAP', 'nombre': 'LAPTOPS'},
+                    {'codigo': 'DES', 'nombre': 'DESKTOPS'},
+                    {'codigo': 'TAB', 'nombre': 'TABLETS'}
+                ]},
+                {'codigo': 'CEL', 'nombre': 'CELULARES', 'clases': [
+                    {'codigo': 'SMA', 'nombre': 'SMARTPHONES'},
+                    {'codigo': 'BAS', 'nombre': 'BASICOS'},
+                    {'codigo': 'ACC', 'nombre': 'ACCESORIOS CELULAR'}
+                ]},
+                {'codigo': 'ACS', 'nombre': 'ACCESORIOS', 'clases': [
+                    {'codigo': 'MOU', 'nombre': 'MOUSE'},
+                    {'codigo': 'TEC', 'nombre': 'TECLADOS'},
+                    {'codigo': 'CAB', 'nombre': 'CABLES'}
+                ]}
             ]
         },
         {
+            'codigo': 'OFI',
             'nombre': 'OFICINA',
             'subcategorias': [
-                {'nombre': 'PAPELERÍA', 'clases': ['PAPEL', 'CUADERNOS', 'CARPETAS']},
-                {'nombre': 'MOBILIARIO', 'clases': ['SILLAS', 'ESCRITORIOS', 'ARCHIVADORES']},
-                {'nombre': 'SUMINISTROS', 'clases': ['TONERS', 'TINTAS', 'GRAPAS']}
+                {'codigo': 'PAP', 'nombre': 'PAPELERÍA', 'clases': [
+                    {'codigo': 'HOJ', 'nombre': 'PAPEL'},
+                    {'codigo': 'CUA', 'nombre': 'CUADERNOS'},
+                    {'codigo': 'CAR', 'nombre': 'CARPETAS'}
+                ]},
+                {'codigo': 'MOB', 'nombre': 'MOBILIARIO', 'clases': [
+                    {'codigo': 'SIL', 'nombre': 'SILLAS'},
+                    {'codigo': 'ESC', 'nombre': 'ESCRITORIOS'},
+                    {'codigo': 'ARC', 'nombre': 'ARCHIVADORES'}
+                ]},
+                {'codigo': 'SUM', 'nombre': 'SUMINISTROS', 'clases': [
+                    {'codigo': 'TON', 'nombre': 'TONERS'},
+                    {'codigo': 'TIN', 'nombre': 'TINTAS'},
+                    {'codigo': 'GRA', 'nombre': 'GRAPAS'}
+                ]}
             ]
         },
         {
+            'codigo': 'LIM',
             'nombre': 'LIMPIEZA',
             'subcategorias': [
-                {'nombre': 'DETERGENTES', 'clases': ['LIQUIDOS', 'POLVO', 'CONCENTRADOS']},
-                {'nombre': 'DESINFECTANTES', 'clases': ['ALCOHOL', 'CLORO', 'ANTIBACTERIAL']},
-                {'nombre': 'UTENSILIOS', 'clases': ['ESCOBAS', 'TRAPEADORES', 'PAÑOS']}
+                {'codigo': 'DET', 'nombre': 'DETERGENTES', 'clases': [
+                    {'codigo': 'LIQ', 'nombre': 'LIQUIDOS'},
+                    {'codigo': 'POL', 'nombre': 'POLVO'},
+                    {'codigo': 'CON', 'nombre': 'CONCENTRADOS'}
+                ]},
+                {'codigo': 'DES', 'nombre': 'DESINFECTANTES', 'clases': [
+                    {'codigo': 'ALC', 'nombre': 'ALCOHOL'},
+                    {'codigo': 'CLO', 'nombre': 'CLORO'},
+                    {'codigo': 'ANT', 'nombre': 'ANTIBACTERIAL'}
+                ]},
+                {'codigo': 'UTE', 'nombre': 'UTENSILIOS', 'clases': [
+                    {'codigo': 'ESB', 'nombre': 'ESCOBAS'},
+                    {'codigo': 'TRA', 'nombre': 'TRAPEADORES'},
+                    {'codigo': 'PAN', 'nombre': 'PAÑOS'}
+                ]}
             ]
         }
     ]
     
-    # Productos actualizados con clases
+    # Productos actualizados con clases, códigos auxiliares y EAN
     productos_base = [
         # Electrónica
-        {'codigo': 'LAP001', 'nombre': 'Laptop Dell Inspiron', 'precio': 850.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'COMPUTADORAS', 'clase': 'LAPTOPS'},
-        {'codigo': 'CEL001', 'nombre': 'iPhone 13', 'precio': 999.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'CELULARES', 'clase': 'SMARTPHONES'},
-        {'codigo': 'MOU001', 'nombre': 'Mouse Inalámbrico', 'precio': 25.00, 'categoria': 'ELECTRÓNICA', 'subcategoria': 'ACCESORIOS', 'clase': 'MOUSE'},
+        {
+            'codigo': 'LAP001', 
+            'codigo_auxiliar': 'DELL-INS-15',
+            'codigo_ean': '7501234567890',
+            'nombre': 'Laptop Dell Inspiron', 
+            'precio': 850.00, 
+            'categoria': 'ELECTRÓNICA', 
+            'subcategoria': 'COMPUTADORAS', 
+            'clase': 'LAPTOPS'
+        },
+        {
+            'codigo': 'CEL001',
+            'codigo_auxiliar': 'IPH13-128GB',
+            'codigo_ean': '8901234567897',
+            'nombre': 'iPhone 13', 
+            'precio': 999.00, 
+            'categoria': 'ELECTRÓNICA', 
+            'subcategoria': 'CELULARES', 
+            'clase': 'SMARTPHONES'
+        },
+        {
+            'codigo': 'MOU001',
+            'codigo_auxiliar': 'LOG-M705',
+            'codigo_ean': '5901234567890',
+            'nombre': 'Mouse Inalámbrico', 
+            'precio': 25.00, 
+            'categoria': 'ELECTRÓNICA', 
+            'subcategoria': 'ACCESORIOS', 
+            'clase': 'MOUSE'
+        },
         # Oficina
-        {'codigo': 'PAP001', 'nombre': 'Resma Papel A4', 'precio': 4.50, 'categoria': 'OFICINA', 'subcategoria': 'PAPELERÍA', 'clase': 'PAPEL'},
-        {'codigo': 'SIL001', 'nombre': 'Silla Ejecutiva', 'precio': 150.00, 'categoria': 'OFICINA', 'subcategoria': 'MOBILIARIO', 'clase': 'SILLAS'},
-        {'codigo': 'TON001', 'nombre': 'Toner HP', 'precio': 75.00, 'categoria': 'OFICINA', 'subcategoria': 'SUMINISTROS', 'clase': 'TONERS'},
+        {
+            'codigo': 'PAP001',
+            'codigo_auxiliar': 'A4-500H',
+            'codigo_ean': '7891234567893',
+            'nombre': 'Resma Papel A4', 
+            'precio': 4.50, 
+            'categoria': 'OFICINA', 
+            'subcategoria': 'PAPELERÍA', 
+            'clase': 'PAPEL'
+        },
+        {
+            'codigo': 'SIL001',
+            'codigo_auxiliar': 'SILLA-EJE-001',
+            'codigo_ean': None,  # Producto sin código EAN
+            'nombre': 'Silla Ejecutiva', 
+            'precio': 150.00, 
+            'categoria': 'OFICINA', 
+            'subcategoria': 'MOBILIARIO', 
+            'clase': 'SILLAS'
+        },
+        {
+            'codigo': 'TON001',
+            'codigo_auxiliar': 'HP-85A',
+            'codigo_ean': '6901234567896',
+            'nombre': 'Toner HP', 
+            'precio': 75.00, 
+            'categoria': 'OFICINA', 
+            'subcategoria': 'SUMINISTROS', 
+            'clase': 'TONERS'
+        },
         # Limpieza
-        {'codigo': 'DET001', 'nombre': 'Detergente Industrial 5L', 'precio': 12.00, 'categoria': 'LIMPIEZA', 'subcategoria': 'DETERGENTES', 'clase': 'LIQUIDOS'},
-        {'codigo': 'ALC001', 'nombre': 'Alcohol 70% 1L', 'precio': 3.50, 'categoria': 'LIMPIEZA', 'subcategoria': 'DESINFECTANTES', 'clase': 'ALCOHOL'},
-        {'codigo': 'ESC001', 'nombre': 'Escoba Industrial', 'precio': 8.00, 'categoria': 'LIMPIEZA', 'subcategoria': 'UTENSILIOS', 'clase': 'ESCOBAS'},
+        {
+            'codigo': 'DET001',
+            'codigo_auxiliar': None,  # Producto sin código auxiliar
+            'codigo_ean': '7701234567895',
+            'nombre': 'Detergente Industrial 5L', 
+            'precio': 12.00, 
+            'categoria': 'LIMPIEZA', 
+            'subcategoria': 'DETERGENTES', 
+            'clase': 'LIQUIDOS'
+        },
+        {
+            'codigo': 'ALC001',
+            'codigo_auxiliar': 'ALC-70-1000',
+            'codigo_ean': '7601234567894',
+            'nombre': 'Alcohol 70% 1L', 
+            'precio': 3.50, 
+            'categoria': 'LIMPIEZA', 
+            'subcategoria': 'DESINFECTANTES', 
+            'clase': 'ALCOHOL'
+        },
+        {
+            'codigo': 'ESC001',
+            'codigo_auxiliar': 'ESC-IND-NEGRO',
+            'codigo_ean': '7801234567892',
+            'nombre': 'Escoba Industrial', 
+            'precio': 8.00, 
+            'categoria': 'LIMPIEZA', 
+            'subcategoria': 'UTENSILIOS', 
+            'clase': 'ESCOBAS'
+        },
     ]
     
     for empresa_nombre, empresa_info in empresas.items():
@@ -317,23 +402,26 @@ def crear_categorias_y_productos(empresas):
         
         for cat_data in categorias_base:
             categoria = Categoria.objects.create(
+                codigo=cat_data['codigo'],
                 nombre=cat_data['nombre'],
                 empresa=empresa
             )
             
             for subcat_data in cat_data['subcategorias']:
                 subcategoria = Subcategoria.objects.create(
+                    codigo=subcat_data['codigo'],
                     nombre=subcat_data['nombre'],
                     categoria=categoria
                 )
                 
-                for clase_nombre in subcat_data['clases']:
+                for clase_data in subcat_data['clases']:
                     clase = Clase.objects.create(
-                        nombre=clase_nombre,
+                        codigo=clase_data['codigo'],
+                        nombre=clase_data['nombre'],
                         subcategoria=subcategoria
                     )
                     # Crear clave única para mapear
-                    clave = f"{cat_data['nombre']}_{subcat_data['nombre']}_{clase_nombre}"
+                    clave = f"{cat_data['nombre']}_{subcat_data['nombre']}_{clase_data['nombre']}"
                     clases_map[clave] = clase
         
         # Crear productos
@@ -356,15 +444,30 @@ def crear_categorias_y_productos(empresas):
                 )
                 productos_creados.append(producto)
                 
-                # Crear inventario inicial en cada sucursal
+                # Crear inventario inicial en cada sucursal CON movimiento de entrada inicial
                 for sucursal in sucursales:
-                    cantidad_inicial = random.randint(10, 100)
-                    Inventario.objects.create(
+                    cantidad_inicial = random.randint(50, 100)
+                    
+                    # Crear el inventario con cantidad 0 inicial
+                    inventario = Inventario.objects.create(
                         producto=producto,
                         sucursal=sucursal,
-                        cantidad=cantidad_inicial,
+                        cantidad=0,  # Comenzar con 0
                         stock_minimo=10
                     )
+                    
+                    # Crear movimiento de entrada inicial para establecer el stock
+                    MovimientoInventario.objects.create(
+                        sucursal=sucursal,
+                        producto=producto,
+                        tipo_movimiento='entrada',
+                        tipo_documento='otros',
+                        cantidad=cantidad_inicial,
+                        comentario='Inventario inicial',
+                        documento_respaldo='INICIAL-001',
+                        usuario=None  # Sistema
+                    )
+                    # El save() del MovimientoInventario actualizará automáticamente el inventario
         
         print(f"  [OK] {len(productos_creados)} productos creados para {empresa_nombre}")
         print(f"      con {Categoria.objects.filter(empresa=empresa).count()} categorías,")
@@ -401,16 +504,16 @@ def crear_movimientos_y_traslados(empresas):
         if not supervisor or not encargado:
             continue
         
-        # Crear algunos movimientos de entrada
+        # Crear algunos movimientos de entrada adicionales (ya hay inventario inicial)
         for producto in productos:
             MovimientoInventario.objects.create(
                 producto=producto,
                 sucursal=sucursales[0],
                 tipo_movimiento='entrada',
-                cantidad=50,
+                cantidad=30,
                 tipo_documento='factura',
                 documento_respaldo=f'FAC-{random.randint(1000, 9999)}',
-                comentario='Compra inicial de inventario',
+                comentario='Compra adicional de inventario',
                 usuario=supervisor
             )
         
@@ -505,9 +608,6 @@ def main():
     
     try:
         with transaction.atomic():
-            # Primero ejecutar migraciones
-            ejecutar_migraciones()
-
             # Crear estructura
             grupos = crear_grupos()
             empresas = crear_empresas_y_sucursales()

@@ -1,0 +1,599 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reporte de Inventario Valorizado{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'plugins/datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'plugins/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'plugins/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css' %}" rel="stylesheet"/>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .page-break { page-break-before: always; }
+        }
+    </style>
+{% endblock %}
+
+{% block encabezado %}
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="#">Reportes</a></li>
+    <li class="breadcrumb-item active">Inventario Valorizado</li>
+</ol>
+<h1 class="page-header">Reporte de Inventario Valorizado</h1>
+{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-inverse">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <i class="fa fa-warehouse"></i> Inventario Valorizado - {{ empresa.nombre }}
+        </h4>
+        <div class="panel-heading-btn">
+            <a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i class="fa fa-expand"></i></a>
+            <a href="javascript:;" class="btn btn-xs btn-icon btn-success" onclick="window.print()"><i class="fa fa-print"></i></a>
+        </div>
+    </div>
+    <div class="panel-body">
+        <!-- Fecha del Reporte -->
+        <div class="alert alert-info mb-4">
+            <i class="fa fa-calendar"></i> <strong>Fecha del Reporte:</strong> {{ fecha_reporte|date:"d/m/Y H:i" }}
+        </div>
+
+        <!-- Tarjetas de Resumen Superior -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="widget widget-stats bg-primary">
+                    <div class="stats-icon"><i class="fa fa-boxes"></i></div>
+                    <div class="stats-info">
+                        <h4>PRODUCTOS</h4>
+                        <p class="fs-2">{{ total_general.total_productos|default:0 }}</p>
+                        <small>Con stock disponible</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="widget widget-stats bg-info">
+                    <div class="stats-icon"><i class="fa fa-cubes"></i></div>
+                    <div class="stats-info">
+                        <h4>UNIDADES TOTALES</h4>
+                        <p class="fs-2">{{ total_general.total_unidades|default:0|floatformat:0 }}</p>
+                        <small>En inventario</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="widget widget-stats bg-success">
+                    <div class="stats-icon"><i class="fa fa-dollar-sign"></i></div>
+                    <div class="stats-info">
+                        <h4>VALOR TOTAL</h4>
+                        <p class="fs-2">${{ total_general.valor_total|default:0|floatformat:2 }}</p>
+                        <small>Inventario valorizado</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="widget widget-stats bg-warning">
+                    <div class="stats-icon"><i class="fa fa-exclamation-triangle"></i></div>
+                    <div class="stats-info">
+                        <h4>STOCK BAJO</h4>
+                        <p class="fs-2">{{ productos_stock_bajo|length }}</p>
+                        <small>Productos con alerta</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs para diferentes vistas -->
+        <ul class="nav nav-tabs mb-3 no-print" id="reporteTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="detalle-tab" data-bs-toggle="tab" data-bs-target="#detalle" type="button" role="tab">
+                    <i class="fa fa-list"></i> Detalle por Producto
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sucursal-tab" data-bs-toggle="tab" data-bs-target="#sucursal" type="button" role="tab">
+                    <i class="fa fa-building"></i> Por Sucursal
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="categoria-tab" data-bs-toggle="tab" data-bs-target="#categoria" type="button" role="tab">
+                    <i class="fa fa-tags"></i> Por Categoría
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="top-tab" data-bs-toggle="tab" data-bs-target="#top" type="button" role="tab">
+                    <i class="fa fa-trophy"></i> Top Productos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="alertas-tab" data-bs-toggle="tab" data-bs-target="#alertas" type="button" role="tab">
+                    <i class="fa fa-bell"></i> Alertas de Stock
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="reporteTabContent">
+            <!-- Tab de Detalle por Producto -->
+            <div class="tab-pane fade show active" id="detalle" role="tabpanel">
+                <div class="table-responsive">
+                    <table id="tabla-inventario" class="table table-striped table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Sucursal</th>
+                                <th class="text-center">Stock Actual</th>
+                                <th class="text-center">Stock Mínimo</th>
+                                <th class="text-end">Precio Unit.</th>
+                                <th class="text-end">Valor Total</th>
+                                <th class="text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in inventarios %}
+                            <tr>
+                                <td><strong>{{ inv.producto.codigo }}</strong></td>
+                                <td>{{ inv.producto.nombre }}</td>
+                                <td>
+                                    {% if inv.producto.clase %}
+                                        <small>{{ inv.producto.clase.subcategoria.categoria.nombre }}</small>
+                                    {% else %}
+                                        <span class="text-muted">Sin categoría</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ inv.sucursal.nombre }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary fs-6">{{ inv.cantidad|floatformat:0 }}</span>
+                                </td>
+                                <td class="text-center">{{ inv.stock_minimo|floatformat:0 }}</td>
+                                <td class="text-end">${{ inv.producto.precio|floatformat:2 }}</td>
+                                <td class="text-end fw-bold">${{ inv.valor_total|floatformat:2 }}</td>
+                                <td class="text-center">
+                                    {% if inv.cantidad <= inv.stock_minimo %}
+                                        <span class="badge bg-danger">
+                                            <i class="fa fa-exclamation-triangle"></i> STOCK BAJO
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success">
+                                            <i class="fa fa-check"></i> OK
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">
+                                    <i class="fa fa-info-circle"></i> No hay productos con stock disponible
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="4" class="text-end">TOTALES:</th>
+                                <th class="text-center">{{ total_general.total_unidades|default:0|floatformat:0 }}</th>
+                                <th></th>
+                                <th></th>
+                                <th class="text-end fw-bold">${{ total_general.valor_total|default:0|floatformat:2 }}</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab de Por Sucursal -->
+            <div class="tab-pane fade" id="sucursal" role="tabpanel">
+                <div class="row">
+                    {% for sucursal in totales_por_sucursal %}
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-0 shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-building"></i> {{ sucursal.sucursal__nombre }}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <h6 class="text-muted mb-1">Productos</h6>
+                                        <h4 class="mb-0">{{ sucursal.total_productos }}</h4>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6 class="text-muted mb-1">Unidades</h6>
+                                        <h4 class="mb-0">{{ sucursal.total_unidades|floatformat:0 }}</h4>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="text-center">
+                                    <h6 class="text-muted mb-1">Valor Total</h6>
+                                    <h3 class="text-success mb-0">${{ sucursal.valor_total|floatformat:2 }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> No hay datos de inventario por sucursal
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <!-- Tab de Por Categoría -->
+            <div class="tab-pane fade" id="categoria" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Categoría</th>
+                                <th class="text-center">Productos</th>
+                                <th class="text-center">Unidades Totales</th>
+                                <th class="text-end">Valor Total</th>
+                                <th class="text-center">% del Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for categoria in totales_por_categoria %}
+                            <tr>
+                                <td>
+                                    <i class="fa fa-tag text-primary"></i> 
+                                    {{ categoria.producto__clase__subcategoria__categoria__nombre|default:"Sin categoría" }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">{{ categoria.total_productos }}</span>
+                                </td>
+                                <td class="text-center">{{ categoria.total_unidades|floatformat:0 }}</td>
+                                <td class="text-end fw-bold">${{ categoria.valor_total|floatformat:2 }}</td>
+                                <td class="text-center">
+                                    {% if total_general.valor_total %}
+                                        {% widthratio categoria.valor_total total_general.valor_total 100 %}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    <i class="fa fa-info-circle"></i> No hay datos por categoría
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th>TOTALES:</th>
+                                <th class="text-center">{{ total_general.total_productos|default:0 }}</th>
+                                <th class="text-center">{{ total_general.total_unidades|default:0|floatformat:0 }}</th>
+                                <th class="text-end fw-bold">${{ total_general.valor_total|default:0|floatformat:2 }}</th>
+                                <th class="text-center">100%</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Tab de Top Productos -->
+            <div class="tab-pane fade" id="top" role="tabpanel">
+                <h5 class="mb-3">
+                    <i class="fa fa-trophy text-warning"></i> Top 10 Productos con Mayor Valor en Inventario
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th width="5%" class="text-center">#</th>
+                                <th width="15%">Código</th>
+                                <th width="35%">Producto</th>
+                                <th width="15%" class="text-center">Stock Total</th>
+                                <th width="15%" class="text-end">Precio Unit.</th>
+                                <th width="15%" class="text-end">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos_top %}
+                            <tr>
+                                <td class="text-center">
+                                    {% if forloop.counter == 1 %}
+                                        <span class="badge bg-warning fs-6">
+                                            <i class="fa fa-trophy"></i> {{ forloop.counter }}
+                                        </span>
+                                    {% elif forloop.counter == 2 %}
+                                        <span class="badge bg-secondary fs-6">
+                                            <i class="fa fa-medal"></i> {{ forloop.counter }}
+                                        </span>
+                                    {% elif forloop.counter == 3 %}
+                                        <span class="badge bg-orange fs-6">
+                                            <i class="fa fa-award"></i> {{ forloop.counter }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-primary">{{ forloop.counter }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><strong>{{ producto.producto__codigo }}</strong></td>
+                                <td>{{ producto.producto__nombre }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-info fs-6">{{ producto.stock_total|floatformat:0 }}</span>
+                                </td>
+                                <td class="text-end">${{ producto.precio|floatformat:2 }}</td>
+                                <td class="text-end">
+                                    <strong class="text-success">${{ producto.valor_total|floatformat:2 }}</strong>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    <i class="fa fa-info-circle"></i> No hay datos de productos
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab de Alertas de Stock -->
+            <div class="tab-pane fade" id="alertas" role="tabpanel">
+                <h5 class="mb-3">
+                    <i class="fa fa-exclamation-triangle text-warning"></i> Productos con Stock Bajo o Crítico
+                </h5>
+                <div class="table-responsive">
+                    <table id="tabla-alertas" class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Sucursal</th>
+                                <th class="text-center">Stock Actual</th>
+                                <th class="text-center">Stock Mínimo</th>
+                                <th class="text-center">Déficit</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Acción Sugerida</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in productos_stock_bajo %}
+                            <tr class="{% if inv.cantidad == 0 %}table-danger{% else %}table-warning{% endif %}">
+                                <td><strong>{{ inv.producto.codigo }}</strong></td>
+                                <td>{{ inv.producto.nombre }}</td>
+                                <td>{{ inv.sucursal.nombre }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger fs-6">{{ inv.cantidad|floatformat:0 }}</span>
+                                </td>
+                                <td class="text-center">{{ inv.stock_minimo|floatformat:0 }}</td>
+                                <td class="text-center">
+                                    {% with deficit=inv.stock_minimo|add:"-"|add:inv.cantidad %}
+                                        <strong>{{ deficit|floatformat:0 }}</strong>
+                                    {% endwith %}
+                                </td>
+                                <td class="text-center">
+                                    {% if inv.cantidad == 0 %}
+                                        <span class="badge bg-danger">
+                                            <i class="fa fa-times-circle"></i> SIN STOCK
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fa fa-exclamation"></i> STOCK BAJO
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="fa fa-shopping-cart"></i> Reabastecer
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-success">
+                                    <i class="fa fa-check-circle"></i> ¡Excelente! No hay productos con stock bajo
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'plugins/datatables.net/js/dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-bs5/js/dataTables.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/build/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/build/vfs_fonts.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/dist/jszip.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // DataTable para inventario detallado
+            $('#tabla-inventario').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                dom: '<"row mb-3"<"col-md-6"B><"col-md-6"fr>>t<"row mt-3"<"col-md-auto me-md-auto"i><"col-md-auto ms-md-auto"p>>',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        className: 'btn-sm',
+                        text: '<i class="fa fa-file-excel"></i> Excel',
+                        title: 'Inventario_Valorizado_{{ fecha_reporte|date:"Ymd" }}'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn-sm',
+                        text: '<i class="fa fa-file-pdf"></i> PDF',
+                        orientation: 'landscape',
+                        title: 'Inventario Valorizado - {{ empresa.nombre }}'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn-sm',
+                        text: '<i class="fa fa-print"></i> Imprimir'
+                    }
+                ],
+                language: {
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                columnDefs: [
+                    { targets: [6, 7], className: 'text-end' },
+                    { targets: [4, 5, 8], className: 'text-center' }
+                ]
+            });
+
+            // DataTable para alertas - solo si hay datos
+            {% if productos_stock_bajo %}
+            $('#tabla-alertas').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+            {% endif %}
+
+            // Gráfico de distribución por sucursal
+            {% if totales_por_sucursal %}
+            const ctxSucursales = document.getElementById('chartSucursales');
+            if (ctxSucursales) {
+                new Chart(ctxSucursales, {
+                    type: 'pie',
+                    data: {
+                        labels: [
+                            {% for sucursal in totales_por_sucursal %}
+                                '{{ sucursal.sucursal__nombre }}'{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        datasets: [{
+                            data: [
+                                {% for sucursal in totales_por_sucursal %}
+                                    {{ sucursal.valor_total|default:0 }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            ],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(255, 206, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(153, 102, 255, 0.8)',
+                                'rgba(255, 159, 64, 0.8)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': $' + context.parsed.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            {% endif %}
+
+            // Gráfico de distribución por categoría
+            {% if totales_por_categoria %}
+            const ctxCategorias = document.getElementById('chartCategorias');
+            if (ctxCategorias) {
+                new Chart(ctxCategorias, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            {% for categoria in totales_por_categoria|slice:":5" %}
+                                '{{ categoria.producto__clase__subcategoria__categoria__nombre|default:"Sin categoría"|truncatechars:20 }}'{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        datasets: [{
+                            label: 'Valor Total',
+                            data: [
+                                {% for categoria in totales_por_categoria|slice:":5" %}
+                                    {{ categoria.valor_total|default:0 }}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            ],
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Valor: $' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            {% endif %}
+        });
+    </script>
+{% endblock %}

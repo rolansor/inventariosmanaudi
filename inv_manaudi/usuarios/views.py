@@ -5,7 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import F, Sum
 from productos.models import Producto
-from .forms import RegistroForm, EdicionUsuarioForm, UsuarioPerfilForm, EmpresaForm, SucursalForm
+from .forms import EmpresaForm, SucursalForm
 from .templatetags.tags import control_acceso
 from inventario.models import MovimientoInventario, Inventario
 from .models import Empresa, Sucursal
@@ -23,7 +23,7 @@ def inicio(request):
         total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
         productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad__lt=F('stock_minimo')).count()
         productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario, cantidad=0).count()
-        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')[:10]
+        movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario, sucursal=sucursal_usuario).order_by('-fecha')
     else:
         # Si el usuario no tiene sucursal (admin/supervisor), mostrar datos de toda la empresa
         if empresa_usuario:
@@ -31,7 +31,7 @@ def inicio(request):
             total_stock = Inventario.objects.filter(producto__empresa=empresa_usuario).aggregate(Sum('cantidad'))['cantidad__sum'] or 0
             productos_bajo_stock = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad__lt=F('stock_minimo')).count()
             productos_agotados = Inventario.objects.filter(producto__empresa=empresa_usuario, cantidad=0).count()
-            movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')[:10]
+            movimientos_recientes = MovimientoInventario.objects.filter(producto__empresa=empresa_usuario).order_by('-fecha')
         else:
             total_productos = 0
             total_stock = 0
@@ -70,38 +70,6 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
-
-
-def registro(request):
-    if request.method == 'POST':
-        form = RegistroForm(request.POST)
-        perfil_form = UsuarioPerfilForm(request.POST)  # Formulario de perfil
-        if form.is_valid() and perfil_form.is_valid():
-            user = form.save()
-            perfil = perfil_form.save(commit=False)
-            perfil.usuario = user  # Relacionar el perfil con el usuario
-            perfil.save()
-            login(request, user)
-            return redirect('admin')  # Redirige a la página principal
-    else:
-        form = RegistroForm()
-        perfil_form = UsuarioPerfilForm()  # Formulario de perfil vacío
-    return render(request, 'registro.html', {'form': form, 'perfil_form': perfil_form})
-
-
-@login_required
-def editar_usuario(request):
-    if request.method == 'POST':
-        form = EdicionUsuarioForm(request.POST, instance=request.user)
-        perfil_form = UsuarioPerfilForm(request.POST, instance=request.user.perfil)  # Cargar el perfil del usuario
-        if form.is_valid() and perfil_form.is_valid():
-            form.save()
-            perfil_form.save()
-            return redirect('admin')
-    else:
-        form = EdicionUsuarioForm(instance=request.user)
-        perfil_form = UsuarioPerfilForm(instance=request.user.perfil)  # Cargar el perfil del usuario
-    return render(request, 'editar.html', {'form': form, 'perfil_form': perfil_form})
 
 
 @control_acceso('Administrador')
@@ -312,9 +280,6 @@ def cambiar_empresa(request, empresa_id):
         try:
             empresa = Empresa.objects.get(id=empresa_id)
             request.session['empresa_id'] = empresa.id
-            # Mensaje de éxito opcional
-            from django.contrib import messages
-            messages.success(request, f'Ahora estás viendo los datos de: {empresa.nombre}')
         except Empresa.DoesNotExist:
             from django.contrib import messages
             messages.error(request, 'Empresa no encontrada')

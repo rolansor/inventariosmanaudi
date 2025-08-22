@@ -16,6 +16,13 @@
 {% endblock %}
 
 {% block contenido %}
+    <!-- Botón para abrir el modal de creación de categoría -->
+    {% if request.user|pertenece_grupo:"Supervisor" %}
+    <button class="btn btn-success mb-3" id="create-categoria-btn" data-bs-toggle="modal" data-bs-target="#createCategoriaModal">
+        Crear Categoría
+    </button>
+    {% endif %}
+
     <div class="panel panel-inverse">
         <div class="panel-heading">
             <h4 class="panel-title">Lista de Categorías</h4>
@@ -25,6 +32,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
+                    <th>Código</th>
                     <th>Nombre</th>
                     <th>Acciones</th>
                 </tr>
@@ -33,6 +41,7 @@
                 {% for categoria in categorias %}
                     <tr id="categoria-{{ categoria.pk }}">
                         <td>{{ forloop.counter }}</td>
+                        <td><span class="badge bg-primary">{{ categoria.codigo }}</span></td>
                         <td>{{ categoria.nombre }}</td>
                         <td>
                             {% if request.user|pertenece_grupo:"Administrador" %}
@@ -57,6 +66,39 @@
         </div>
     </div>
 
+    <!-- Modal para crear categoría -->
+    <div class="modal fade" id="createCategoriaModal" tabindex="-1" role="dialog" aria-labelledby="createCategoriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCategoriaModalLabel">Crear Categoría</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="create-categoria-form" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label for="create-codigo">Código</label>
+                            <input type="text" class="form-control" id="create-codigo" name="codigo" 
+                                   maxlength="3" pattern="[A-Za-z0-9]{3}" required
+                                   style="text-transform: uppercase;" placeholder="Ej: A01">
+                        </div>
+                        <div class="form-group">
+                            <label for="create-nombre">Nombre</label>
+                            <input type="text" class="form-control" id="create-nombre" name="nombre" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para editar categoría -->
     <div class="modal fade" id="editCategoriaModal" tabindex="-1" role="dialog" aria-labelledby="editCategoriaModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -70,9 +112,15 @@
                 <form id="edit-categoria-form" method="POST">
                     {% csrf_token %}
                     <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label for="modal-codigo">Código</label>
+                            <input type="text" class="form-control" id="modal-codigo" name="codigo" 
+                                   maxlength="3" pattern="[A-Za-z0-9]{3}" required
+                                   style="text-transform: uppercase;">
+                        </div>
                         <div class="form-group">
                             <label for="modal-nombre">Nombre</label>
-                            <input type="text" class="form-control" id="modal-nombre" name="nombre">
+                            <input type="text" class="form-control" id="modal-nombre" name="nombre" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -87,6 +135,29 @@
 
 {% block extra_js %}
 <script>
+    // Manejar la creación de categoría
+    $('#create-categoria-form').on('submit', function(event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/categorias/nueva_categoria/',
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.id) {
+                    location.reload(); // Recargar para mostrar la nueva categoría
+                } else if (response.errors) {
+                    alert('Errores: ' + Object.values(response.errors).join(', '));
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error al crear la categoría: ' + error);
+            }
+        });
+    });
+
     // Manejar la edición de categoría abriendo el modal
     $('#categoria-list').on('click', '.edit-categoria', function () {
         var categoriaId = $(this).data('id');
@@ -94,9 +165,10 @@
             url: '/categorias/editar/' + categoriaId + '/',
             type: 'GET',
             success: function (response) {
+                $('#modal-codigo').val(response.codigo);
                 $('#modal-nombre').val(response.nombre);
                 $('#edit-categoria-form').attr('action', '/categorias/editar/' + categoriaId + '/');
-                $('#editCategoriaModal').modal('show'); // Mostrar el modal
+                $('#editCategoriaModal').modal('show');
             },
             error: function (xhr, status, error) {
                 alert('Error al cargar la categoría: ' + error);
@@ -106,7 +178,7 @@
 
     // Enviar el formulario de edición por AJAX
     $('#edit-categoria-form').on('submit', function (event) {
-        event.preventDefault(); // Evitar el envío estándar
+        event.preventDefault();
         var categoriaId = $(this).attr('action').split('/').slice(-2, -1)[0];
         $.ajax({
             url: $(this).attr('action'),
@@ -114,9 +186,10 @@
             data: $(this).serialize(),
             success: function (response) {
                 if (response.success) {
-                    // Actualizar el nombre en la lista de categorías
-                    $('#categoria-' + categoriaId + ' td:nth-child(2)').text(response.nombre);
-                    $('#editCategoriaModal').modal('hide'); // Cerrar el modal
+                    // Actualizar el código y nombre en la tabla
+                    $('#categoria-' + categoriaId + ' td:nth-child(2)').html('<span class="badge bg-primary">' + response.codigo + '</span>');
+                    $('#categoria-' + categoriaId + ' td:nth-child(3)').text(response.nombre);
+                    $('#editCategoriaModal').modal('hide');
                 } else if (response.errors) {
                     alert('Errores: ' + Object.values(response.errors).join(', '));
                 }

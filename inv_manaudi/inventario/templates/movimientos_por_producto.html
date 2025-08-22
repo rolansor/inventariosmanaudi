@@ -7,194 +7,294 @@
 {% endblock %}
 
 {% block contenido %}
-    <h1>Movimientos por Producto</h1>
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Movimientos por Producto</h4>
+        </div>
+        <div class="panel-body">
+            <!-- Formulario de búsqueda -->
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-8">
+                        {{ form.as_p }}
+                    </div>
+                    <div class="col-md-4 d-flex">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa fa-search"></i> Buscar Movimientos
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Buscar</button>
-    </form>
-    <br>
-    <br>
-    <div class="row">
-        <div class="col-xl-3 col-md-6">
-            <div class="widget widget-stats bg-blue">
-                <div class="stats-icon"><i class="fa fa-plus-circle"></i></div>
-                <div class="stats-info">
-                    <h4>Entradas</h4>
-                    <p>{{ resumen.entradas }}</p>
+            {% if entradas or salidas or traslados %}
+            <!-- Resumen General de Inventario -->
+            <h4 class="mb-3"><i class="fa fa-chart-bar"></i> Resumen de Inventario</h4>
+            <div class="row mb-4">
+                <!-- Movimientos Normales -->
+                <div class="col-xl-4 col-md-6">
+                    <div class="widget widget-stats bg-primary">
+                        <div class="stats-icon"><i class="fa fa-plus-circle"></i></div>
+                        <div class="stats-info">
+                            <h4>ENTRADAS NORMALES</h4>
+                            <p class="fs-2">+{{ resumen.entradas }}</p>
+                            <small>Sin incluir traslados recibidos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6">
+                    <div class="widget widget-stats bg-danger">
+                        <div class="stats-icon"><i class="fa fa-minus-circle"></i></div>
+                        <div class="stats-info">
+                            <h4>SALIDAS NORMALES</h4>
+                            <p class="fs-2">-{{ resumen.salidas }}</p>
+                            <small>Sin incluir traslados enviados</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6">
+                    <div class="widget widget-stats bg-success">
+                        <div class="stats-icon"><i class="fa fa-warehouse"></i></div>
+                        <div class="stats-info">
+                            <h4>STOCK ACTUAL</h4>
+                            <p class="fs-2 fw-bold">{{ resumen.total_fisico }}</p>
+                            <small>Inventario físico disponible</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="widget widget-stats bg-red">
-                <div class="stats-icon"><i class="fa fa-minus-circle"></i></div>
-                <div class="stats-info">
-                    <h4>Salidas</h4>
-                    <p>{{ resumen.salidas }}</p>
+
+            <!-- Resumen de Traslados -->
+            <h4 class="mb-3"><i class="fa fa-exchange-alt"></i> Resumen de Traslados</h4>
+            <div class="row mb-4">
+                <!-- Traslados Realizados -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="widget widget-stats bg-orange">
+                        <div class="stats-icon"><i class="fa fa-truck"></i></div>
+                        <div class="stats-info">
+                            <h4>ENVIADOS</h4>
+                            <p class="fs-3">{{ resumen.traslados_salida }}</p>
+                            <small>Cantidad real enviada</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="widget widget-stats bg-teal">
+                        <div class="stats-icon"><i class="fa fa-check-double"></i></div>
+                        <div class="stats-info">
+                            <h4>RECIBIDOS</h4>
+                            <p class="fs-3">{{ resumen.traslados_entrada }}</p>
+                            <small>Cantidad real recibida</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- Estados de Traslados -->
+                <div class="col-xl-3 col-md-6">
+                    <div class="widget widget-stats bg-warning">
+                        <div class="stats-icon"><i class="fa fa-clock"></i></div>
+                        <div class="stats-info">
+                            <h4>EN TRÁNSITO</h4>
+                            <p class="fs-3">{{ resumen.traslados_pendientes }}</p>
+                            <small>Pendientes de confirmar</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="widget widget-stats bg-info">
+                        <div class="stats-icon"><i class="fa fa-exclamation-triangle"></i></div>
+                        <div class="stats-info">
+                            <h4>DIFERENCIA</h4>
+                            <p class="fs-3">{{ resumen.diferencia_traslados }}</p>
+                            <small>Enviado vs Recibido</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="widget widget-stats bg-lime">
-                <div class="stats-icon"><i class="fa fa-cubes"></i></div>
-                <div class="stats-info">
-                    <h4>Total Físico</h4>
-                    <p>{{ resumen.total_fisico }}</p>
+
+            <!-- Detalle de Movimientos -->
+            <ul class="nav nav-tabs mb-3" id="movimientosTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="entradas-tab" data-bs-toggle="tab" data-bs-target="#entradas" type="button" role="tab">
+                        <i class="fa fa-plus-circle text-primary"></i> Entradas Normales ({{ entradas|length|default:0 }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="salidas-tab" data-bs-toggle="tab" data-bs-target="#salidas" type="button" role="tab">
+                        <i class="fa fa-minus-circle text-danger"></i> Salidas Normales ({{ salidas|length|default:0 }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="traslados-tab" data-bs-toggle="tab" data-bs-target="#traslados" type="button" role="tab">
+                        <i class="fa fa-exchange-alt text-info"></i> Traslados ({{ traslados|length|default:0 }})
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="movimientosTabContent">
+                <!-- Tab de Entradas -->
+                <div class="tab-pane fade show active" id="entradas" role="tabpanel">
+                    <h5 class="mb-3">Historial de Entradas Normales</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="15%">Cantidad</th>
+                                    <th width="20%">Fecha y Hora</th>
+                                    <th width="15%">Sucursal</th>
+                                    <th width="20%">Responsable</th>
+                                    <th width="30%">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if entradas %}
+                                    {% for entrada in entradas %}
+                                        <tr>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary fs-6">+{{ entrada.cantidad }}</span>
+                                            </td>
+                                            <td>{{ entrada.fecha|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ entrada.sucursal.nombre }}</td>
+                                            <td>{% if entrada.usuario %}{{ entrada.usuario.get_full_name|default:entrada.usuario.username }}{% else %}Sin usuario{% endif %}</td>
+                                            <td>
+                                                <small>{{ entrada.comentario|default:"Sin comentarios" }} --</small>
+                                                {% if entrada.tipo_documento %}
+                                                    <span class="badge bg-secondary">{{ entrada.get_tipo_documento_display }}: {{ entrada.documento_respaldo }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            <i class="fa fa-info-circle"></i> No hay registros de entradas normales para este producto
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab de Salidas -->
+                <div class="tab-pane fade" id="salidas" role="tabpanel">
+                    <h5 class="mb-3">Historial de Salidas Normales</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="15%">Cantidad</th>
+                                    <th width="20%">Fecha y Hora</th>
+                                    <th width="15%">Sucursal</th>
+                                    <th width="20%">Responsable</th>
+                                    <th width="30%">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if salidas %}
+                                    {% for salida in salidas %}
+                                        <tr>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger fs-6">-{{ salida.cantidad }}</span>
+                                            </td>
+                                            <td>{{ salida.fecha|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ salida.sucursal.nombre }}</td>
+                                            <td>{% if salida.usuario %}{{ salida.usuario.get_full_name|default:salida.usuario.username }}{% else %}Sin usuario{% endif %}</td>
+                                            <td>
+                                                <small>{{ salida.comentario|default:"Sin comentarios" }} --</small>
+                                                {% if salida.tipo_documento %}
+                                                    <span class="badge bg-secondary">{{ salida.get_tipo_documento_display }}: {{ salida.documento_respaldo }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            <i class="fa fa-info-circle"></i> No hay registros de salidas normales para este producto
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab de Traslados -->
+                <div class="tab-pane fade" id="traslados" role="tabpanel">
+                    <h5 class="mb-3">Historial de Traslados entre Sucursales</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="10%">Enviado</th>
+                                    <th width="10%">Recibido</th>
+                                    <th width="15%">Origen</th>
+                                    <th width="15%">Destino</th>
+                                    <th width="15%">Fecha</th>
+                                    <th width="10%">Estado</th>
+                                    <th width="15%">Responsable</th>
+                                    <th width="10%">Diferencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if traslados %}
+                                    {% for traslado in traslados %}
+                                        <tr>
+                                            <td class="text-center">
+                                                <span class="badge bg-orange">{{ traslado.cantidad_entregada }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                {% if traslado.estado == 'confirmado' %}
+                                                    <span class="badge bg-teal">{{ traslado.cantidad_recibida|default:"-" }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ traslado.sucursal_origen.nombre }}</td>
+                                            <td>{{ traslado.sucursal_destino.nombre }}</td>
+                                            <td>{{ traslado.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                            <td class="text-center">
+                                                {% if traslado.estado == 'pendiente' %}
+                                                    <span class="badge bg-warning">
+                                                        <i class="fa fa-clock"></i> En Tránsito
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fa fa-check"></i> Confirmado
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{% if traslado.usuario %}{{ traslado.usuario.get_full_name|default:traslado.usuario.username }}{% else %}Sin usuario{% endif %}</td>
+                                            <td class="text-center">
+                                                {% if traslado.estado == 'confirmado' and traslado.cantidad_recibida %}
+                                                    {% if traslado.cantidad_entregada != traslado.cantidad_recibida %}
+                                                        <span class="badge bg-danger">
+                                                            {{ traslado.cantidad_entregada|add:traslado.cantidad_recibida|floatformat:0 }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge bg-success">0</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">
+                                            <i class="fa fa-info-circle"></i> No hay registros de traslados para este producto
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
-    <br>
-    <div class="row">
-    <div class="col-xl-2 col-md-6">
-            <div class="widget widget-stats bg-orange">
-                <div class="stats-icon"><i class="fa fa-exchange-alt"></i></div>
-                <div class="stats-info">
-                    <h4>Traslados Salida Real</h4>
-                    <p>{{ resumen.traslados_salida }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <div class="widget widget-stats bg-green">
-                <div class="stats-icon"><i class="fa fa-exchange-alt"></i></div>
-                <div class="stats-info">
-                    <h4>Traslados Entrada Real</h4>
-                    <p>{{ resumen.traslados_entrada }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <div class="widget widget-stats bg-teal">
-                <div class="stats-icon"><i class="fa fa-check-circle"></i></div>
-                <div class="stats-info">
-                    <h4>Productos Trasladados</h4>
-                    <p>{{ resumen.traslados_confirmados }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <div class="widget widget-stats bg-yellow">
-                <div class="stats-icon"><i class="fa fa-hourglass-half"></i></div>
-                <div class="stats-info">
-                    <h4>Productos Transito</h4>
-                    <p>{{ resumen.traslados_pendientes }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-2 col-md-6">
-            <div class="widget widget-stats bg-purple">
-                <div class="stats-icon"><i class="fa fa-balance-scale"></i></div>
-                <div class="stats-info">
-                    <h4>Diferencia de Traslados</h4>
-                    <p>{{ resumen.diferencia_traslados }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <br>
-    <br>
-    <!-- Tabla de Entradas -->
-    <h3>Entradas</h3>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-            <th>Responsable</th>
-            <th>Comentario</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% if entradas %}
-            {% for entrada in entradas %}
-                <tr>
-                    <td>{{ entrada.cantidad }}</td>
-                    <td>{{ entrada.fecha }}</td>
-                    <td>{{ entrada.usuario.first_name }} {{ entrada.usuario.last_name }}</td>
-                    <td>{{ entrada.comentario }}</td>
-                </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="4" class="text-center">No hay entradas para este producto.</td>
-            </tr>
-        {% endif %}
-        </tbody>
-    </table>
-    <br>
-    <br>
-    <!-- Tabla de Salidas -->
-    <h3>Salidas</h3>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-            <th>Responsable</th>
-            <th>Comentario</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% if salidas %}
-            {% for salida in salidas %}
-                <tr>
-                    <td>{{ salida.cantidad }}</td>
-                    <td>{{ salida.fecha }}</td>
-                    <td>{{ salida.usuario.first_name }} {{ salida.usuario.last_name }}</td>
-                    <td>{{ salida.comentario }}</td>
-                </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="4" class="text-center">No hay salidas para este producto.</td>
-            </tr>
-        {% endif %}
-        </tbody>
-    </table>
-    <br>
-    <br>
-    <!-- Tabla de Traslados -->
-    <h3>Traslados</h3>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Cantidad Entregada</th>
-            <th>Cantidad Recibida</th>
-            <th>Sucursal Origen</th>
-            <th>Sucursal Destino</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Responsable</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% if traslados %}
-            {% for traslado in traslados %}
-                <tr>
-                    <td>{{ traslado.cantidad_entregada }}</td>
-                    <td>{{ traslado.cantidad_recibida }}</td>
-                    <td>{{ traslado.sucursal_origen.nombre }}</td>
-                    <td>{{ traslado.sucursal_destino.nombre }}</td>
-                    <td>{{ traslado.fecha_creacion }}</td>
-                    <td>
-                        {% if traslado.estado == 'pendiente' %}
-                            <span class="badge bg-warning">Pendiente</span>
-                        {% else %}
-                            <span class="badge bg-success">Confirmado</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ traslado.usuario.first_name }} {{ traslado.usuario.last_name }}</td>
-                </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="7" class="text-center">No hay traslados para este producto.</td>
-            </tr>
-        {% endif %}
-        </tbody>
-    </table>
 {% endblock %}
 
 {% block extra_js %}

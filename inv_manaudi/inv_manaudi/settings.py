@@ -114,6 +114,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Configuración para usar punto como separador decimal
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = ','
+DECIMAL_SEPARATOR = '.'
+
 STATIC_URL = '/static/'
 
 #STATIC_ROOT = os.path.join(BASE_DIR, 'static')

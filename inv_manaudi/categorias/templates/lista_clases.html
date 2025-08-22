@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load tags %}
+
+{% block title %}Lista de Clases{% endblock %}
+
+{% block encabezado %}
+<!-- BEGIN breadcrumb -->
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_categorias' %}">Categorías</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_subcategorias' categoria.id %}">{{ categoria.nombre }}</a></li>
+    <li class="breadcrumb-item active">Clases</li>
+</ol>
+<!-- END breadcrumb -->
+<!-- BEGIN page-header -->
+<h1 class="page-header">Clases para {{ subcategoria.nombre }}</h1>
+<!-- END page-header -->
+{% endblock %}
+
+{% block contenido %}
+    <!-- Botón para abrir el modal de creación de clase -->
+    {% if request.user|pertenece_grupo:"Supervisor" %}
+    <button class="btn btn-success mb-3" id="create-clase-btn" data-bs-toggle="modal" data-bs-target="#createClaseModal">
+        Crear Clase
+    </button>
+    {% endif %}
+
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Lista de Clases</h4>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered" id="clase-list">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for clase in clases %}
+                    <tr id="clase-{{ clase.id }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td><span class="badge bg-warning">{{ clase.codigo }}</span></td>
+                        <td>{{ clase.nombre }}</td>
+                        <td>
+                            {% if request.user|pertenece_grupo:"Administrador" %}
+                                <button class="btn btn-primary edit-clase" data-id="{{ clase.id }}">Editar</button>
+                                <button class="btn btn-danger delete-clase" data-id="{{ clase.id }}">Eliminar</button>
+                            {% elif request.user|pertenece_grupo:"Supervisor" %}
+                                <button class="btn btn-primary edit-clase" data-id="{{ clase.id }}">Editar</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay clases registradas.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para crear clase -->
+    <div class="modal fade" id="createClaseModal" tabindex="-1" role="dialog" aria-labelledby="createClaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createClaseModalLabel">Crear Clase</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="create-clase-form" method="POST" action="{% url 'nueva_clase' subcategoria.pk %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label for="create-codigo-clase">Código</label>
+                            <input type="text" class="form-control" id="create-codigo-clase" name="codigo" 
+                                   maxlength="3" pattern="[A-Za-z0-9]{3}" required
+                                   style="text-transform: uppercase;" placeholder="Ej: C01">
+                        </div>
+                        <div class="form-group">
+                            <label for="create-nombre-clase">Nombre</label>
+                            <input type="text" class="form-control" id="create-nombre-clase" name="nombre" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar clase -->
+    <div class="modal fade" id="editClaseModal" tabindex="-1" role="dialog" aria-labelledby="editClaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClaseModalLabel">Editar Clase</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="edit-clase-form" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label for="modal-codigo-clase">Código</label>
+                            <input type="text" class="form-control" id="modal-codigo-clase" name="codigo" 
+                                   maxlength="3" pattern="[A-Za-z0-9]{3}" required
+                                   style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-nombre-clase">Nombre</label>
+                            <input type="text" class="form-control" id="modal-nombre-clase" name="nombre" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Manejar el envío del formulario de creación usando AJAX
+    $('#create-clase-form').on('submit', function(event) {
+        event.preventDefault();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.id) {
+                    location.reload(); // Recargar la página para mostrar la nueva clase
+                } else if (response.errors) {
+                    alert('Errores: ' + Object.values(response.errors).join(', '));
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error al crear la clase: ' + error);
+            }
+        });
+    });
+
+    // Manejar la edición de clase abriendo el modal
+    $('#clase-list').on('click', '.edit-clase', function() {
+        var claseId = $(this).data('id');
+        $.ajax({
+            url: '/categorias/clases/editar/' + claseId + '/',
+            type: 'GET',
+            success: function(response) {
+                $('#modal-codigo-clase').val(response.codigo);
+                $('#modal-nombre-clase').val(response.nombre);
+                $('#edit-clase-form').attr('action', '/categorias/clases/editar/' + claseId + '/');
+                $('#editClaseModal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                alert('Error al cargar la clase: ' + error);
+            }
+        });
+    });
+
+    // Enviar el formulario de edición de clase usando AJAX
+    $('#edit-clase-form').on('submit', function(event) {
+        event.preventDefault();
+        var claseId = $(this).attr('action').split('/').slice(-2, -1)[0];
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    // Actualizar el código y nombre en la tabla sin recargar
+                    $('#clase-' + claseId + ' td:nth-child(2)').html('<span class="badge bg-warning">' + response.codigo + '</span>');
+                    $('#clase-' + claseId + ' td:nth-child(3)').text(response.nombre);
+                    $('#editClaseModal').modal('hide');
+                } else if (response.errors) {
+                    alert('Errores: ' + Object.values(response.errors).join(', '));
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error al guardar la clase: ' + error);
+            }
+        });
+    });
+
+    // Manejar la eliminación de clase
+    $('#clase-list').on('click', '.delete-clase', function() {
+        var claseId = $(this).data('id');
+        if (confirm('¿Estás seguro de que deseas eliminar esta clase?')) {
+            $.ajax({
+                url: '/categorias/clases/eliminar/' + claseId + '/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#clase-' + claseId).remove();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error al eliminar la clase: ' + error);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CategoriaForm, SubcategoriaForm
-from .models import Categoria, Subcategoria
+from .forms import CategoriaForm, SubcategoriaForm, ClaseForm
+from .models import Categoria, Subcategoria, Clase
 from usuarios.templatetags.tags import control_acceso
 
 
@@ -13,12 +13,16 @@ def nueva_categoria(request):
             categoria = form.save(commit=False)
             categoria.empresa = request.user.perfil.empresa  # Asignar la empresa del usuario logueado
             categoria.save()
-            return redirect('lista_categorias')  # Redirigir a la lista de categorías
-    else:
-        form = CategoriaForm()
-
-    return render(request, 'crear_categoria.html', {'form': form})
-
+            if request.is_ajax():
+                return JsonResponse({
+                    'id': categoria.id,
+                    'codigo': categoria.codigo,
+                    'nombre': categoria.nombre,
+                    'success': True
+                })
+        else:
+            if request.is_ajax():
+                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
 def lista_categorias(request):
     empresa = request.user.perfil.empresa
@@ -36,6 +40,7 @@ def editar_categoria(request, pk):
             categoria = form.save()
             return JsonResponse({
                 'id': categoria.id,
+                'codigo': categoria.codigo,
                 'nombre': categoria.nombre,
                 'success': True
             })
@@ -43,6 +48,7 @@ def editar_categoria(request, pk):
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
     return JsonResponse({
+        'codigo': categoria.codigo,
         'nombre': categoria.nombre,
         'success': True
     })
@@ -68,12 +74,12 @@ def nueva_subcategoria(request, pk):
             subcategoria.categoria = categoria
             subcategoria.save()
             if request.is_ajax():
-                data = {
+                return JsonResponse({
                     'id': subcategoria.id,
+                    'codigo': subcategoria.codigo,
                     'nombre': subcategoria.nombre,
                     'categoria': categoria.nombre
-                }
-                return JsonResponse(data)
+                })
             else:
                 return redirect('lista_subcategorias', pk=pk)
         else:
@@ -98,6 +104,7 @@ def editar_subcategoria(request, pk):
             subcategoria = form.save()
             return JsonResponse({
                 'id': subcategoria.id,
+                'codigo': subcategoria.codigo,
                 'nombre': subcategoria.nombre,
                 'categoria': subcategoria.categoria.nombre,
                 'success': True
@@ -106,6 +113,7 @@ def editar_subcategoria(request, pk):
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
     return JsonResponse({
+        'codigo': subcategoria.codigo,
         'nombre': subcategoria.nombre,
         'success': True
     })
@@ -119,3 +127,74 @@ def eliminar_subcategoria(request, pk):
         return JsonResponse({'id': pk, 'success': True})
 
     return redirect('lista_subcategorias', categoria_pk=subcategoria.categoria.pk)
+
+
+@control_acceso('Supervisor')
+def nueva_clase(request, pk):
+    subcategoria = get_object_or_404(Subcategoria, id=pk)
+    if request.method == 'POST':
+        form = ClaseForm(request.POST)
+        if form.is_valid():
+            clase = form.save(commit=False)
+            clase.subcategoria = subcategoria
+            clase.save()
+            if request.is_ajax():
+                data = {
+                    'id': clase.id,
+                    'codigo': clase.codigo,
+                    'nombre': clase.nombre,
+                    'subcategoria': subcategoria.nombre,
+                    'categoria': subcategoria.categoria.nombre
+                }
+                return JsonResponse(data)
+            else:
+                return redirect('lista_clases', pk=pk)
+        else:
+            if request.is_ajax():
+                return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+
+def lista_clases(request, pk):
+    subcategoria = get_object_or_404(Subcategoria, id=pk)
+    clases = Clase.objects.filter(subcategoria=subcategoria)
+    return render(request, 'lista_clases.html', {
+        'clases': clases, 
+        'subcategoria': subcategoria,
+        'categoria': subcategoria.categoria
+    })
+
+
+@control_acceso('Supervisor')
+def editar_clase(request, pk):
+    clase = get_object_or_404(Clase, pk=pk)
+    
+    if request.method == 'POST':
+        form = ClaseForm(request.POST, instance=clase)
+        if form.is_valid():
+            clase = form.save()
+            return JsonResponse({
+                'id': clase.id,
+                'codigo': clase.codigo,
+                'nombre': clase.nombre,
+                'subcategoria': clase.subcategoria.nombre,
+                'categoria': clase.subcategoria.categoria.nombre,
+                'success': True
+            })
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    
+    return JsonResponse({
+        'codigo': clase.codigo,
+        'nombre': clase.nombre,
+        'success': True
+    })
+
+
+@control_acceso('Administrador')
+def eliminar_clase(request, pk):
+    clase = get_object_or_404(Clase, pk=pk)
+    if request.method == 'POST':
+        clase.delete()
+        return JsonResponse({'id': pk, 'success': True})
+    
+    return redirect('lista_clases', pk=clase.subcategoria.pk)

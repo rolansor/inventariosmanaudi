@@ -12,50 +12,41 @@
 {% block encabezado %}
 <ol class="breadcrumb float-xl-end">
     <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
-    <li class="breadcrumb-item active">Lista de Producto</li>
+    <li class="breadcrumb-item active">Lista de Productos</li>
 </ol>
-<h1 class="page-header">Lista de Productos para {{ productos.first.empresa.nombre }}</h1>
+<h1 class="page-header">Lista de Productos - {{ empresa_actual.nombre }}</h1>
 {% endblock %}
 
 {% block contenido %}
 <div class="panel panel-inverse">
     <div class="panel-heading">
         <h4 class="panel-title">Lista de Productos</h4>
+        <div class="panel-heading-btn">
+            <a href="{% url 'crear_producto' %}" class="btn btn-xs btn-success">
+                <i class="fa fa-plus"></i> Nuevo Producto
+            </a>
+        </div>
     </div>
     <div class="panel-body">
-            <table id="tabla-productos" class="table table-striped table-bordered align-middle text-nowrap">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Precio</th>
-                        <th>Tipo</th><th>Categoría > Subcategoría > Clase</th>
-                        <th>Empresa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for producto in productos %}
-                    <tr>
-                        <td>{{ producto.codigo }}</td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.descripcion|default:"Sin descripción" }}</td>
-                        <td>{{ producto.precio }}</td>
-                        <td>{{ producto.get_tipo_producto_display }}</td>
-                        <td>
-                            {% if producto.clase %}
-                                {{ producto.clase.subcategoria.categoria.nombre }} > 
-                                {{ producto.clase.subcategoria.nombre }} > 
-                                {{ producto.clase.nombre }}
-                            {% else %}
-                                Sin clasificación
-                            {% endif %}
-                        </td>
-                        <td>{{ producto.empresa.nombre }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <table id="tabla-productos" class="table table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Código Aux.</th>
+                    <th>Código EAN</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Tipo</th>
+                    <th>Clasificación</th>
+                    <th>Estado</th>
+                    <th data-orderable="false">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los datos se cargarán via AJAX -->
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}
@@ -74,17 +65,88 @@
     <script>
         $(document).ready(function () {
             $('#tabla-productos').DataTable({
+                // Server-side processing
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{% url 'lista_productos' %}",
+                    type: 'GET',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                    },
+                    error: function(xhr, error, thrown) {
+                        console.error('Error en AJAX:', error, thrown);
+                        console.log('Respuesta:', xhr.responseText);
+                    },
+                    dataSrc: function(json) {
+                        console.log('Respuesta del servidor:', json);
+                        return json.data;
+                    }
+                },
+                // Configuración de columnas
+                columns: [
+                    { data: 0 },  // Código
+                    { data: 1 },  // Código Auxiliar
+                    { data: 2 },  // Código EAN
+                    { data: 3 },  // Nombre
+                    { data: 4 },  // Descripción
+                    { data: 5 },  // Precio
+                    { data: 6 },  // Tipo
+                    { data: 7 },  // Clasificación
+                    { data: 8 },  // Estado (con HTML)
+                    { data: 9 }   // Acciones (con HTML)
+                ],
+                // Columnas con HTML
+                columnDefs: [
+                    {
+                        targets: [8, 9],  // Estado y Acciones
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                // Dom structure con botones
                 dom: '<"row mb-3"<"col-md-6"B><"col-md-6"fr>>t<"row mt-3"<"col-md-auto me-md-auto"i><"col-md-auto ms-md-auto"p>>',
                 buttons: [
-                    { extend: 'copy', className: 'btn-sm' },
-                    { extend: 'csv', className: 'btn-sm' },
-                    { extend: 'excel', className: 'btn-sm' },
-                    { extend: 'pdf', className: 'btn-sm' },
-                    { extend: 'print', className: 'btn-sm' }
+                    { 
+                        extend: 'copy', 
+                        className: 'btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]  // Excluir Estado y Acciones
+                        }
+                    },
+                    { 
+                        extend: 'csv', 
+                        className: 'btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                        }
+                    },
+                    { 
+                        extend: 'excel', 
+                        className: 'btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                        }
+                    },
+                    { 
+                        extend: 'pdf', 
+                        className: 'btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                        }
+                    },
+                    { 
+                        extend: 'print', 
+                        className: 'btn-sm',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                        }
+                    }
                 ],
-                responsive: true,
-                pageLength: 25,   // Muestra 100 registros por página
-                lengthMenu: [25, 50, 100, 200],  // Opciones para cambiar el número de registros
+                // Configuración de paginación
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                // Idioma en español
                 language: {
                     "lengthMenu": "Mostrar _MENU_ entradas",
                     "zeroRecords": "No se encontraron registros",
@@ -106,6 +168,15 @@
                         "sortDescending": ": activar para ordenar la columna de manera descendente"
                     }
                 },
+                // Configuración adicional
+                responsive: true,
+                order: [[0, 'asc']],  // Ordenar por código por defecto
+                // Renderizar HTML en columnas específicas
+                createdRow: function(row, data, dataIndex) {
+                    // Las celdas de Estado y Acciones ya vienen con HTML
+                    $('td:eq(8)', row).html(data[8]);  // Estado
+                    $('td:eq(9)', row).html(data[9]);  // Acciones
+                }
             });
         });
     </script>

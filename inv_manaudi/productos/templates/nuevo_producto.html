@@ -30,59 +30,163 @@
             <!-- Formulario para creación de producto -->
             <form method="POST" action="{% url 'crear_producto' %}" id="producto-form">
                 {% csrf_token %}
+                
+                <!-- Selección de Clase (que incluye Categoría y Subcategoría) -->
                 <div class="form-group">
-                    <label for="codigo">Código</label>
-                    <input type="text" class="form-control" id="codigo" name="codigo" required>
+                    <label for="clase">Clasificación <span class="text-danger">*</span></label>
+                    {{ form.clase }}
+                    {% if form.clase.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.clase.errors|striptags }}
+                        </div>
+                    {% endif %}
                 </div>
                 <br>
+                
                 <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <label for="codigo">Código Principal <span class="text-danger">*</span></label>
+                    {{ form.codigo }}
+                    <small class="form-text text-muted">Solo letras, números y guiones (-)</small>
                 </div>
                 <br>
+                
+                <div class="form-group">
+                    <label for="codigo_auxiliar">Código Auxiliar</label>
+                    {{ form.codigo_auxiliar }}
+                    <small class="form-text text-muted">Código alternativo (opcional)</small>
+                </div>
+                <br>
+                
+                <div class="form-group">
+                    <label for="codigo_ean">Código EAN-13</label>
+                    {{ form.codigo_ean }}
+                    <small class="form-text text-muted">Código de barras EAN-13 (13 dígitos)</small>
+                </div>
+                <br>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre <span class="text-danger">*</span></label>
+                    {{ form.nombre }}
+                </div>
+                <br>
+                
                 <div class="form-group">
                     <label for="descripcion">Descripción</label>
-                    <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+                    {{ form.descripcion }}
                 </div>
                 <br>
+                
                 <div class="form-group">
-                    <label for="precio">Precio</label>
-                    <input type="text" class="form-control" id="precio" name="precio" required>
+                    <label for="precio">Precio <span class="text-danger">*</span></label>
+                    {{ form.precio }}
                 </div>
                 <br>
+                
                 <div class="form-group">
-                    <label for="tipo_producto">Tipo</label>
-                    <select class="form-control" id="tipo_producto" name="tipo_producto" required>
-                        <option value="unidad">Unidad</option>
-                        <option value="juego">Juego</option>
-                    </select>
+                    <label for="tipo_producto">Tipo <span class="text-danger">*</span></label>
+                    {{ form.tipo_producto }}
                 </div>
                 <br>
-                <div class="form-group">
-                    <label for="categoria">Subcategoría</label>
-                    <select class="form-control" id="categoria" name="categoria" required>
-                        {% for subcategoria in subcategorias %}
-                            <option value="{{ subcategoria.pk }}">{{ subcategoria.categoria.nombre }} - {{ subcategoria.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <br>
-                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+                
+                <button type="submit" class="btn btn-primary" id="submit-btn">
+                    <i class="fa fa-save"></i> Crear Producto
+                </button>
+                <a href="{% url 'lista_productos' %}" class="btn btn-secondary">
+                    <i class="fa fa-times"></i> Cancelar
+                </a>
             </form>
         </div>
     </div>
 {% endblock %}
 
+{% block extra_css %}
+    <!-- Select2 CSS desde CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block extra_js %}
+    <!-- Select2 JS desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
+    
+    <!-- jQuery Mask Plugin desde CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         $(document).ready(function(){
-            $('#precio').mask('00000000.00', {
+            // Inicializar Select2 para el campo de clase
+            $('#id_clase').select2({
+                placeholder: '-- Seleccione Categoría / Subcategoría / Clase --',
+                allowClear: true,
+                language: 'es'
+            });
+            
+            // Máscara para el precio con jQuery Mask
+            $('#id_precio').mask('00000000.00', {
                 reverse: true,
-                placeholder: "____.__"
+                placeholder: '0.00'
+            });
+            
+            // Validación adicional para el precio
+            $('#id_precio').on('blur', function() {
+                var value = $(this).val();
+                if (value === '' || value === '0.00') {
+                    $(this).val('');
+                }
+            });
+            
+            // Máscara y validación para código EAN-13
+            $('#id_codigo_ean').mask('0000000000000');
+            
+            // Validación en tiempo real para código principal y auxiliar
+            $('#id_codigo, #id_codigo_auxiliar').on('input', function() {
+                var value = $(this).val();
+                // Remover caracteres no permitidos (solo permitir letras, números y guiones)
+                var cleaned = value.replace(/[^A-Za-z0-9\-]/g, '');
+                if (value !== cleaned) {
+                    $(this).val(cleaned);
+                }
+            });
+            
+            // Validación del dígito de control EAN-13
+            $('#id_codigo_ean').on('blur', function() {
+                var ean = $(this).val();
+                if (ean.length === 13) {
+                    if (!validarEAN13(ean)) {
+                        $(this).addClass('is-invalid');
+                        if (!$(this).nextAll('.invalid-feedback').length) {
+                            $(this).after('<div class="invalid-feedback">El código EAN-13 no es válido</div>');
+                        }
+                    } else {
+                        $(this).removeClass('is-invalid');
+                        $(this).nextAll('.invalid-feedback').remove();
+                    }
+                } else if (ean.length > 0) {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).nextAll('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">El código EAN debe tener exactamente 13 dígitos</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).nextAll('.invalid-feedback').remove();
+                }
             });
         });
-        document.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
+        
+        // Función para validar el dígito de control EAN-13
+        function validarEAN13(ean) {
+            if (!/^\d{13}$/.test(ean)) return false;
+            
+            var sum = 0;
+            for (var i = 0; i < 12; i++) {
+                sum += parseInt(ean[i]) * (i % 2 === 0 ? 1 : 3);
+            }
+            var checkDigit = (10 - (sum % 10)) % 10;
+            return checkDigit === parseInt(ean[12]);
+        }
+        
+        // Convertir a mayúsculas los campos de texto (excepto precio y EAN)
+        document.querySelectorAll('input[type="text"]:not(#id_precio):not(#id_codigo_ean), textarea').forEach(function(input) {
             input.addEventListener('input', function() {
                 this.value = this.value.toUpperCase();
             });

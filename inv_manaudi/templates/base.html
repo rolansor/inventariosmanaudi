@@ -137,7 +137,7 @@
                     <div class="menu-submenu has-sub">
                         <div class="menu-item">
                             <a href="{% url 'empresa_list' %}" class="menu-link">
-                                <div class="menu-text">Empresas</div>
+                                <div class="menu-text">Lista Empresas</div>
                             </a>
                         </div>
                     </div>
@@ -154,13 +154,8 @@
                     </a>
                     <div class="menu-submenu">
                         <div class="menu-item">
-                            <a href="{% url 'nueva_categoria' %}" class="menu-link">
-                                <div class="menu-text">Nueva Categoria</div>
-                            </a>
-                        </div>
-                        <div class="menu-item">
                             <a href="{% url 'lista_categorias' %}" class="menu-link">
-                                <div class="menu-text">Lista Categoria</div>
+                                <div class="menu-text">Lista Categorias</div>
                             </a>
                         </div>
                     </div>
@@ -214,11 +209,6 @@
                         </div>
                         {% endif %}
                         <div class="menu-item">
-                            <a href="{% url 'iniciar_traslado_laboratorio' %}" class="menu-link">
-                                <div class="menu-text">Traslados Laboratorio</div>
-                            </a>
-                        </div>
-                        <div class="menu-item">
                             <a href="{% url 'traslados_pendientes' %}" class="menu-link">
                                 <div class="menu-text">Acuse Recibo</div>
                             </a>
@@ -262,16 +252,18 @@
                         <div class="menu-caret"></div>
                     </a>
                     <div class="menu-submenu">
+                        {% if request.user|pertenece_grupo:"Supervisor" %}
                         <div class="menu-item">
                             <a href="{% url 'reporte_movimientos_dia' %}" class="menu-link">
-                                <div class="menu-text">Reporte Movimientos Diario</div>
+                                <div class="menu-text">Movimientos del Día</div>
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a href="" class="menu-link">
-                                <div class="menu-text">Reporte 2</div>
+                            <a href="{% url 'reporte_inventario_valorizado' %}" class="menu-link">
+                                <div class="menu-text">Inventario Valorizado</div>
                             </a>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
