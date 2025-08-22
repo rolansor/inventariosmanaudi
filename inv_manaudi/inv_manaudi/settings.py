@@ -79,10 +79,10 @@ DATABASES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rolansor$inv_manaudi',
-        'USER': 'rolansor',
+        'NAME': 'sifcol$inv_manaudi',
+        'USER': 'sifcol',
         'PASSWORD': 'f4d3s2a1',
-        'HOST': 'rolansor.mysql.pythonanywhere-services.com',
+        'HOST': 'sifcol.mysql.pythonanywhere-services.com',
         'PORT': '3306',
     }
 }
