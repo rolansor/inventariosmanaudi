@@ -5,6 +5,7 @@ from django.db import transaction
 from datetime import datetime, timedelta
 from decimal import Decimal
 import random
+import os
 
 from usuarios.models import Usuario, Empresa, Sucursal, UsuarioPerfil
 from productos.models import Producto
