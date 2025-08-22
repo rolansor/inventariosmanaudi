@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carga Masiva de Productos{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .upload-area {
+            border: 3px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+            background-color: #e7f3ff;
+        }
+        .upload-area.dragover {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        .file-icon {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        .stats-card {
+            border-left: 4px solid #007bff;
+            transition: transform 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .instruction-list li {
+            margin-bottom: 10px;
+        }
+        .excel-columns {
+            background-color: #f0f8ff;
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+{% endblock %}
+
+{% block encabezado %}
+<ol class="breadcrumb float-xl-end">
+    <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="#">Reportes</a></li>
+    <li class="breadcrumb-item active">Carga Masiva de Productos</li>
+</ol>
+<h1 class="page-header">Carga Masiva de Productos</h1>
+{% endblock %}
+
+{% block contenido %}
+<!-- Mensajes de notificación -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="fa fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row mb-4">
+    <!-- Estadísticas actuales -->
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-boxes fa-2x text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Productos</h6>
+                        <h3 class="mb-0">{{ resumen.total_productos }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card" style="border-left-color: #28a745;">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-list fa-2x text-success"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Categorías</h6>
+                        <h3 class="mb-0">{{ resumen.total_categorias }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card" style="border-left-color: #ffc107;">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-sitemap fa-2x text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Subcategorías</h6>
+                        <h3 class="mb-0">{{ resumen.total_subcategorias }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card" style="border-left-color: #dc3545;">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-layer-group fa-2x text-danger"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Clases</h6>
+                        <h3 class="mb-0">{{ resumen.total_clases }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Panel de carga -->
+    <div class="col-lg-7">
+        <div class="panel panel-inverse">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <i class="fa fa-file-upload"></i> Cargar Archivo Excel
+                </h4>
+            </div>
+            <div class="panel-body">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fa fa-file-excel file-icon"></i>
+                        <h4>Arrastra y suelta tu archivo Excel aquí</h4>
+                        <p class="text-muted">o haz clic para seleccionar</p>
+                        <input type="file" name="archivo_excel" id="fileInput" accept=".xlsx,.xls" class="d-none">
+                        <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa fa-folder-open"></i> Seleccionar Archivo
+                        </button>
+                    </div>
+                    
+                    <div id="fileInfo" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fa fa-file"></i> Archivo seleccionado: <strong id="fileName"></strong>
+                            <button type="button" class="btn btn-sm btn-danger float-end" onclick="clearFile()">
+                                <i class="fa fa-times"></i> Eliminar
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fa fa-upload"></i> Procesar Archivo
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4">
+                    <a href="{% url 'descargar_plantilla_productos' %}" class="btn btn-info">
+                        <i class="fa fa-download"></i> Descargar Plantilla Excel
+                    </a>
+                    <small class="text-muted ms-2">Usa esta plantilla para asegurar el formato correcto</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panel de instrucciones -->
+    <div class="col-lg-5">
+        <div class="panel panel-inverse">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <i class="fa fa-info-circle"></i> Instrucciones
+                </h4>
+            </div>
+            <div class="panel-body">
+                <div class="alert excel-columns mb-3">
+                    <h6 class="mb-2"><i class="fa fa-columns"></i> Columnas del Excel:</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <small>
+                                <strong>Obligatorias:</strong>
+                                <ul class="mb-0">
+                                    <li>codigo</li>
+                                    <li>nombre</li>
+                                    <li>categoria</li>
+                                    <li>subcategoria</li>
+                                    <li>clase</li>
+                                </ul>
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small>
+                                <strong>Opcionales:</strong>
+                                <ul class="mb-0">
+                                    <li>precio</li>
+                                    <li>tipo_producto</li>
+                                    <li>descripcion</li>
+                                    <li>stock_minimo</li>
+                                    <li>sucursal</li>
+                                    <li>cantidad_inicial</li>
+                                </ul>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <h6>Pasos para la carga masiva:</h6>
+                <ol class="instruction-list">
+                    <li><strong>Descarga la plantilla:</strong> Usa el botón "Descargar Plantilla Excel"</li>
+                    <li><strong>Completa los datos:</strong> Llena las columnas requeridas en el Excel</li>
+                    <li><strong>Verifica los códigos:</strong> Asegúrate que sean únicos por producto</li>
+                    <li><strong>Carga el archivo:</strong> Arrastra o selecciona tu archivo Excel</li>
+                    <li><strong>Procesa:</strong> Haz clic en "Procesar Archivo"</li>
+                </ol>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="fa fa-exclamation-triangle"></i> Importante:</h6>
+                    <ul class="mb-0">
+                        <li>Los códigos deben ser únicos en la empresa</li>
+                        <li>Las categorías, subcategorías y clases se crearán automáticamente si no existen</li>
+                        <li>tipo_producto debe ser: 'unidad' o 'juego'</li>
+                        <li>Usa punto (.) como separador decimal</li>
+                    </ul>
+                </div>
+                
+                {% if resumen.sucursales %}
+                <div class="alert alert-info">
+                    <h6><i class="fa fa-building"></i> Sucursales disponibles:</h6>
+                    <small>
+                        {% for sucursal in resumen.sucursales %}
+                            <span class="badge bg-secondary me-1">{{ sucursal }}</span>
+                        {% endfor %}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Drag and drop functionality
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+    
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    // Handle dropped files
+    uploadArea.addEventListener('drop', handleDrop, false);
+    
+    // Handle file selection
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            showFileInfo(this.files[0]);
+        }
+    });
+    
+    // Click to select file
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    function highlight(e) {
+        uploadArea.classList.add('dragover');
+    }
+    
+    function unhighlight(e) {
+        uploadArea.classList.remove('dragover');
+    }
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files && files[0]) {
+            // Validate file type
+            const fileName = files[0].name;
+            if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+                alert('Por favor seleccione un archivo Excel (.xlsx o .xls)');
+                return;
+            }
+            
+            fileInput.files = files;
+            showFileInfo(files[0]);
+        }
+    }
+    
+    function showFileInfo(file) {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileInfo').style.display = 'block';
+    }
+    
+    function clearFile() {
+        fileInput.value = '';
+        document.getElementById('fileInfo').style.display = 'none';
+    }
+    
+    // Show loading state on form submit
+    uploadForm.addEventListener('submit', function() {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Procesando...';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

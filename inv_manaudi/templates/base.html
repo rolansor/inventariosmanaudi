@@ -264,6 +264,13 @@
                             </a>
                         </div>
                         {% endif %}
+                        {% if request.user|pertenece_grupo:"Administrador" %}
+                        <div class="menu-item">
+                            <a href="{% url 'carga_masiva_productos' %}" class="menu-link">
+                                <div class="menu-text">Carga Masiva de Productos</div>
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

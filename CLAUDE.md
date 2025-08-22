@@ -229,94 +229,138 @@ python manage.py runserver
 
 # Crear superusuario
 python manage.py createsuperuser
+
+# Poblar base de datos con datos de prueba
+python manage.py populate_data                  # Crea datos de prueba
+python manage.py populate_data --clear          # Limpia y recrea todos los datos
+python manage.py populate_data --empresas 2     # Crea solo 2 empresas
 ```
 
 
 
 ## 👥 Usuarios del Sistema
 
-### Lista de Usuarios Existentes
-**NOTA**: Todas las contraseñas han sido establecidas a: **1234**
+### Comando populate_data
+El comando `python manage.py populate_data` crea automáticamente usuarios de prueba con la siguiente estructura:
 
-| Usuario | Nombre Completo | Rol | Empresa | Sucursal | Estado |
-|---------|----------------|-----|---------|----------|--------|
-| **administrador_inventarios** | Edgar Rivas | Administrador | NINEFIFTEEN | - | Activo (Superusuario) |
-| **ninefifteen_manaudi** | Manaudi Ninefifteen | Manaudi | NINEFIFTEEN | - | Activo |
-| **ninefifteen_guayaquil** | Usuario Guayaquil | Supervisor | NINEFIFTEEN | Guayaquil | Activo |
-| **ninefifteen_cuenca** | Usuario Cuenca | Encargado | NINEFIFTEEN | Cuenca | Activo |
-| **ninefifteen_quito** | Usuario Quito | Encargado | NINEFIFTEEN | Quito | Activo |
-| **ninefifteen_administrador** | Stephanny | Supervisor | NINEFIFTEEN | Guayaquil | Activo |
-| **ninefifteen_labgye** | Laboratorio Guayaquil | Encargado | NINEFIFTEEN | Laboratorio Guayaquil | Activo |
+**NOTA**: Todas las contraseñas son: **1234**
 
-### Distribución por Roles
-- **Administradores**: 1 usuario (administrador_inventarios)
-- **Supervisores**: 2 usuarios (ninefifteen_guayaquil, ninefifteen_administrador)
-- **Encargados**: 3 usuarios (ninefifteen_cuenca, ninefifteen_quito, ninefifteen_labgye)
-- **Manaudi**: 1 usuario (ninefifteen_manaudi)
+### Usuarios Creados por Empresa
 
-### Empresa Actual
-- **NINEFIFTEEN**: Todos los usuarios pertenecen a esta empresa
-- **Sucursales**: Guayaquil, Cuenca, Quito, Laboratorio Guayaquil
+#### TechCorp Ecuador
+| Usuario | Nombre | Rol | Sucursal | Email |
+|---------|--------|-----|----------|-------|
+| **admin** | Super Admin | Superusuario | - | admin@sistema.com |
+| **techcorp_admin** | Admin TechCorp | Administrador | - | admin@techcorp.com |
+| **techcorp_supervisor** | Supervisor TechCorp | Supervisor | Matriz Quito | supervisor@techcorp.com |
+| **techcorp_encargado** | Encargado TechCorp | Encargado | Sucursal Guayaquil | encargado@techcorp.com |
+| **techcorp_manaudi** | Manaudi TechCorp | Manaudi | - | manaudi@techcorp.com |
+
+#### Comercial Andina
+| Usuario | Nombre | Rol | Sucursal | Email |
+|---------|--------|-----|----------|-------|
+| **comercia_admin** | Admin Comercial | Administrador | - | admin@comercia.com |
+| **comercia_supervisor** | Supervisor Comercial | Supervisor | Bodega Principal | supervisor@comercia.com |
+| **comercia_encargado** | Encargado Comercial | Encargado | Punto Venta Norte | encargado@comercia.com |
+| **comercia_manaudi** | Manaudi Comercial | Manaudi | - | manaudi@comercia.com |
+
+#### Distribuidora Nacional
+| Usuario | Nombre | Rol | Sucursal | Email |
+|---------|--------|-----|----------|-------|
+| **distribu_admin** | Admin Distribuidora | Administrador | - | admin@distribu.com |
+| **distribu_supervisor** | Supervisor Distribuidora | Supervisor | Centro Distribución | supervisor@distribu.com |
+| **distribu_encargado** | Encargado Distribuidora | Encargado | Tienda Cuenca | encargado@distribu.com |
+| **distribu_manaudi** | Manaudi Distribuidora | Manaudi | - | manaudi@distribu.com |
+
+### Estructura de Empresas y Sucursales
+
+#### TechCorp Ecuador
+- **Matriz Quito** (Bodega) - UIO
+- **Sucursal Guayaquil** (Punto de Venta) - GYE  
+- **Laboratorio Quito** (Laboratorio) - LAB
+
+#### Comercial Andina
+- **Bodega Principal** (Bodega) - BOD
+- **Punto Venta Norte** (Punto de Venta) - PVN
+- **Punto Venta Sur** (Punto de Venta) - PVS
+
+#### Distribuidora Nacional
+- **Centro Distribución** (Bodega) - CDI
+- **Tienda Cuenca** (Punto de Venta) - CUE
+- **Tienda Loja** (Punto de Venta) - LOJ
+
+### Datos de Prueba Incluidos
+El comando también crea:
+- **Categorías**: Electrónica, Oficina
+- **Subcategorías**: Computadoras, Celulares, Papelería, Mobiliario
+- **Clases**: Laptops, Desktops, Tablets, Smartphones, etc.
+- **Productos**: 10 productos por empresa con códigos únicos
+- **Inventario**: Stock inicial aleatorio (10-100 unidades)
+- **Movimientos**: Entradas y salidas de ejemplo
+
+### Comandos de Gestión
+```bash
+# Crear datos de prueba completos
+python manage.py populate_data
+
+# Limpiar y recrear todos los datos
+python manage.py populate_data --clear
+
+# Crear solo 1 empresa (en lugar de las 3 por defecto)
+python manage.py populate_data --empresas 1
+```
 
 ## 🏢 Estructura Organizacional y Permisos
 
-### Diagrama de Jerarquía
+### Diagrama de Jerarquía Multi-Empresa
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          NINEFIFTEEN (Empresa)                       │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-        ┌───────────────────────────┴───────────────────────────┐
-        │                                                       │
-┌───────▼──────────┐                                    ┌──────▼──────┐
-│  ADMINISTRADOR   │                                    │   MANAUDI   │
-│ ═══════════════  │                                    │ ══════════  │
-│                  │                                    │             │
-│ Edgar Rivas      │                                    │ Ninefifteen │
-│ (Super Admin)    │                                    │   Manaudi   │
-│                  │                                    │             │
-│ Permisos: TODOS  │                                    │ Permisos:   │
-│                  │                                    │ - Consultas │
-└──────────────────┘                                    └─────────────┘
-        │
-        │ Supervisa y gestiona
-        ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                         SUPERVISORES                              │
-│ ════════════════════════════════════════════════════════════════ │
-│                                                                   │
-│  ┌─────────────────────────┐    ┌──────────────────────────┐    │
-│  │ ninefifteen_guayaquil   │    │ ninefifteen_administrador │    │
-│  │ (Sucursal: Guayaquil)   │    │ Stephanny                 │    │
-│  └─────────────────────────┘    │ (Sucursal: Guayaquil)     │    │
-│                                  └──────────────────────────┘    │
-│                                                                   │
-│ Permisos:                                                        │
-│ • Gestión de productos y categorías                              │
-│ • Iniciar traslados                                              │
-│ • Generar reportes                                               │
-│ • Ver movimientos por empresa                                    │
-└──────────────────────────────────────────────────────────────────┘
-        │
-        │ Coordinan con
-        ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                         ENCARGADOS                                │
-│ ════════════════════════════════════════════════════════════════ │
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌────────────────┐ │
-│  │ ninefifteen_     │  │ ninefifteen_     │  │ ninefifteen_   │ │
-│  │ cuenca           │  │ quito            │  │ labgye         │ │
-│  │                  │  │                  │  │                │ │
-│  │ Sucursal: Cuenca │  │ Sucursal: Quito  │  │ Sucursal: Lab  │ │
-│  │                  │  │                  │  │ Guayaquil      │ │
-│  └──────────────────┘  └──────────────────┘  └────────────────┘ │
-│                                                                   │
-│ Permisos:                                                        │
-│ • Registrar movimientos (entradas/salidas)                       │
-│ • Confirmar traslados recibidos                                  │
-│ • Ver movimientos por producto/sucursal                          │
-└──────────────────────────────────────────────────────────────────┘
+                        ┌──────────────────────────────────────┐
+                        │            SUPERUSUARIO              │
+                        │         admin (Super Admin)         │
+                        │         Permisos: GLOBALES          │
+                        └─────────────────┬────────────────────┘
+                                          │
+        ┌─────────────────────────────────┼─────────────────────────────────┐
+        │                                 │                                 │
+┌───────▼──────────┐            ┌────────▼─────────┐            ┌──────────▼────────┐
+│   TECHCORP       │            │  COMERCIAL       │            │   DISTRIBUIDORA   │
+│   ECUADOR        │            │    ANDINA        │            │    NACIONAL       │
+└─────────┬────────┘            └─────────┬────────┘            └──────────┬────────┘
+          │                               │                               │
+    ┌─────▼─────┐                   ┌─────▼─────┐                   ┌─────▼─────┐
+    │   ADMIN   │                   │   ADMIN   │                   │   ADMIN   │
+    │ techcorp_ │                   │ comercia_ │                   │ distribu_ │
+    │   admin   │                   │   admin   │                   │   admin   │
+    └─────┬─────┘                   └─────┬─────┘                   └─────┬─────┘
+          │                               │                               │
+  ┌───────▼───────┐               ┌───────▼───────┐               ┌───────▼───────┐
+  │  SUPERVISOR   │               │  SUPERVISOR   │               │  SUPERVISOR   │
+  │ techcorp_     │               │ comercia_     │               │ distribu_     │
+  │ supervisor    │               │ supervisor    │               │ supervisor    │
+  │ (Matriz UIO)  │               │ (Bodega BOD)  │               │ (Centro CDI)  │
+  └───────┬───────┘               └───────┬───────┘               └───────┬───────┘
+          │                               │                               │
+  ┌───────▼───────┐               ┌───────▼───────┐               ┌───────▼───────┐
+  │  ENCARGADO    │               │  ENCARGADO    │               │  ENCARGADO    │
+  │ techcorp_     │               │ comercia_     │               │ distribu_     │
+  │ encargado     │               │ encargado     │               │ encargado     │
+  │ (Sucursal GYE)│               │ (P.Venta PVN) │               │ (Tienda CUE)  │
+  └───────┬───────┘               └───────┬───────┘               └───────┬───────┘
+          │                               │                               │
+  ┌───────▼───────┐               ┌───────▼───────┐               ┌───────▼───────┐
+  │   MANAUDI     │               │   MANAUDI     │               │   MANAUDI     │
+  │ techcorp_     │               │ comercia_     │               │ distribu_     │
+  │  manaudi      │               │  manaudi      │               │  manaudi      │
+  │ (Auditoría)   │               │ (Auditoría)   │               │ (Auditoría)   │
+  └───────────────┘               └───────────────┘               └───────────────┘
+
+SUCURSALES POR EMPRESA:
+──────────────────────
+
+TechCorp Ecuador:           Comercial Andina:           Distribuidora Nacional:
+• Matriz Quito (UIO)        • Bodega Principal (BOD)    • Centro Distribución (CDI)
+• Sucursal Guayaquil (GYE)  • Punto Venta Norte (PVN)   • Tienda Cuenca (CUE)
+• Laboratorio Quito (LAB)   • Punto Venta Sur (PVS)     • Tienda Loja (LOJ)
 ```
 
 ### Matriz de Permisos por Rol
@@ -336,38 +380,99 @@ python manage.py createsuperuser
 | **Reportes** | ✅ | ✅ | ❌ | ❌ |
 | **Consulta IDs (Auxiliares)** | ✅ | ✅ | ✅ | ✅ |
 
-### Flujo de Trabajo por Sucursal
+### Flujo de Trabajo Multi-Empresa
 
+#### TechCorp Ecuador
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    SUCURSAL GUAYAQUIL                        │
+│                    MATRIZ QUITO (UIO)                       │
 │  ┌────────────────────────────────────────────────────┐     │
-│  │ Supervisores:                                      │     │
-│  │ • ninefifteen_guayaquil                           │     │
-│  │ • ninefifteen_administrador (Stephanny)           │     │
+│  │ Supervisor: techcorp_supervisor                    │     │
+│  │ Funciones Centrales:                               │     │
+│  │ • Gestión de productos y categorías                │     │
+│  │ • Coordinación de traslados                        │     │
+│  │ • Generación de reportes                           │     │
+│  │ • Control de inventario principal                  │     │
 │  └────────────────────────────────────────────────────┘     │
-│                                                              │
-│  Funciones principales:                                      │
-│  • Centro de operaciones principal                           │
-│  • Gestión de productos y categorías                         │
-│  • Coordinación de traslados                                 │
-│  • Generación de reportes                                    │
 └─────────────────────────────────────────────────────────────┘
                               │
-                              │ Traslados
-                              ▼
-┌──────────────────┬──────────────────┬───────────────────────┐
-│ SUCURSAL CUENCA  │  SUCURSAL QUITO  │ LAB. GUAYAQUIL       │
-│                  │                  │                       │
-│ Encargado:       │ Encargado:       │ Encargado:           │
-│ ninefifteen_     │ ninefifteen_     │ ninefifteen_labgye   │
-│ cuenca           │ quito            │                       │
-│                  │                  │                       │
-│ Funciones:       │ Funciones:       │ Funciones:           │
-│ • Recepción      │ • Recepción      │ • Recepción          │
-│ • Movimientos    │ • Movimientos    │ • Movimientos        │
-│ • Stock local    │ • Stock local    │ • Stock laboratorio  │
-└──────────────────┴──────────────────┴───────────────────────┘
+                ┌─────────────┼─────────────┐
+                │             │             │
+┌───────────────▼───┐  ┌──────▼──────┐  ┌───▼────────────┐
+│ SUCURSAL GYE (GYE)│  │LAB UIO (LAB)│  │  TRASLADOS     │
+│                   │  │             │  │  INTER-        │
+│ Encargado:        │  │ Personal:   │  │  SUCURSALES    │
+│ techcorp_encargado│  │ Técnicos    │  │                │
+│                   │  │ Lab         │  │ • GYE ↔ UIO    │
+│ Funciones:        │  │             │  │ • LAB ↔ UIO    │
+│ • Ventas          │  │ Funciones:  │  │ • GYE ↔ LAB    │
+│ • Atención cliente│  │ • Análisis  │  │                │
+│ • Stock local     │  │ • Pruebas   │  │ Estados:       │
+│ • Recepción       │  │ • R&D       │  │ • Pendiente    │
+│                   │  │ • QC        │  │ • Confirmado   │
+└───────────────────┘  └─────────────┘  └────────────────┘
+```
+
+#### Comercial Andina
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 BODEGA PRINCIPAL (BOD)                      │
+│  ┌────────────────────────────────────────────────────┐     │
+│  │ Supervisor: comercia_supervisor                    │     │
+│  │ Funciones de Distribución:                         │     │
+│  │ • Control de stock central                         │     │
+│  │ • Coordinación logística                           │     │
+│  │ • Distribución a puntos de venta                   │     │
+│  │ • Recepción de mercancía                           │     │
+│  └────────────────────────────────────────────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                ┌─────────────┴─────────────┐
+                │                           │
+┌───────────────▼───┐              ┌────────▼────────┐
+│P.VENTA NORTE (PVN)│              │P.VENTA SUR (PVS)│
+│                   │              │                 │
+│Encargado:         │              │ Personal:       │
+│comercia_encargado │              │ Vendedores      │
+│                   │              │                 │
+│Funciones:         │              │ Funciones:      │
+│• Ventas al público│              │ • Ventas        │
+│• Atención cliente │              │ • Inventario    │
+│• Manejo de caja   │              │ • Exhibición    │
+│• Inventario PV    │              │ • Recepción     │
+│• Reportes ventas  │              │                 │
+└───────────────────┘              └─────────────────┘
+```
+
+#### Distribuidora Nacional
+```
+┌─────────────────────────────────────────────────────────────┐
+│              CENTRO DISTRIBUCIÓN (CDI)                      │
+│  ┌────────────────────────────────────────────────────┐     │
+│  │ Supervisor: distribu_supervisor                    │     │
+│  │ Funciones de Distribución Nacional:                │     │
+│  │ • Logística nacional                               │     │
+│  │ • Control de inventario central                    │     │
+│  │ • Coordinación inter-ciudades                      │     │
+│  │ • Planificación de distribución                    │     │
+│  └────────────────────────────────────────────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                ┌─────────────┴─────────────┐
+                │                           │
+┌───────────────▼───┐              ┌────────▼────────┐
+│TIENDA CUENCA (CUE)│              │TIENDA LOJA (LOJ)│
+│                   │              │                 │
+│Encargado:         │              │ Personal:       │
+│distribu_encargado │              │ Vendedores      │
+│                   │              │ locales         │
+│Funciones:         │              │                 │
+│• Ventas locales   │              │ Funciones:      │
+│• Stock regional   │              │ • Ventas        │
+│• Atención cliente │              │ • Inventario    │
+│• Recepción        │              │ • Atención      │
+│• Reportes zona    │              │ • Recepción     │
+└───────────────────┘              └─────────────────┘
 ```
 
 ### Reglas de Negocio y Restricciones
