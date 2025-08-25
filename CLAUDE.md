@@ -248,29 +248,29 @@ El comando `python manage.py populate_data` crea automáticamente usuarios de pr
 ### Usuarios Creados por Empresa
 
 #### TechCorp Ecuador
-| Usuario | Nombre | Rol | Sucursal | Email |
-|---------|--------|-----|----------|-------|
-| **admin** | Super Admin | Superusuario | - | admin@sistema.com |
-| **techcorp_admin** | Admin TechCorp | Administrador | - | admin@techcorp.com |
-| **techcorp_supervisor** | Supervisor TechCorp | Supervisor | Matriz Quito | supervisor@techcorp.com |
-| **techcorp_encargado** | Encargado TechCorp | Encargado | Sucursal Guayaquil | encargado@techcorp.com |
-| **techcorp_manaudi** | Manaudi TechCorp | Manaudi | - | manaudi@techcorp.com |
+| Usuario                 | Nombre              | Rol           | Sucursal           | Email                   | Grupos                                  |
+|-------------------------|---------------------|---------------|--------------------|-------------------------|-----------------------------------------|
+| **admin**               | Super Admin         | Superusuario  | -                  | admin@sistema.com       | Todos                                   |
+| **techcorp_manaudi**    | Manaudi TechCorp    | Manaudi       | -                  | manaudi@techcorp.com    | Manaudi, Supervisor, Encargado, Auditor |
+| **techcorp_supervisor** | Supervisor TechCorp | Supervisor    | Matriz Quito       | supervisor@techcorp.com | Supervisor, Encargado                   |
+| **techcorp_encargado**  | Encargado TechCorp  | Encargado     | Sucursal Guayaquil | encargado@techcorp.com  | Encargado                               |
+| **techcorp_auditor**    | Auditor TechCorp    | Auditor       | -                  | auditor@techcorp.com    | Auditor                                 |
 
 #### Comercial Andina
-| Usuario | Nombre | Rol | Sucursal | Email |
-|---------|--------|-----|----------|-------|
-| **comercia_admin** | Admin Comercial | Administrador | - | admin@comercia.com |
-| **comercia_supervisor** | Supervisor Comercial | Supervisor | Bodega Principal | supervisor@comercia.com |
-| **comercia_encargado** | Encargado Comercial | Encargado | Punto Venta Norte | encargado@comercia.com |
-| **comercia_manaudi** | Manaudi Comercial | Manaudi | - | manaudi@comercia.com |
+| Usuario                 | Nombre               | Rol           | Sucursal          | Email                   | Grupos                                  |
+|-------------------------|----------------------|---------------|-------------------|-------------------------|-----------------------------------------|
+| **comercia_manaudi**    | Manaudi Comercial    | Manaudi       | -                 | manaudi@comercia.com    | Manaudi, Supervisor, Encargado, Auditor |
+| **comercia_supervisor** | Supervisor Comercial | Supervisor    | Bodega Principal  | supervisor@comercia.com | Supervisor, Encargado                   |
+| **comercia_encargado**  | Encargado Comercial  | Encargado     | Punto Venta Norte | encargado@comercia.com  | Encargado                               |
+| **comercia_auditor**    | Auditor Comercial    | Auditor       | -                 | auditor@comercia.com    | Auditor                                 |
 
 #### Distribuidora Nacional
-| Usuario | Nombre | Rol | Sucursal | Email |
-|---------|--------|-----|----------|-------|
-| **distribu_admin** | Admin Distribuidora | Administrador | - | admin@distribu.com |
-| **distribu_supervisor** | Supervisor Distribuidora | Supervisor | Centro Distribución | supervisor@distribu.com |
-| **distribu_encargado** | Encargado Distribuidora | Encargado | Tienda Cuenca | encargado@distribu.com |
-| **distribu_manaudi** | Manaudi Distribuidora | Manaudi | - | manaudi@distribu.com |
+| Usuario                 | Nombre                   | Rol           | Sucursal            | Email                   | Grupos                                  |
+|-------------------------|--------------------------|---------------|---------------------|-------------------------|-----------------------------------------|
+| **distribu_manaudi**    | Manaudi Distribuidora    | Manaudi       | -                   | manaudi@distribu.com    | Manaudi, Supervisor, Encargado, Auditor |
+| **distribu_supervisor** | Supervisor Distribuidora | Supervisor    | Centro Distribución | supervisor@distribu.com | Supervisor, Encargado                   |
+| **distribu_encargado**  | Encargado Distribuidora  | Encargado     | Tienda Cuenca       | encargado@distribu.com  | Encargado                               |
+| **distribu_auditor**    | Auditor Distribuidora    | Auditor       | -                   | auditor@distribu.com    | Auditor                                 |
 
 ### Estructura de Empresas y Sucursales
 
@@ -328,9 +328,9 @@ python manage.py populate_data --empresas 1
 └─────────┬────────┘            └─────────┬────────┘            └──────────┬────────┘
           │                               │                               │
     ┌─────▼─────┐                   ┌─────▼─────┐                   ┌─────▼─────┐
-    │   ADMIN   │                   │   ADMIN   │                   │   ADMIN   │
+    │  MANAUDI  │                   │  MANAUDI  │                   │  MANAUDI  │
     │ techcorp_ │                   │ comercia_ │                   │ distribu_ │
-    │   admin   │                   │   admin   │                   │   admin   │
+    │  manaudi  │                   │  manaudi  │                   │  manaudi  │
     └─────┬─────┘                   └─────┬─────┘                   └─────┬─────┘
           │                               │                               │
   ┌───────▼───────┐               ┌───────▼───────┐               ┌───────▼───────┐
@@ -348,10 +348,10 @@ python manage.py populate_data --empresas 1
   └───────┬───────┘               └───────┬───────┘               └───────┬───────┘
           │                               │                               │
   ┌───────▼───────┐               ┌───────▼───────┐               ┌───────▼───────┐
-  │   MANAUDI     │               │   MANAUDI     │               │   MANAUDI     │
+  │   AUDITOR     │               │   AUDITOR     │               │   AUDITOR     │
   │ techcorp_     │               │ comercia_     │               │ distribu_     │
-  │  manaudi      │               │  manaudi      │               │  manaudi      │
-  │ (Auditoría)   │               │ (Auditoría)   │               │ (Auditoría)   │
+  │   auditor     │               │   auditor     │               │   auditor     │
+  │ (Solo lectura)│               │ (Solo lectura)│               │ (Solo lectura)│
   └───────────────┘               └───────────────┘               └───────────────┘
 
 SUCURSALES POR EMPRESA:
@@ -365,20 +365,20 @@ TechCorp Ecuador:           Comercial Andina:           Distribuidora Nacional:
 
 ### Matriz de Permisos por Rol
 
-| Funcionalidad | Administrador | Supervisor | Encargado | Manaudi |
-|--------------|:-------------:|:----------:|:---------:|:-------:|
-| **Gestión de Empresas** | ✅ | ❌ | ❌ | ❌ |
-| **Gestión de Sucursales** | ✅ | ❌ | ❌ | ❌ |
-| **Gestión de Usuarios** | ✅ | ❌ | ❌ | ❌ |
-| **Categorías - Crear/Listar** | ✅ | ✅ | ❌ | ❌ |
-| **Categorías - Eliminar** | ✅ | ❌ | ❌ | ❌ |
-| **Productos - Crear/Editar** | ✅ | ✅ | ❌ | ❌ |
-| **Productos - Eliminar** | ✅ | ❌ | ❌ | ❌ |
-| **Iniciar Traslados** | ✅ | ✅ | ❌ | ❌ |
-| **Confirmar Traslados** | ✅ | ✅ | ✅ | ❌ |
-| **Movimientos Inventario** | ✅ | ✅ | ✅ | ❌ |
-| **Reportes** | ✅ | ✅ | ❌ | ❌ |
-| **Consulta IDs (Auxiliares)** | ✅ | ✅ | ✅ | ✅ |
+| Funcionalidad                 | Manaudi | Supervisor | Encargado | Auditor |
+|-------------------------------|:-------:|:----------:|:---------:|:-------:|
+| **Gestión de Empresas**       |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Gestión de Sucursales**     |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Gestión de Usuarios**       |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Categorías - Crear/Editar** |    ✅    |     ✅      |     ❌     |    ❌    |
+| **Categorías - Eliminar**     |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Productos - Crear/Editar**  |    ✅    |     ✅      |     ❌     |    ❌    |
+| **Productos - Eliminar**      |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Productos - Lista/Buscar**  |    ✅    |     ✅      |     ✅     |    ✅    |
+| **Iniciar Traslados**         |    ✅    |     ✅      |     ✅     |    ❌    |
+| **Confirmar Traslados**       |    ✅    |     ✅      |     ✅     |    ❌    |
+| **Movimientos Inventario**    |    ✅    |     ✅      |     ✅     |    ❌    |
+| **Reportes**                  |    ✅    |     ✅      |     ❌     |    ✅    |
 
 ### Flujo de Trabajo Multi-Empresa
 

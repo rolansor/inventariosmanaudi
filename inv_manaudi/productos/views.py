@@ -54,7 +54,7 @@ def crear_producto(request):
     })
 
 
-@control_acceso('Supervisor')
+@control_acceso('Auditor')
 def lista_productos(request):
     # Obtener la empresa del perfil del usuario actual
     empresa_actual = obtener_empresa(request)
@@ -139,7 +139,7 @@ def lista_productos(request):
     return render(request, 'lista_productos.html', {'empresa_actual': empresa_actual})
 
 
-@control_acceso('Supervisor')
+@control_acceso('Encargado')
 def busqueda_producto(request):
     empresa_actual = obtener_empresa(request)
     query = request.GET.get('q', '')
@@ -228,7 +228,7 @@ def editar_producto(request, pk=None):
     })
 
 
-@control_acceso('Supervisor')
+@control_acceso('Auditor')
 def bsq_por_codigo(request):
     """
     Vista para buscar un producto por su código y devolver sus datos en JSON.
@@ -260,7 +260,7 @@ def bsq_por_codigo(request):
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def desactivar_producto(request, pk):
     # Obtener la empresa del usuario logueado
     empresa_actual = obtener_empresa(request)
@@ -273,7 +273,7 @@ def desactivar_producto(request, pk):
     return redirect('busqueda_producto')
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def activar_producto(request, pk):
     # Obtener la empresa del usuario logueado
     empresa_actual = obtener_empresa(request)
@@ -291,6 +291,7 @@ def activar_producto(request, pk):
     return redirect('busqueda_producto')
 
 
+@control_acceso('Supervisor')
 def obtener_modelos_unicos(request):
     """
     Vista para obtener modelos únicos de productos para autocompletado.

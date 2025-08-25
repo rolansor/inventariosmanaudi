@@ -74,7 +74,7 @@ def login_view(request):
     return render(request, 'login.html', {'form': form})
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def empresa_list(request):
     # Obtener todas las empresas
     empresas = Empresa.objects.all()
@@ -104,7 +104,7 @@ def empresa_list(request):
     return render(request, 'empresas.html', {'empresas': empresas, 'form': form})
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def empresa_edit(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
 
@@ -137,7 +137,7 @@ def empresa_edit(request, pk):
             return JsonResponse(data)
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def empresa_delete(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
     if request.method == 'POST':
@@ -146,7 +146,7 @@ def empresa_delete(request, pk):
     return render(request, 'empresas.html', {'form': EmpresaForm(), 'empresas': Empresa.objects.all()})
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def sucursal_list(request, pk):
     empresa = get_object_or_404(Empresa, pk=pk)
     sucursales = Sucursal.objects.filter(empresa=empresa)
@@ -180,7 +180,7 @@ def sucursal_list(request, pk):
     return render(request, 'sucursales.html', {'sucursales': sucursales, 'empresa': empresa, 'form': form})
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def sucursal_edit(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
 
@@ -213,7 +213,7 @@ def sucursal_edit(request, pk):
             return JsonResponse(data)
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def sucursal_delete(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
     if request.method == 'POST':

@@ -10,6 +10,7 @@ from .forms import MovimientoInventarioForm, ProductoSelectForm, SucursalSelectF
     ConfirmarRecepcionForm
 
 
+@control_acceso('Encargado')
 def movimiento_inventario(request):
     empresa_actual = obtener_empresa(request)
 
@@ -41,7 +42,7 @@ def movimiento_inventario(request):
     })
 
 
-@control_acceso('Supervisor')
+@control_acceso('Encargado')
 def iniciar_traslado(request):
     empresa_actual = obtener_empresa(request)
 
@@ -124,7 +125,7 @@ def confirmar_traslado(request, pk):
     })
 
 
-@control_acceso('Supervisor')
+@control_acceso('Encargado')
 def movimientos_por_empresa(request):
     """
     Vista para mostrar todos los movimientos y traslados de una empresa.
@@ -148,7 +149,7 @@ def movimientos_por_empresa(request):
     })
 
 
-@control_acceso('Supervisor')
+@control_acceso('Encargado')
 def movimientos_por_sucursal(request):
     """
     Vista que muestra los movimientos de inventario y traslados para una sucursal específica.

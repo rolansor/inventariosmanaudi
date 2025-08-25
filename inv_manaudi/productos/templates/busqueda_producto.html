@@ -93,7 +93,7 @@
                                         <i class="fa fa-edit"></i>
                                     </a>
                                 {% endif %}
-                                {% if request.user|pertenece_grupo:"Administrador" %}
+                                {% if request.user|pertenece_grupo:"Manaudi" %}
                                     {% if producto.estado == 'activo' %}
                                         <a href="{% url 'desactivar_producto' producto.pk %}" 
                                            class="btn btn-warning" 

@@ -149,7 +149,7 @@
                         <h4>Arrastra y suelta tu archivo Excel aquí</h4>
                         <p class="text-muted">o haz clic para seleccionar</p>
                         <input type="file" name="archivo_excel" id="fileInput" accept=".xlsx,.xls" class="d-none">
-                        <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('fileInput').click()">
+                        <button type="button" class="btn btn-primary mt-3" id="selectFileBtn">
                             <i class="fa fa-folder-open"></i> Seleccionar Archivo
                         </button>
                     </div>
@@ -205,6 +205,7 @@
                             <small>
                                 <strong>Opcionales:</strong>
                                 <ul class="mb-0">
+                                    <li>modelo</li>
                                     <li>precio</li>
                                     <li>tipo_producto</li>
                                     <li>descripcion</li>
@@ -230,6 +231,7 @@
                     <h6><i class="fa fa-exclamation-triangle"></i> Importante:</h6>
                     <ul class="mb-0">
                         <li>Los códigos deben ser únicos en la empresa</li>
+                        <li>El modelo se guardará automáticamente en mayúsculas</li>
                         <li>Las categorías, subcategorías y clases se crearán automáticamente si no existen</li>
                         <li>tipo_producto debe ser: 'unidad' o 'juego'</li>
                         <li>Usa punto (.) como separador decimal</li>
@@ -258,6 +260,7 @@
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     const uploadForm = document.getElementById('uploadForm');
+    const selectFileBtn = document.getElementById('selectFileBtn');
     
     // Prevent default drag behaviors
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -284,9 +287,18 @@
         }
     });
     
-    // Click to select file
-    uploadArea.addEventListener('click', function() {
+    // Click on button to select file (prevent event bubbling)
+    selectFileBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
         fileInput.click();
+    });
+    
+    // Click on upload area to select file (but not on button)
+    uploadArea.addEventListener('click', function(e) {
+        // Only trigger if not clicking on the button
+        if (e.target !== selectFileBtn && !selectFileBtn.contains(e.target)) {
+            fileInput.click();
+        }
     });
     
     function preventDefaults(e) {

@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block contenido %}
-    {% if request.user|pertenece_grupo:"Administrador" %}
+    {% if request.user|pertenece_grupo:"Manaudi" %}
     <div class="panel panel-inverse">
         <div class="panel-heading">
             <h4 class="panel-title">Nueva Empresa</h4>
@@ -76,7 +76,7 @@
                         <td>{{ empresa.telefono }}</td>
                         <td>{{ empresa.email }}</td>
                         <td>
-                            {% if request.user|pertenece_grupo:"Encargado" %}
+                            {% if request.user|pertenece_grupo:"Manaudi" %}
                                 <a href="{% url 'sucursal_list' empresa.pk %}" class="btn btn-warning">Sucursales</a>
                                 <button class="btn btn-primary edit-empresa" data-id="{{ empresa.pk }}">Editar</button>
                                 <button class="btn btn-danger delete-empresa" data-id="{{ empresa.pk }}">Eliminar</button>

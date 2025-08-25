@@ -44,7 +44,7 @@
                         <td><span class="badge bg-info">{{ subcategoria.codigo }}</span></td>
                         <td>{{ subcategoria.nombre }}</td>
                         <td>
-                            {% if request.user|pertenece_grupo:"Administrador" %}
+                            {% if request.user|pertenece_grupo:"Manaudi" %}
                                 <button class="btn btn-primary edit-subcategoria" data-id="{{ subcategoria.id }}">Editar</button>
                                 <a href="{% url 'lista_clases' subcategoria.id %}" class="btn btn-info">Clases</a>
                                 <button class="btn btn-danger delete-subcategoria" data-id="{{ subcategoria.id }}">Eliminar</button>

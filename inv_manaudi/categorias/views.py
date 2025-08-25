@@ -24,6 +24,7 @@ def nueva_categoria(request):
             if request.is_ajax():
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
+@control_acceso('Supervisor')
 def lista_categorias(request):
     empresa = request.user.perfil.empresa
     categorias = Categoria.objects.filter(empresa=empresa)
@@ -54,7 +55,7 @@ def editar_categoria(request, pk):
     })
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def eliminar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
     if request.method == 'POST':
@@ -88,6 +89,7 @@ def nueva_subcategoria(request, pk):
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
 
+@control_acceso('Supervisor')
 def lista_subcategorias(request, pk):
     categoria = get_object_or_404(Categoria, id=pk)
     subcategorias = Subcategoria.objects.filter(categoria=categoria)
@@ -119,7 +121,7 @@ def editar_subcategoria(request, pk):
     })
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def eliminar_subcategoria(request, pk):
     subcategoria = get_object_or_404(Subcategoria, pk=pk)
     if request.method == 'POST':
@@ -154,6 +156,7 @@ def nueva_clase(request, pk):
                 return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
 
+@control_acceso('Supervisor')
 def lista_clases(request, pk):
     subcategoria = get_object_or_404(Subcategoria, id=pk)
     clases = Clase.objects.filter(subcategoria=subcategoria)
@@ -190,7 +193,7 @@ def editar_clase(request, pk):
     })
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def eliminar_clase(request, pk):
     clase = get_object_or_404(Clase, pk=pk)
     if request.method == 'POST':

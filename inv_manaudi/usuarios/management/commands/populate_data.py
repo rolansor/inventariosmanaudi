@@ -52,7 +52,7 @@ class Command(BaseCommand):
         self.stdout.write(f'  - Productos creados: {Producto.objects.count()}')
         self.stdout.write(f'  - Inventarios inicializados: {Inventario.objects.count()}')
         self.stdout.write(f'  - Movimientos de ejemplo: {MovimientoInventario.objects.count()}')
-        self.stdout.write(self.style.WARNING('\n⚠ IMPORTANTE: Todas las contraseñas son: 1234'))
+        self.stdout.write(self.style.WARNING('\nIMPORTANTE: Todas las contraseñas son: 1234'))
 
     def limpiar_datos(self):
         """Limpia todos los datos de prueba"""
@@ -82,7 +82,7 @@ class Command(BaseCommand):
         """Crea los grupos de permisos si no existen"""
         self.stdout.write("Creando grupos...")
         
-        grupos = ['Administrador', 'Supervisor', 'Encargado', 'Manaudi']
+        grupos = ['Manaudi', 'Supervisor', 'Encargado', 'Auditor']
         for nombre_grupo in grupos:
             grupo, created = Group.objects.get_or_create(name=nombre_grupo)
             if created:
@@ -177,10 +177,12 @@ class Command(BaseCommand):
                 superuser.groups.add(grupo)
             # Verificar si tiene perfil, si no crearlo con la primera empresa
             if not hasattr(superuser, 'perfil') and primera_empresa:
-                UsuarioPerfil.objects.create(
+                UsuarioPerfil.objects.get_or_create(
                     usuario=superuser,
-                    empresa=primera_empresa,
-                    sucursal=None
+                    defaults={
+                        'empresa': primera_empresa,
+                        'sucursal': None
+                    }
                 )
                 self.stdout.write(f"  [INFO] Perfil creado para superusuario")
         else:
@@ -198,10 +200,12 @@ class Command(BaseCommand):
             for grupo in grupos.values():
                 superuser.groups.add(grupo)
             if primera_empresa:
-                UsuarioPerfil.objects.create(
+                UsuarioPerfil.objects.get_or_create(
                     usuario=superuser,
-                    empresa=primera_empresa,
-                    sucursal=None
+                    defaults={
+                        'empresa': primera_empresa,
+                        'sucursal': None
+                    }
                 )
             self.stdout.write(self.style.SUCCESS(f"  [OK] Superusuario creado: {superuser.username}"))
         
@@ -211,24 +215,30 @@ class Command(BaseCommand):
             sucursales = empresa_info['sucursales']
             empresa_corto = empresa_nombre.split()[0].lower()[:8]
             
-            # Administrador
-            admin_user = Usuario.objects.create(
-                username=f'{empresa_corto}_admin',
-                first_name='Admin',
+            # Manaudi (Admin del sistema) - tiene todos los permisos
+            manaudi_user = Usuario.objects.create(
+                username=f'{empresa_corto}_manaudi',
+                first_name='Manaudi',
                 last_name=empresa_nombre.split()[0],
-                email=f'admin@{empresa_corto}.com',
+                email=f'manaudi@{empresa_corto}.com',
                 password=password,
                 is_active=True
             )
-            admin_user.groups.add(grupos['Administrador'])
-            UsuarioPerfil.objects.create(
-                usuario=admin_user,
-                empresa=empresa,
-                sucursal=None
+            # Manaudi tiene todos los grupos (jerarquía completa)
+            manaudi_user.groups.add(grupos['Manaudi'])
+            manaudi_user.groups.add(grupos['Supervisor'])
+            manaudi_user.groups.add(grupos['Encargado'])
+            manaudi_user.groups.add(grupos['Auditor'])
+            UsuarioPerfil.objects.get_or_create(
+                usuario=manaudi_user,
+                defaults={
+                    'empresa': empresa,
+                    'sucursal': None
+                }
             )
-            usuarios_creados.append(admin_user)
+            usuarios_creados.append(manaudi_user)
             
-            # Supervisor
+            # Supervisor - tiene permisos de supervisor y encargado
             supervisor_user = Usuario.objects.create(
                 username=f'{empresa_corto}_supervisor',
                 first_name='Supervisor',
@@ -237,15 +247,20 @@ class Command(BaseCommand):
                 password=password,
                 is_active=True
             )
+            # Supervisor tiene grupo de supervisor y encargado
             supervisor_user.groups.add(grupos['Supervisor'])
-            UsuarioPerfil.objects.create(
+            supervisor_user.groups.add(grupos['Encargado'])
+            supervisor_user.groups.add(grupos['Auditor'])
+            UsuarioPerfil.objects.get_or_create(
                 usuario=supervisor_user,
-                empresa=empresa,
-                sucursal=sucursales[0]
+                defaults={
+                    'empresa': empresa,
+                    'sucursal': sucursales[0]
+                }
             )
             usuarios_creados.append(supervisor_user)
             
-            # Encargado
+            # Encargado - solo tiene permisos de encargado
             if len(sucursales) > 1:
                 encargado_user = Usuario.objects.create(
                     username=f'{empresa_corto}_encargado',
@@ -256,29 +271,33 @@ class Command(BaseCommand):
                     is_active=True
                 )
                 encargado_user.groups.add(grupos['Encargado'])
-                UsuarioPerfil.objects.create(
+                UsuarioPerfil.objects.get_or_create(
                     usuario=encargado_user,
-                    empresa=empresa,
-                    sucursal=sucursales[1]
+                    defaults={
+                        'empresa': empresa,
+                        'sucursal': sucursales[1]
+                    }
                 )
                 usuarios_creados.append(encargado_user)
             
-            # Manaudi
-            manaudi_user = Usuario.objects.create(
-                username=f'{empresa_corto}_manaudi',
-                first_name='Manaudi',
+            # Auditor - solo tiene permisos de auditor (solo lectura)
+            auditor_user = Usuario.objects.create(
+                username=f'{empresa_corto}_auditor',
+                first_name='Auditor',
                 last_name=empresa_nombre.split()[0],
-                email=f'manaudi@{empresa_corto}.com',
+                email=f'auditor@{empresa_corto}.com',
                 password=password,
                 is_active=True
             )
-            manaudi_user.groups.add(grupos['Manaudi'])
-            UsuarioPerfil.objects.create(
-                usuario=manaudi_user,
-                empresa=empresa,
-                sucursal=None
+            auditor_user.groups.add(grupos['Auditor'])
+            UsuarioPerfil.objects.get_or_create(
+                usuario=auditor_user,
+                defaults={
+                    'empresa': empresa,
+                    'sucursal': None
+                }
             )
-            usuarios_creados.append(manaudi_user)
+            usuarios_creados.append(auditor_user)
             
             self.stdout.write(self.style.SUCCESS(f"  [OK] 4 usuarios creados para {empresa_nombre}"))
         

@@ -96,7 +96,7 @@
         {% block sidebar_menu %}
             <div class="menu">
                 <div class="menu-header">Navegación</div>
-                {% if request.user|pertenece_grupo:"Administrador" %}
+                {% if request.user|pertenece_grupo:"Manaudi" %}
                     <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -131,6 +131,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -140,24 +141,30 @@
                         <div class="menu-caret"></div>
                     </a>
                     <div class="menu-submenu">
+                        {% if request.user|pertenece_grupo:"Supervisor" %}
                         <div class="menu-item">
                             <a href="{% url 'crear_producto' %}" class="menu-link">
                                 <div class="menu-text">Nuevo Producto</div>
                             </a>
                         </div>
+                        {% endif %}
+                        {% if request.user|pertenece_grupo:"Encargado" %}
                         <div class="menu-item">
                             <a href="{% url 'busqueda_producto' %}" class="menu-link">
                                 <div class="menu-text">Busqueda Productos</div>
                             </a>
                         </div>
+                        {% endif %}
+                        {% if request.user|pertenece_grupo:"Auditor" %}
                         <div class="menu-item">
                             <a href="{% url 'lista_productos' %}" class="menu-link">
                                 <div class="menu-text">Lista Productos</div>
                             </a>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
-                {% endif %}
+                {% if request.user|pertenece_grupo:"Encargado" %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -172,13 +179,11 @@
                                 <div class="menu-text">Entrada/Salida</div>
                             </a>
                         </div>
-                        {% if request.user|pertenece_grupo:"Supervisor" %}
                          <div class="menu-item">
                             <a href="{% url 'iniciar_traslado' %}" class="menu-link">
                                 <div class="menu-text">Traslados</div>
                             </a>
                         </div>
-                        {% endif %}
                         <div class="menu-item">
                             <a href="{% url 'traslados_pendientes' %}" class="menu-link">
                                 <div class="menu-text">Acuse Recibo</div>
@@ -214,6 +219,8 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
+                {% if request.user|pertenece_grupo:"Auditor" %}
                 <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">
@@ -223,7 +230,6 @@
                         <div class="menu-caret"></div>
                     </a>
                     <div class="menu-submenu">
-                        {% if request.user|pertenece_grupo:"Supervisor" %}
                         <div class="menu-item">
                             <a href="{% url 'reporte_movimientos_dia' %}" class="menu-link">
                                 <div class="menu-text">Movimientos del Día</div>
@@ -234,8 +240,7 @@
                                 <div class="menu-text">Inventario Valorizado</div>
                             </a>
                         </div>
-                        {% endif %}
-                        {% if request.user|pertenece_grupo:"Administrador" %}
+                        {% if request.user|pertenece_grupo:"Manaudi" %}
                         <div class="menu-item">
                             <a href="{% url 'carga_masiva_productos' %}" class="menu-link">
                                 <div class="menu-text">Carga Masiva de Productos</div>
@@ -244,6 +249,7 @@
                         {% endif %}
                     </div>
                 </div>
+                {% endif %}
             </div>
             <!-- END menu -->
         {% endblock %}

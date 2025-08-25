@@ -18,7 +18,7 @@ from openpyxl.utils import get_column_letter
 from io import BytesIO
 
 
-@control_acceso('Supervisor')
+@control_acceso('Auditor')
 def reporte_movimientos_dia(request):
     # Obtener empresa del usuario
     empresa_actual = obtener_empresa(request)
@@ -59,7 +59,7 @@ def reporte_movimientos_dia(request):
     })
 
 
-@control_acceso('Supervisor')
+@control_acceso('Auditor')
 def reporte_inventario_valorizado(request):
     """
     Reporte de inventario valorizado mostrando el valor total del inventario
@@ -158,7 +158,7 @@ def reporte_inventario_valorizado(request):
     })
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def descargar_plantilla_productos(request):
     """
     Descarga la plantilla Excel para carga masiva de productos con datos reales de la empresa
@@ -174,6 +174,7 @@ def descargar_plantilla_productos(request):
     headers = [
         ('codigo', 'Código único del producto (obligatorio)'),
         ('nombre', 'Nombre del producto (obligatorio)'),
+        ('modelo', 'Modelo del producto (opcional)'),
         ('categoria', 'Nombre de la categoría (obligatorio)'),
         ('subcategoria', 'Nombre de la subcategoría (obligatorio)'),
         ('clase', 'Nombre de la clase (obligatorio)'),
@@ -229,6 +230,7 @@ def descargar_plantilla_productos(request):
                     ejemplo = [
                         f'PROD{str(row_count-1).zfill(3)}',  # Código de ejemplo
                         f'Producto de ejemplo {row_count-1}',  # Nombre de ejemplo
+                        f'MOD-{str(row_count-1).zfill(3)}',  # Modelo de ejemplo
                         categoria.nombre,
                         subcategoria.nombre,
                         clase.nombre,
@@ -246,9 +248,9 @@ def descargar_plantilla_productos(request):
     if not ejemplos:
         sucursal_nombre = sucursales.first().nombre if sucursales else 'Sucursal Principal'
         ejemplos = [
-            ['PROD001', 'Producto de ejemplo 1', 'CATEGORIA1', 'SUBCATEGORIA1', 'CLASE1', '45.50', 'unidad', 'Descripción del producto 1', '10', sucursal_nombre, '50'],
-            ['PROD002', 'Producto de ejemplo 2', 'CATEGORIA1', 'SUBCATEGORIA1', 'CLASE2', '12.75', 'unidad', 'Descripción del producto 2', '20', sucursal_nombre, '100'],
-            ['PROD003', 'Producto de ejemplo 3', 'CATEGORIA2', 'SUBCATEGORIA2', 'CLASE1', '35.00', 'juego', 'Descripción del producto 3', '5', sucursal_nombre, '25'],
+            ['PROD001', 'Producto de ejemplo 1', 'MOD-001', 'CATEGORIA1', 'SUBCATEGORIA1', 'CLASE1', '45.50', 'unidad', 'Descripción del producto 1', '10', sucursal_nombre, '50'],
+            ['PROD002', 'Producto de ejemplo 2', 'MOD-002', 'CATEGORIA1', 'SUBCATEGORIA1', 'CLASE2', '12.75', 'unidad', 'Descripción del producto 2', '20', sucursal_nombre, '100'],
+            ['PROD003', 'Producto de ejemplo 3', 'MOD-003', 'CATEGORIA2', 'SUBCATEGORIA2', 'CLASE1', '35.00', 'juego', 'Descripción del producto 3', '5', sucursal_nombre, '25'],
         ]
     
     # Escribir ejemplos en la plantilla
@@ -272,6 +274,7 @@ def descargar_plantilla_productos(request):
         ["   - clase: Use valores de la hoja 'Clases' o se creará automáticamente"],
         [""],
         ["2. CAMPOS OPCIONALES:"],
+        ["   - modelo: Modelo del producto (se guardará en mayúsculas)"],
         ["   - precio: Por defecto será 0.00 si no se especifica"],
         ["   - tipo_producto: 'unidad' o 'juego'. Por defecto será 'unidad'"],
         ["   - descripcion: Texto libre para describir el producto"],
@@ -385,7 +388,7 @@ def descargar_plantilla_productos(request):
     return response
 
 
-@control_acceso('Administrador')
+@control_acceso('Manaudi')
 def carga_masiva_productos(request):
     """
     Vista para cargar productos masivamente desde un archivo Excel
@@ -455,6 +458,7 @@ def carga_masiva_productos(request):
                     # Preparar datos del producto
                     producto_data = {
                         'nombre': data['nombre'],
+                        'modelo': data.get('modelo', ''),
                         'clase': clase,
                         'empresa': empresa_actual,
                         'precio': Decimal(str(data.get('precio', 0))),
