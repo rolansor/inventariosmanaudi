@@ -45,6 +45,8 @@ def inicio(request):
         'productos_bajo_stock': productos_bajo_stock,
         'productos_agotados': productos_agotados,
         'movimientos_recientes': movimientos_recientes,
+        'empresa_actual': empresa_usuario,
+        'sucursal_actual': sucursal_usuario,
     })
 
 

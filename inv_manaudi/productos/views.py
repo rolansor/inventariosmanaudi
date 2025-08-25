@@ -70,7 +70,7 @@ def lista_productos(request):
         order_dir = request.GET.get('order[0][dir]', 'asc')
         
         # Mapeo de columnas para ordenamiento
-        columns = ['codigo', 'codigo_auxiliar', 'codigo_ean', 'nombre', 'descripcion', 'precio', 
+        columns = ['codigo', 'codigo_auxiliar', 'codigo_ean', 'modelo', 'nombre', 'descripcion', 'precio', 
                   'tipo_producto', 'clase', 'estado']
         
         # Query base
@@ -87,6 +87,7 @@ def lista_productos(request):
                 Q(codigo__icontains=search_value) |
                 Q(codigo_auxiliar__icontains=search_value) |
                 Q(codigo_ean__icontains=search_value) |
+                Q(modelo__icontains=search_value) |
                 Q(nombre__icontains=search_value) |
                 Q(descripcion__icontains=search_value)
             )
@@ -111,6 +112,7 @@ def lista_productos(request):
                 producto.codigo,
                 producto.codigo_auxiliar or '-',
                 producto.codigo_ean or '-',
+                producto.modelo or '-',
                 producto.nombre,
                 producto.descripcion or 'Sin descripción',
                 f'${producto.precio}',
@@ -152,6 +154,7 @@ def busqueda_producto(request):
             Q(codigo__icontains=query) | 
             Q(codigo_auxiliar__icontains=query) | 
             Q(codigo_ean__icontains=query) | 
+            Q(modelo__icontains=query) |
             Q(nombre__icontains=query) | 
             Q(descripcion__icontains=query)
         )
@@ -242,6 +245,7 @@ def bsq_por_codigo(request):
             'codigo': producto.codigo,
             'codigo_auxiliar': producto.codigo_auxiliar,
             'codigo_ean': producto.codigo_ean,
+            'modelo': producto.modelo,
             'nombre': producto.nombre,
             'descripcion': producto.descripcion,
             'precio': str(producto.precio),  # Convertir Decimal a string para JSON
@@ -285,4 +289,21 @@ def activar_producto(request, pk):
             return redirect(referer)
         return redirect('busqueda_producto')
     return redirect('busqueda_producto')
+
+
+def obtener_modelos_unicos(request):
+    """
+    Vista para obtener modelos únicos de productos para autocompletado.
+    """
+    empresa_actual = obtener_empresa(request)
+    
+    # Obtener modelos únicos no nulos de la empresa actual
+    modelos = (Producto.objects.para_empresa(empresa_actual)
+               .exclude(modelo__isnull=True)
+               .exclude(modelo__exact='')
+               .values_list('modelo', flat=True)
+               .distinct()
+               .order_by('modelo'))
+    
+    return JsonResponse(list(modelos), safe=False)
 

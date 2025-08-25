@@ -23,6 +23,8 @@ class Producto(models.Model):
                                        help_text='Código auxiliar o alternativo del producto')
     codigo_ean = models.CharField(max_length=13, blank=True, null=True, 
                                   help_text='Código EAN-13 (13 dígitos)')
+    modelo = models.CharField(max_length=100, blank=True, null=True,
+                             help_text='Modelo del producto')
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
@@ -37,11 +39,13 @@ class Producto(models.Model):
     objects = ProductoManager()
 
     def save(self, *args, **kwargs):
-        # Convertir códigos y nombre a mayúsculas antes de guardar
+        # Convertir códigos, modelo y nombre a mayúsculas antes de guardar
         if self.codigo:
             self.codigo = self.codigo.upper()
         if self.codigo_auxiliar:
             self.codigo_auxiliar = self.codigo_auxiliar.upper()
+        if self.modelo:
+            self.modelo = self.modelo.upper()
         if self.nombre:
             self.nombre = self.nombre.upper()
         if self.descripcion:

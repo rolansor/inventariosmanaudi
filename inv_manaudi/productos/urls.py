@@ -9,4 +9,5 @@ urlpatterns = [
     path('desactivar/<int:pk>/', views.desactivar_producto, name='desactivar_producto'),
     path('activar/<int:pk>/', views.activar_producto, name='activar_producto'),
     path('bsq_por_codigo/', views.bsq_por_codigo, name='bsq_por_codigo'),
+    path('obtener_modelos/', views.obtener_modelos_unicos, name='obtener_modelos_unicos'),
 ]

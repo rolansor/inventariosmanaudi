@@ -325,17 +325,17 @@ class Command(BaseCommand):
         
         productos_ejemplo = [
             # Electrónica
-            {'codigo': 'LAP001', 'nombre': 'Laptop Dell Latitude', 'precio': 850.00, 'tipo': 'unidad'},
-            {'codigo': 'LAP002', 'nombre': 'Laptop HP ProBook', 'precio': 750.00, 'tipo': 'unidad'},
-            {'codigo': 'DES001', 'nombre': 'Desktop Dell OptiPlex', 'precio': 650.00, 'tipo': 'unidad'},
-            {'codigo': 'TAB001', 'nombre': 'Tablet iPad Air', 'precio': 599.00, 'tipo': 'unidad'},
-            {'codigo': 'SMA001', 'nombre': 'iPhone 13', 'precio': 999.00, 'tipo': 'unidad'},
-            {'codigo': 'SMA002', 'nombre': 'Samsung Galaxy S21', 'precio': 899.00, 'tipo': 'unidad'},
+            {'codigo': 'LAP001', 'nombre': 'Laptop Dell Latitude', 'modelo': 'LATITUDE-5520', 'precio': 850.00, 'tipo': 'unidad'},
+            {'codigo': 'LAP002', 'nombre': 'Laptop HP ProBook', 'modelo': 'PROBOOK-450-G8', 'precio': 750.00, 'tipo': 'unidad'},
+            {'codigo': 'DES001', 'nombre': 'Desktop Dell OptiPlex', 'modelo': 'OPTIPLEX-7090', 'precio': 650.00, 'tipo': 'unidad'},
+            {'codigo': 'TAB001', 'nombre': 'Tablet iPad Air', 'modelo': 'IPAD-AIR-5', 'precio': 599.00, 'tipo': 'unidad'},
+            {'codigo': 'SMA001', 'nombre': 'iPhone 13', 'modelo': 'A2633', 'precio': 999.00, 'tipo': 'unidad'},
+            {'codigo': 'SMA002', 'nombre': 'Samsung Galaxy S21', 'modelo': 'SM-G991B', 'precio': 899.00, 'tipo': 'unidad'},
             # Oficina
-            {'codigo': 'HOJ001', 'nombre': 'Resma Papel A4', 'precio': 4.50, 'tipo': 'unidad'},
-            {'codigo': 'CUA001', 'nombre': 'Cuaderno 100 hojas', 'precio': 2.50, 'tipo': 'unidad'},
-            {'codigo': 'SIL001', 'nombre': 'Silla Ejecutiva', 'precio': 120.00, 'tipo': 'unidad'},
-            {'codigo': 'ESC001', 'nombre': 'Escritorio 1.5m', 'precio': 250.00, 'tipo': 'unidad'},
+            {'codigo': 'HOJ001', 'nombre': 'Resma Papel A4', 'modelo': 'REPORT-75G', 'precio': 4.50, 'tipo': 'unidad'},
+            {'codigo': 'CUA001', 'nombre': 'Cuaderno 100 hojas', 'modelo': 'NORMA-100H', 'precio': 2.50, 'tipo': 'unidad'},
+            {'codigo': 'SIL001', 'nombre': 'Silla Ejecutiva', 'modelo': 'EXEC-2000', 'precio': 120.00, 'tipo': 'unidad'},
+            {'codigo': 'ESC001', 'nombre': 'Escritorio 1.5m', 'modelo': 'OFFICE-150', 'precio': 250.00, 'tipo': 'unidad'},
         ]
         
         for empresa_nombre, empresa_info in empresas.items():
@@ -370,6 +370,7 @@ class Command(BaseCommand):
                                 Producto.objects.create(
                                     codigo=codigo_unico,
                                     nombre=prod_data['nombre'],
+                                    modelo=prod_data.get('modelo', ''),
                                     precio=Decimal(str(prod_data['precio'])),
                                     tipo_producto=prod_data['tipo'],
                                     clase=clase,

@@ -71,14 +71,6 @@
             <!-- END navbar-header -->
             <!-- BEGIN header-nav -->
             <div class="navbar-nav">
-                <div class="navbar-item navbar-form">
-                    <form action="" method="POST" name="search">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Búsqueda en la página"/>
-                            <button type="submit" class="btn btn-search"><i class="fa fa-search"></i></button>
-                        </div>
-                    </form>
-                </div>
                 <div class="navbar-item navbar-user dropdown">
                     <a href="#" class="navbar-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
                         <img src="{% static 'img/user/user-13.jpg' %}" alt=""/>
@@ -105,27 +97,6 @@
             <div class="menu">
                 <div class="menu-header">Navegación</div>
                 {% if request.user|pertenece_grupo:"Administrador" %}
-                    <div class="menu-item has-sub">
-                        <a href="javascript:;" class="menu-link">
-                            <div class="menu-icon">
-                                <i class="fa fa-search"></i>
-                            </div>
-                            <div class="menu-text">Consultas ID</div>
-                            <div class="menu-caret"></div>
-                        </a>
-                        <div class="menu-submenu">
-                            <div class="menu-item">
-                                <a href="{% url 'consulta_id' %}" class="menu-link">
-                                    <div class="menu-text">Cédula</div>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div class="menu-text">RUC</div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                     <div class="menu-item has-sub">
                     <a href="javascript:;" class="menu-link">
                         <div class="menu-icon">

@@ -24,7 +24,7 @@ class ProductoForm(forms.ModelForm):
     
     class Meta:
         model = Producto
-        fields = ['codigo', 'codigo_auxiliar', 'codigo_ean', 'nombre', 'descripcion', 'precio', 'tipo_producto', 'clase']
+        fields = ['codigo', 'codigo_auxiliar', 'codigo_ean', 'modelo', 'nombre', 'descripcion', 'precio', 'tipo_producto', 'clase']
         widgets = {
             'codigo': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -41,6 +41,11 @@ class ProductoForm(forms.ModelForm):
                 'pattern': '[0-9]{13}',
                 'maxlength': '13',
                 'title': 'Debe ser exactamente 13 dígitos'
+            }),
+            'modelo': forms.TextInput(attrs={
+                'class': 'form-control',
+                'list': 'modelos_list',
+                'placeholder': 'Ingrese el modelo del producto'
             }),
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 1}),

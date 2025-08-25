@@ -65,6 +65,13 @@
                 <br>
                 
                 <div class="form-group">
+                    <label for="modelo">Modelo</label>
+                    {{ form.modelo }}
+                    <datalist id="modelos_list"></datalist>
+                </div>
+                <br>
+                
+                <div class="form-group">
                     <label for="nombre">Nombre <span class="text-danger">*</span></label>
                     {{ form.nombre }}
                 </div>
@@ -119,6 +126,22 @@
                 placeholder: '-- Seleccione Categoría / Subcategoría / Clase --',
                 allowClear: true,
                 language: 'es'
+            });
+            
+            // Cargar modelos existentes para autocompletado
+            $.ajax({
+                url: '{% url "obtener_modelos_unicos" %}',
+                type: 'GET',
+                success: function(data) {
+                    var datalist = $('#modelos_list');
+                    datalist.empty();
+                    data.forEach(function(modelo) {
+                        datalist.append($('<option>').attr('value', modelo));
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al cargar modelos:', error);
+                }
             });
             
             // Máscara para el precio con jQuery Mask

@@ -34,6 +34,7 @@
                     <th>Código</th>
                     <th>Código Aux.</th>
                     <th>Código EAN</th>
+                    <th>Modelo</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Precio</th>
@@ -88,18 +89,19 @@
                     { data: 0 },  // Código
                     { data: 1 },  // Código Auxiliar
                     { data: 2 },  // Código EAN
-                    { data: 3 },  // Nombre
-                    { data: 4 },  // Descripción
-                    { data: 5 },  // Precio
-                    { data: 6 },  // Tipo
-                    { data: 7 },  // Clasificación
-                    { data: 8 },  // Estado (con HTML)
-                    { data: 9 }   // Acciones (con HTML)
+                    { data: 3 },  // Modelo
+                    { data: 4 },  // Nombre
+                    { data: 5 },  // Descripción
+                    { data: 6 },  // Precio
+                    { data: 7 },  // Tipo
+                    { data: 8 },  // Clasificación
+                    { data: 9 },  // Estado (con HTML)
+                    { data: 10 }  // Acciones (con HTML)
                 ],
                 // Columnas con HTML
                 columnDefs: [
                     {
-                        targets: [8, 9],  // Estado y Acciones
+                        targets: [9, 10],  // Estado y Acciones
                         orderable: false,
                         searchable: false
                     }
@@ -111,35 +113,35 @@
                         extend: 'copy', 
                         className: 'btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7]  // Excluir Estado y Acciones
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]  // Excluir Estado y Acciones
                         }
                     },
                     { 
                         extend: 'csv', 
                         className: 'btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
                         }
                     },
                     { 
                         extend: 'excel', 
                         className: 'btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
                         }
                     },
                     { 
                         extend: 'pdf', 
                         className: 'btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
                         }
                     },
                     { 
                         extend: 'print', 
                         className: 'btn-sm',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
                         }
                     }
                 ],
@@ -174,8 +176,8 @@
                 // Renderizar HTML en columnas específicas
                 createdRow: function(row, data, dataIndex) {
                     // Las celdas de Estado y Acciones ya vienen con HTML
-                    $('td:eq(8)', row).html(data[8]);  // Estado
-                    $('td:eq(9)', row).html(data[9]);  // Acciones
+                    $('td:eq(9)', row).html(data[9]);  // Estado
+                    $('td:eq(10)', row).html(data[10]);  // Acciones
                 }
             });
         });

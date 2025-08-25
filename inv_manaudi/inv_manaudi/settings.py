@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'inventario',
     'categorias',
     'productos',
-    'auxiliares',
     'reportes',
 ]
 

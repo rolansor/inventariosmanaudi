@@ -24,9 +24,9 @@
 {% block contenido %}
 <div id="content" class="content">
     <h1 class="page-header">Resumen de inventarios para: 
-        <b>{{ request.user.perfil.empresa.nombre }}</b> 
-        {% if request.user.perfil.sucursal %}
-            - <b>{{ request.user.perfil.sucursal.nombre }}</b>
+        <b>{{ empresa_actual.nombre }}</b> 
+        {% if sucursal_actual %}
+            - <b>{{ sucursal_actual.nombre }}</b>
         {% endif %}
     </h1>
 
