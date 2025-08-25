@@ -374,7 +374,8 @@ TechCorp Ecuador:           Comercial Andina:           Distribuidora Nacional:
 | **Categorías - Eliminar**     |    ✅    |     ❌      |     ❌     |    ❌    |
 | **Productos - Crear/Editar**  |    ✅    |     ✅      |     ❌     |    ❌    |
 | **Productos - Eliminar**      |    ✅    |     ❌      |     ❌     |    ❌    |
-| **Productos - Lista/Buscar**  |    ✅    |     ✅      |     ✅     |    ✅    |
+| **Productos - Listar**        |    ✅    |     ✅      |     ❌     |    ✅    |
+| **Productos - Buscar**        |    ✅    |     ✅      |     ✅     |    ❌    |
 | **Iniciar Traslados**         |    ✅    |     ✅      |     ✅     |    ❌    |
 | **Confirmar Traslados**       |    ✅    |     ✅      |     ✅     |    ❌    |
 | **Movimientos Inventario**    |    ✅    |     ✅      |     ✅     |    ❌    |
