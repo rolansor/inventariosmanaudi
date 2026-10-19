@@ -31,10 +31,12 @@ inv_manaudi/
 
 ### productos/models.py
 - **Producto**: 
-  - Campos clave: codigo, nombre, precio, tipo_producto (unidad/juego)
-  - Estado: activo/inactivo
+  - Campos clave: codigo, codigo_auxiliar, codigo_ean (13 dígitos), modelo, nombre, descripcion, precio, tipo_producto (unidad/juego)
+  - clase: FK a `categorias.Clase` (SET_NULL); la clasificación es Categoría / Subcategoría / Clase
+  - Estado: activo/inactivo (no se eliminan productos, se desactivan)
   - Constraint único: codigo + empresa
-  - Manager personalizado para filtrar por empresa
+  - codigo, codigo_auxiliar, modelo, nombre y descripcion se guardan en mayúsculas
+  - Manager personalizado: `Producto.objects.para_empresa(empresa)`
 
 ### inventario/models.py
 - **Inventario**: 
@@ -44,17 +46,22 @@ inv_manaudi/
   
 - **MovimientoInventario**:
   - Tipos: entrada/salida
-  - Documentos: nota_venta, factura, orden_trabajo, etc.
-  - Auto-actualiza inventario al guardar
+  - Documentos: nota_venta, factura, orden_trabajo, nota_pedido, otros
+  - Auto-actualiza inventario al guardar (transacción + bloqueo de la fila de inventario)
+  - Lanza `ValueError('Stock insuficiente...')` si la salida supera el stock
   
 - **Traslado**:
   - Estados: pendiente/confirmado
-  - Crea automáticamente movimientos de entrada/salida
-  - Validaciones de stock y sucursales
+  - Al crear: genera el movimiento de salida en origen (misma transacción)
+  - `confirmar()`: genera el movimiento de entrada en destino con `cantidad_recibida` (puede diferir de la entregada)
+  - Documentos: guia_remision, guia_servientrega, orden_trabajo, otros
 
 ### categorias/models.py
-- **Categoria**: Por empresa, nombre en mayúsculas automático
-- **Subcategoria**: Relacionada a categoría, nombre en mayúsculas
+Jerarquía de tres niveles, todos con `codigo` de 3 caracteres alfanuméricos (único dentro de su padre)
+y `nombre`; ambos se guardan en mayúsculas.
+- **Categoria**: por empresa (unique codigo + empresa)
+- **Subcategoria**: pertenece a una categoría (unique codigo + categoria)
+- **Clase**: pertenece a una subcategoría (unique codigo + subcategoria); los productos apuntan a Clase
 
 ## 🔐 Sistema de Permisos
 
@@ -117,15 +124,18 @@ La matriz detallada está más abajo en "Matriz de Permisos por Rol".
 - **Docker**: servicio `db` (MySQL 8.0), expuesto en 127.0.0.1:3307. Volumen `db_data`.
 - **Producción**: PythonAnywhere (`sifcol$inv_manaudi`).
 - Dumps `.sql` en `docker/dumps/` se importan al crear el volumen por primera vez.
+- Para traer los datos reales: exportar desde PythonAnywhere y seguir `docker/dumps/README.md`
+  (revisar el nombre de la base dentro del dump y correr `migrate` después).
 
 ### Configuración Regional
 - **LANGUAGE_CODE**: 'es-ec'
 - **TIME_ZONE**: 'America/Guayaquil'
 
 ### Archivos Estáticos y Media
-- STATIC_URL: '/static/'
-- MEDIA_URL: '/media/'
-- Archivos de soporte se guardan en 'documento_soporte/'
+- STATIC_URL: '/static/', STATICFILES_DIRS: `inv_manaudi/static/`, STATIC_ROOT: `inv_manaudi/staticfiles/` (para `collectstatic`, ignorado en git)
+- MEDIA_URL: '/media/', MEDIA_ROOT: `inv_manaudi/media/` (en Docker es el volumen `media_data`)
+- Los documentos de soporte adjuntos se guardan en `media/documento_soporte/` (máximo 5 MB)
+- No copiar los estáticos del admin de Django dentro de `static/`: pisan los de la versión instalada
 
 ## 🔄 Flujo de Trabajo Principal
 
@@ -135,9 +145,9 @@ La matriz detallada está más abajo en "Matriz de Permisos por Rol".
 3. Valida stock disponible para salidas
 
 ### Traslados entre Sucursales
-1. Supervisor inicia traslado (crea movimiento de salida)
+1. Un usuario del grupo Encargado (o superior) inicia el traslado (crea movimiento de salida en origen)
 2. Traslado queda en estado "pendiente"
-3. Encargado destino confirma recepción (crea movimiento de entrada)
+3. El encargado de la sucursal destino, o un usuario sin sucursal (Manaudi/superusuario), confirma la recepción indicando la cantidad recibida (crea movimiento de entrada en destino)
 4. Estado cambia a "confirmado"
 
 ### Multi-Empresa
@@ -228,7 +238,7 @@ docker compose exec -T db mysql -uroot -pf4d3s2a1 inv_manaudi < docker/dumps/bac
 ## 👥 Usuarios del Sistema
 
 ### Comando populate_data
-El comando `python manage.py populate_data` crea automáticamente usuarios de prueba con la siguiente estructura:
+El comando `docker compose exec web python manage.py populate_data` crea automáticamente usuarios de prueba con la siguiente estructura:
 
 **NOTA**: Todas las contraseñas son: **1234**
 
@@ -239,7 +249,7 @@ El comando `python manage.py populate_data` crea automáticamente usuarios de pr
 |-------------------------|---------------------|---------------|--------------------|-------------------------|-----------------------------------------|
 | **admin**               | Super Admin         | Superusuario  | -                  | admin@sistema.com       | Todos                                   |
 | **techcorp_manaudi**    | Manaudi TechCorp    | Manaudi       | -                  | manaudi@techcorp.com    | Manaudi, Supervisor, Encargado, Auditor |
-| **techcorp_supervisor** | Supervisor TechCorp | Supervisor    | Matriz Quito       | supervisor@techcorp.com | Supervisor, Encargado                   |
+| **techcorp_supervisor** | Supervisor TechCorp | Supervisor    | Matriz Quito       | supervisor@techcorp.com | Supervisor, Encargado, Auditor          |
 | **techcorp_encargado**  | Encargado TechCorp  | Encargado     | Sucursal Guayaquil | encargado@techcorp.com  | Encargado                               |
 | **techcorp_auditor**    | Auditor TechCorp    | Auditor       | -                  | auditor@techcorp.com    | Auditor                                 |
 
@@ -247,7 +257,7 @@ El comando `python manage.py populate_data` crea automáticamente usuarios de pr
 | Usuario                 | Nombre               | Rol           | Sucursal          | Email                   | Grupos                                  |
 |-------------------------|----------------------|---------------|-------------------|-------------------------|-----------------------------------------|
 | **comercia_manaudi**    | Manaudi Comercial    | Manaudi       | -                 | manaudi@comercia.com    | Manaudi, Supervisor, Encargado, Auditor |
-| **comercia_supervisor** | Supervisor Comercial | Supervisor    | Bodega Principal  | supervisor@comercia.com | Supervisor, Encargado                   |
+| **comercia_supervisor** | Supervisor Comercial | Supervisor    | Bodega Principal  | supervisor@comercia.com | Supervisor, Encargado, Auditor          |
 | **comercia_encargado**  | Encargado Comercial  | Encargado     | Punto Venta Norte | encargado@comercia.com  | Encargado                               |
 | **comercia_auditor**    | Auditor Comercial    | Auditor       | -                 | auditor@comercia.com    | Auditor                                 |
 
@@ -255,7 +265,7 @@ El comando `python manage.py populate_data` crea automáticamente usuarios de pr
 | Usuario                 | Nombre                   | Rol           | Sucursal            | Email                   | Grupos                                  |
 |-------------------------|--------------------------|---------------|---------------------|-------------------------|-----------------------------------------|
 | **distribu_manaudi**    | Manaudi Distribuidora    | Manaudi       | -                   | manaudi@distribu.com    | Manaudi, Supervisor, Encargado, Auditor |
-| **distribu_supervisor** | Supervisor Distribuidora | Supervisor    | Centro Distribución | supervisor@distribu.com | Supervisor, Encargado                   |
+| **distribu_supervisor** | Supervisor Distribuidora | Supervisor    | Centro Distribución | supervisor@distribu.com | Supervisor, Encargado, Auditor          |
 | **distribu_encargado**  | Encargado Distribuidora  | Encargado     | Tienda Cuenca       | encargado@distribu.com  | Encargado                               |
 | **distribu_auditor**    | Auditor Distribuidora    | Auditor       | -                   | auditor@distribu.com    | Auditor                                 |
 
@@ -288,14 +298,15 @@ El comando también crea:
 ### Comandos de Gestión
 ```bash
 # Crear datos de prueba completos
-python manage.py populate_data
+docker compose exec web python manage.py populate_data
 
-# Limpiar y recrear todos los datos
-python manage.py populate_data --clear
+# Limpiar y recrear todos los datos (conserva los superusuarios y les pone contraseña 1234)
+docker compose exec web python manage.py populate_data --clear
 
 # Crear solo 1 empresa (en lugar de las 3 por defecto)
-python manage.py populate_data --empresas 1
+docker compose exec web python manage.py populate_data --empresas 1
 ```
+Nota: `--clear` borra y recrea los registros, por lo que los IDs cambian y las sesiones abiertas de usuarios no superusuarios quedan inválidas.
 
 ## 🏢 Estructura Organizacional y Permisos
 
@@ -356,17 +367,23 @@ TechCorp Ecuador:           Comercial Andina:           Distribuidora Nacional:
 |-------------------------------|:-------:|:----------:|:---------:|:-------:|
 | **Gestión de Empresas**       |    ✅    |     ❌      |     ❌     |    ❌    |
 | **Gestión de Sucursales**     |    ✅    |     ❌      |     ❌     |    ❌    |
-| **Gestión de Usuarios**       |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Gestión de Usuarios** (solo admin de Django, superusuario) | ❌ | ❌ | ❌ | ❌ |
 | **Categorías - Crear/Editar** |    ✅    |     ✅      |     ❌     |    ❌    |
 | **Categorías - Eliminar**     |    ✅    |     ❌      |     ❌     |    ❌    |
 | **Productos - Crear/Editar**  |    ✅    |     ✅      |     ❌     |    ❌    |
-| **Productos - Eliminar**      |    ✅    |     ❌      |     ❌     |    ❌    |
+| **Productos - Activar/Desactivar** | ✅  |     ❌      |     ❌     |    ❌    |
 | **Productos - Listar**        |    ✅    |     ✅      |     ❌     |    ✅    |
 | **Productos - Buscar**        |    ✅    |     ✅      |     ✅     |    ❌    |
 | **Iniciar Traslados**         |    ✅    |     ✅      |     ✅     |    ❌    |
 | **Confirmar Traslados**       |    ✅    |     ✅      |     ✅     |    ❌    |
 | **Movimientos Inventario**    |    ✅    |     ✅      |     ✅     |    ❌    |
+| **Movimientos por Empresa/Sucursal** | ✅ |   ✅      |     ❌     |    ❌    |
 | **Reportes**                  |    ✅    |     ✅      |     ❌     |    ✅    |
+| **Carga Masiva de Productos** |    ✅    |     ❌      |     ❌     |    ❌    |
+
+La matriz refleja los grupos que asigna `populate_data` (Manaudi tiene los 4 grupos; Supervisor tiene
+Supervisor + Encargado + Auditor). En el código cada vista exige un único grupo, así que un usuario creado
+a mano con un solo grupo tendrá menos permisos que los de la tabla.
 
 ### Flujo de Trabajo Multi-Empresa
 
@@ -467,14 +484,14 @@ TechCorp Ecuador:           Comercial Andina:           Distribuidora Nacional:
 
 1. **Aislamiento por Empresa**: Cada usuario solo ve datos de su empresa asignada
 2. **Traslados**: Solo entre sucursales de la misma empresa
-3. **Jerarquía de Permisos**: Un rol superior tiene todos los permisos de los roles inferiores
+3. **Jerarquía de Permisos**: no existe herencia en el código; se logra asignando varios grupos al usuario (como hace `populate_data`)
 4. **Stock Mínimo**: Alertas automáticas cuando el inventario está por debajo del mínimo
 5. **Documentación**: Todos los movimientos requieren documento de respaldo
 
 ## 📌 TODOs y Mejoras Sugeridas
 
 1. **Seguridad**: definir SECRET_KEY, DEBUG=0 y credenciales por entorno en producción
-2. **Producción**: verificar la versión de Python de PythonAnywhere (Django 4.2 requiere 3.8+)
+2. **Producción**: desplegar Django 4.2 en PythonAnywhere (requiere Python 3.8+) e importar el dump real en Docker para desarrollo
 3. **Tests**: Agregar pruebas unitarias y de integración
 4. **API REST**: Considerar agregar Django REST Framework
 5. **Documentación**: Agregar docstrings en vistas y modelos
