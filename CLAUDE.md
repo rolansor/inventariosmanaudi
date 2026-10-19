@@ -3,7 +3,7 @@
 ## 🏗️ Arquitectura del Proyecto
 
 ### Stack Tecnológico
-- **Framework**: Django 3.2.25
+- **Framework**: Django 4.2.30 (LTS)
 - **Base de Datos**: MySQL 8 (PyMySQL)
 - **Frontend**: Templates Django con Bootstrap 5 (tema Color Admin), DataTables, Select2
 - **Autenticación**: Sistema customizado con modelo Usuario personalizado

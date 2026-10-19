@@ -20,6 +20,11 @@ ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
     'DJANGO_ALLOWED_HOSTS', 'sifcol.pythonanywhere.com,localhost,127.0.0.1'
 ).split(',') if h.strip()]
 
+# Django 4+ exige el esquema en los orígenes de confianza para CSRF (https://...)
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get(
+    'DJANGO_CSRF_TRUSTED_ORIGINS', 'https://sifcol.pythonanywhere.com'
+).split(',') if o.strip()]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -115,8 +120,6 @@ LANGUAGE_CODE = 'es-ec'
 TIME_ZONE = 'America/Guayaquil'
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
