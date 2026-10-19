@@ -7,6 +7,7 @@ from django.db.models import F, Sum
 from productos.models import Producto
 from .forms import EmpresaForm, SucursalForm
 from .templatetags.tags import control_acceso
+from .utils import es_ajax
 from inventario.models import MovimientoInventario, Inventario
 from .models import Empresa, Sucursal
 
@@ -84,7 +85,7 @@ def empresa_list(request):
         form = EmpresaForm(request.POST)
         if form.is_valid():
             empresa = form.save()
-            if request.is_ajax():
+            if es_ajax(request):
                 data = {
                     'id': empresa.pk,
                     'nombre': empresa.nombre,
@@ -112,7 +113,7 @@ def empresa_edit(request, pk):
         form = EmpresaForm(request.POST, instance=empresa)
         if form.is_valid():
             empresa = form.save()
-            if request.is_ajax():
+            if es_ajax(request):
                 # Devolver solo los datos de la empresa como JSON
                 data = {
                     'id': empresa.pk,
@@ -122,19 +123,20 @@ def empresa_edit(request, pk):
                     'email': empresa.email
                 }
                 return JsonResponse(data)
-        else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
-    else:
-        if request.is_ajax():
-            # Devolver los datos para precargar el formulario
-            data = {
-                'nombre': empresa.nombre,
-                'direccion': empresa.direccion,
-                'telefono': empresa.telefono,
-                'email': empresa.email
-            }
-            return JsonResponse(data)
+            return redirect('empresa_list')
+        return JsonResponse({'error': 'Formulario no válido', 'errors': form.errors}, status=400)
+
+    if es_ajax(request):
+        # Devolver los datos para precargar el formulario
+        data = {
+            'nombre': empresa.nombre,
+            'direccion': empresa.direccion,
+            'telefono': empresa.telefono,
+            'email': empresa.email
+        }
+        return JsonResponse(data)
+    # Acceso directo por navegador (no AJAX): volver al listado
+    return redirect('empresa_list')
 
 
 @control_acceso('Manaudi')
@@ -158,7 +160,7 @@ def sucursal_list(request, pk):
             sucursal.empresa = empresa  # Asignar la empresa antes de guardar
             sucursal.save()
 
-            if request.is_ajax():
+            if es_ajax(request):
                 # Si es una solicitud Ajax, devolvemos los datos de la nueva sucursal
                 data = {
                     'id': sucursal.id,
@@ -188,7 +190,7 @@ def sucursal_edit(request, pk):
         form = SucursalForm(request.POST, instance=sucursal)
         if form.is_valid():
             sucursal = form.save()
-            if request.is_ajax():
+            if es_ajax(request):
                 data = {
                     'id': sucursal.pk,
                     'nombre': sucursal.nombre,
@@ -198,28 +200,32 @@ def sucursal_edit(request, pk):
                     'empresa_id': sucursal.empresa_id
                 }
                 return JsonResponse(data)
-        else:
-            print(form.errors)
-            return JsonResponse({'error': 'Formulario no válido'}, status=400)
-    else:
-        if request.is_ajax():
-            data = {
-                'nombre': sucursal.nombre,
-                'abreviatura': sucursal.abreviatura,
-                'direccion': sucursal.direccion,
-                'telefono': sucursal.telefono,
-                'empresa_id': sucursal.empresa_id
-            }
-            return JsonResponse(data)
+            return redirect('sucursal_list', pk=sucursal.empresa_id)
+        return JsonResponse({'error': 'Formulario no válido', 'errors': form.errors}, status=400)
+
+    if es_ajax(request):
+        data = {
+            'nombre': sucursal.nombre,
+            'abreviatura': sucursal.abreviatura,
+            'direccion': sucursal.direccion,
+            'telefono': sucursal.telefono,
+            'empresa_id': sucursal.empresa_id
+        }
+        return JsonResponse(data)
+    # Acceso directo por navegador (no AJAX): volver al listado de la empresa
+    return redirect('sucursal_list', pk=sucursal.empresa_id)
 
 
 @control_acceso('Manaudi')
 def sucursal_delete(request, pk):
     sucursal = get_object_or_404(Sucursal, pk=pk)
     if request.method == 'POST':
+        empresa_id = sucursal.empresa_id
         sucursal.delete()
-        return JsonResponse({'success': True})
-    return redirect('sucursal_list')
+        if es_ajax(request):
+            return JsonResponse({'success': True})
+        return redirect('sucursal_list', pk=empresa_id)
+    return redirect('sucursal_list', pk=sucursal.empresa_id)
 
 
 def obtener_empresa(request: HttpRequest):

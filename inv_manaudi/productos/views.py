@@ -265,12 +265,12 @@ def desactivar_producto(request, pk):
     # Obtener la empresa del usuario logueado
     empresa_actual = obtener_empresa(request)
     producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
-    if request.method == 'GET':
+    # Solo por POST (con CSRF): un cambio de estado no debe dispararse con un simple enlace
+    if request.method == 'POST':
         producto.estado = 'inactivo'  # Cambiar el estado del producto
         producto.save()
         messages.success(request, f'Producto {producto.codigo} desactivado con éxito.')
-        return redirect('busqueda_producto')
-    return redirect('busqueda_producto')
+    return _volver_a_busqueda(request)
 
 
 @control_acceso('Manaudi')
@@ -278,16 +278,18 @@ def activar_producto(request, pk):
     # Obtener la empresa del usuario logueado
     empresa_actual = obtener_empresa(request)
     producto = get_object_or_404(Producto.objects.para_empresa(empresa_actual), pk=pk)
-    if request.method == 'GET':
+    if request.method == 'POST':
         producto.estado = 'activo'  # Cambiar el estado del producto
         producto.save()
         messages.success(request, f'Producto {producto.codigo} activado con éxito.')
-        
-        # Obtener la URL de referencia para volver a la misma página
-        referer = request.META.get('HTTP_REFERER')
-        if referer and 'busqueda_producto' in referer:
-            return redirect(referer)
-        return redirect('busqueda_producto')
+    return _volver_a_busqueda(request)
+
+
+def _volver_a_busqueda(request):
+    """Vuelve a la página de búsqueda conservando los filtros si se venía de ella."""
+    referer = request.META.get('HTTP_REFERER')
+    if referer and 'productos/busqueda' in referer:
+        return redirect(referer)
     return redirect('busqueda_producto')
 
 

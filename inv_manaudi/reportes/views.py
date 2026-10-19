@@ -1,6 +1,5 @@
 from django.db.models import Sum, F, Count, DecimalField, ExpressionWrapper
-from django.utils.timezone import now
-from datetime import timedelta
+from django.utils.timezone import now, localtime
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponse
@@ -23,8 +22,9 @@ def reporte_movimientos_dia(request):
     # Obtener empresa del usuario
     empresa_actual = obtener_empresa(request)
     
-    # Obtener la fecha de hoy
-    fecha = now() - timedelta(days=0)
+    # Fecha de hoy en la zona horaria del sistema (America/Guayaquil), no en UTC,
+    # para que el "día" coincida con el día real de operación.
+    fecha = localtime(now())
     inicio_dia = fecha.replace(hour=0, minute=0, second=0, microsecond=0)
     fin_dia = fecha.replace(hour=23, minute=59, second=59, microsecond=999999)
 
@@ -388,6 +388,23 @@ def descargar_plantilla_productos(request):
     return response
 
 
+def _generar_codigo(nombre, codigos_usados):
+    """
+    Genera un código de 3 caracteres alfanuméricos (A-Z, 0-9) a partir del nombre,
+    evitando los códigos ya usados. Ej: 'ELECTRÓNICA' -> 'ELE'; si existe, 'EL1', 'EL2'...
+    """
+    usados = set(codigos_usados)
+    base = ''.join(c for c in nombre.upper() if c.isascii() and c.isalnum())[:3].ljust(3, 'X')
+    if base not in usados:
+        return base
+    for i in range(1, 1000):
+        sufijo = str(i)
+        candidato = base[:3 - len(sufijo)] + sufijo
+        if candidato not in usados:
+            return candidato
+    raise ValueError(f'No hay códigos disponibles para "{nombre}"')
+
+
 @control_acceso('Manaudi')
 def carga_masiva_productos(request):
     """
@@ -437,23 +454,38 @@ def carga_masiva_productos(request):
                     continue
                 
                 try:
-                    # Obtener o crear categoría
-                    categoria, _ = Categoria.objects.get_or_create(
-                        nombre=str(data['categoria']).upper(),
-                        empresa=empresa_actual
-                    )
+                    # Obtener o crear categoría (el código es obligatorio y único por empresa)
+                    nombre_categoria = str(data['categoria']).upper().strip()
+                    categoria = Categoria.objects.filter(nombre=nombre_categoria, empresa=empresa_actual).first()
+                    if categoria is None:
+                        usados = Categoria.objects.filter(empresa=empresa_actual).values_list('codigo', flat=True)
+                        categoria = Categoria.objects.create(
+                            codigo=_generar_codigo(nombre_categoria, usados),
+                            nombre=nombre_categoria,
+                            empresa=empresa_actual
+                        )
                     
                     # Obtener o crear subcategoría
-                    subcategoria, _ = Subcategoria.objects.get_or_create(
-                        nombre=str(data['subcategoria']).upper(),
-                        categoria=categoria
-                    )
+                    nombre_subcategoria = str(data['subcategoria']).upper().strip()
+                    subcategoria = Subcategoria.objects.filter(nombre=nombre_subcategoria, categoria=categoria).first()
+                    if subcategoria is None:
+                        usados = Subcategoria.objects.filter(categoria=categoria).values_list('codigo', flat=True)
+                        subcategoria = Subcategoria.objects.create(
+                            codigo=_generar_codigo(nombre_subcategoria, usados),
+                            nombre=nombre_subcategoria,
+                            categoria=categoria
+                        )
                     
                     # Obtener o crear clase
-                    clase, _ = Clase.objects.get_or_create(
-                        nombre=str(data['clase']).upper(),
-                        subcategoria=subcategoria
-                    )
+                    nombre_clase = str(data['clase']).upper().strip()
+                    clase = Clase.objects.filter(nombre=nombre_clase, subcategoria=subcategoria).first()
+                    if clase is None:
+                        usados = Clase.objects.filter(subcategoria=subcategoria).values_list('codigo', flat=True)
+                        clase = Clase.objects.create(
+                            codigo=_generar_codigo(nombre_clase, usados),
+                            nombre=nombre_clase,
+                            subcategoria=subcategoria
+                        )
                     
                     # Preparar datos del producto
                     producto_data = {

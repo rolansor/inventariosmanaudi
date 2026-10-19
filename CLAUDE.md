@@ -4,9 +4,10 @@
 
 ### Stack Tecnológico
 - **Framework**: Django 3.2.25
-- **Base de Datos**: MySQL (PyMySQL)
-- **Frontend**: Templates Django con Bootstrap 5
+- **Base de Datos**: MySQL 8 (PyMySQL)
+- **Frontend**: Templates Django con Bootstrap 5 (tema Color Admin), DataTables, Select2
 - **Autenticación**: Sistema customizado con modelo Usuario personalizado
+- **Entorno de ejecución**: Docker (`docker compose up -d`). No se usa entorno virtual local.
 
 ## 📁 Estructura del Proyecto
 
@@ -16,7 +17,6 @@ inv_manaudi/
 ├── inventario/      # Control de inventarios y movimientos
 ├── productos/       # Administración de productos
 ├── categorias/      # Categorías y subcategorías
-├── auxiliares/      # Funciones auxiliares
 ├── reportes/        # Generación de reportes
 └── templates/       # Templates base
 ```
@@ -62,82 +62,61 @@ inv_manaudi/
 - Verifica permisos basados en grupo del usuario
 - Ubicado en: usuarios/templatetags/tags.py
 
-### Roles y Permisos Detallados
+### Grupos (django.contrib.auth.Group)
+Los permisos se resuelven por pertenencia a grupo. Un usuario con varios grupos acumula permisos;
+`populate_data` asigna a Manaudi todos los grupos y a Supervisor los grupos Supervisor + Encargado + Auditor.
 
-#### 1. **Administrador** (Control total del sistema)
-**Permisos:**
-- Gestión completa de empresas (crear, listar)
-- Gestión completa de sucursales (crear, listar)
-- Gestión completa de usuarios (crear, editar, listar)
-- Eliminar categorías y subcategorías
-- Eliminar y desactivar productos
-- Acceso a todas las funciones de otros roles
+- **Manaudi**: administración (empresas, sucursales, eliminar categorías/subcategorías/clases, activar/desactivar productos, carga masiva).
+- **Supervisor**: categorías/subcategorías/clases (crear, editar, listar), productos (crear, editar), movimientos por empresa y sucursal.
+- **Encargado**: movimientos de inventario, traslados (iniciar, pendientes, confirmar), búsqueda de productos, movimientos por producto.
+- **Auditor**: solo lectura: lista de productos, reportes.
 
-#### 2. **Supervisor** (Gestión operativa y reportes)
-**Permisos:**
-- Crear y listar categorías
-- Crear y listar subcategorías
-- Gestión completa de productos (crear, editar, listar, buscar)
-- Iniciar traslados entre sucursales
-- Ver traslados pendientes
-- Generar reportes diarios
-- Ver movimientos por empresa
-- Acceso a inventarios
+Reglas de `control_acceso`: usuario anónimo → redirige al login con `?next=`; usuario sin el grupo → `acceso_denegado.html` con HTTP 403.
 
-#### 3. **Encargado** (Operaciones diarias de inventario)
-**Permisos:**
-- Registrar movimientos de inventario (entradas/salidas)
-- Confirmar traslados recibidos
-- Ver movimientos por producto
-- Ver movimientos por sucursal
-- Operaciones básicas de inventario
+Confirmación de traslados: un usuario **con** sucursal solo confirma traslados destinados a su sucursal;
+un usuario **sin** sucursal (Manaudi, superusuario) puede confirmar cualquier traslado de su empresa.
 
-#### 4. **Manaudi** (Rol especial con acceso limitado)
-**Permisos:**
-- Consulta de IDs en módulo auxiliares
-- Posiblemente rol de auditoría o consulta
-
-**Jerarquía de permisos**: Administrador > Supervisor > Encargado > Manaudi
+La matriz detallada está más abajo en "Matriz de Permisos por Rol".
 
 ## 🌐 URLs y Endpoints Principales
 
 ### /usuarios/
-- login/, logout/, registro/
-- empresas/, sucursales/
-- editar/
+- login/, logout/
+- empresas/, empresas/editar/<pk>/, empresas/eliminar/<pk>/ (AJAX)
+- empresas/<pk>/sucursales, sucursales/editar/<pk>/, sucursales/eliminar/<pk>/ (AJAX)
+- cambiar-empresa/<id>/ (solo superusuario: cambia la empresa activa en sesión)
 
 ### /inventario/
 - movimiento_inventario/
-- traslado/iniciar/
-- traslados_pendientes/
+- traslado/iniciar/, traslados_pendientes/, traslado/confirmar/<pk>/
 - producto_movimientos/, empresa_movimientos/, sucursal_movimientos/
 
 ### /productos/
-- nuevo/, lista_productos/
-- busqueda/, editar/<id>/, eliminar/<id>/
-- bsq_por_codigo/
+- nuevo/, lista_productos/ (DataTables server-side), busqueda/, editar/<pk>/
+- desactivar/<pk>/, activar/<pk>/ (solo POST)
+- bsq_por_codigo/, obtener_modelos/ (JSON)
 
 ### /categorias/
-- nueva_categoria/, lista_categorias/
-- <id>/nueva_subcategoria/, <id>/lista_subcategorias/
+- nueva_categoria/ (POST), lista_categorias/, editar/<pk>/, eliminar/<pk>/
+- <pk>/nueva_subcategoria/ (POST), <pk>/lista_subcategorias/, subcategorias/editar/<pk>/, subcategorias/eliminar/<pk>/
+- subcategorias/<pk>/nueva_clase/ (POST), subcategorias/<pk>/lista_clases/, clases/editar/<pk>/, clases/eliminar/<pk>/
+- Todas las vistas filtran por la empresa activa (`obtener_empresa`); un ID de otra empresa devuelve 404.
 
 ### /reportes/
-- reporte_diario/
-
-### /auxiliares/
-- consulta_id/
+- reporte_diario/, inventario_valorizado/
+- carga_masiva/, descargar_plantilla/ (Excel; crea categorías/subcategorías/clases nuevas generando códigos de 3 caracteres)
 
 ## ⚙️ Configuración Importante (settings.py)
 
-### Base de Datos
-- **Local**: MySQL en localhost, DB: inv_manaudi
-- **Producción** (comentado): PythonAnywhere
-- **Credenciales**: root/f4d3s2a1 (⚠️ CAMBIAR EN PRODUCCIÓN)
+### Variables de entorno (ver `.env.example`)
+`settings.py` lee `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS`,
+`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`. Sin variables usa los valores locales originales
+(root/f4d3s2a1 en localhost:3306, DEBUG=True). ⚠️ En producción definir todas en el entorno.
 
-### Seguridad
-- **SECRET_KEY**: Expuesta (⚠️ CAMBIAR EN PRODUCCIÓN)
-- **DEBUG**: True (⚠️ Desactivar en producción)
-- **ALLOWED_HOSTS**: ['sifcol.pythonanywhere.com', 'localhost']
+### Base de Datos
+- **Docker**: servicio `db` (MySQL 8.0), expuesto en 127.0.0.1:3307. Volumen `db_data`.
+- **Producción**: PythonAnywhere (`sifcol$inv_manaudi`).
+- Dumps `.sql` en `docker/dumps/` se importan al crear el volumen por primera vez.
 
 ### Configuración Regional
 - **LANGUAGE_CODE**: 'es-ec'
@@ -185,15 +164,13 @@ inv_manaudi/
 ## 🚨 Puntos de Atención
 
 ### Seguridad
-- SECRET_KEY expuesta en settings.py
-- DEBUG=True en producción
-- Credenciales de BD hardcodeadas
+- Los valores por defecto de SECRET_KEY, DEBUG y credenciales de BD en settings.py son de desarrollo;
+  en producción deben definirse por variables de entorno.
 
-### Migraciones Pendientes
-- Carpetas de migraciones creadas pero posiblemente sin aplicar:
-  - inventario/migrations/
-  - productos/migrations/
-  - usuarios/migrations/
+### Migraciones
+- Las migraciones se borraron del repo en agosto de 2025 y se regeneraron el 18/10/2026
+  con los mismos nombres (`0001_initial`, `0002_initial`, `0003_initial`, `0002_traslado_producto`).
+- El contenedor `web` ejecuta `migrate` al arrancar (desactivable con `RUN_MIGRATIONS=0`).
 
 ### Validaciones Críticas
 - Stock insuficiente en salidas
@@ -203,9 +180,12 @@ inv_manaudi/
 ## 📝 Notas de Desarrollo
 
 ### Helpers Importantes
-- `obtener_empresa(request)`: Obtiene empresa del usuario logueado
-- `control_acceso`: Decorador para verificar permisos
-- Managers personalizados en Producto para filtrar por empresa
+- `obtener_empresa(request)` (usuarios/views.py): empresa del usuario; para superusuario, la elegida en sesión
+- `control_acceso` (usuarios/templatetags/tags.py): decorador de permisos por grupo
+- `es_ajax(request)` (usuarios/utils.py): reemplazo de `request.is_ajax()` (eliminado en Django 4)
+- `Producto.objects.para_empresa(empresa)`: manager para filtrar por empresa
+- Integridad de stock: `MovimientoInventario.save()` y `Traslado.save()/confirmar()` corren en
+  `transaction.atomic()` con `select_for_update()` sobre la fila de inventario
 
 ### Plantillas Base
 - base.html: Template principal con Bootstrap 5
@@ -217,23 +197,30 @@ inv_manaudi/
 - jQuery + DataTables
 - Plugins: Select2, Bootstrap Datepicker, PDFMake
 
-## 🔧 Comandos Útiles
+## 🔧 Comandos Útiles (Docker)
 
 ```bash
-# Migraciones
-python manage.py makemigrations
-python manage.py migrate
+# Levantar todo (web: http://127.0.0.1:8012, MySQL: 127.0.0.1:3307)
+docker compose up -d
+docker compose logs -f web
 
-# Servidor de desarrollo
-python manage.py runserver
+# Reconstruir la imagen tras cambiar requirements.txt
+docker compose build && docker compose up -d
 
-# Crear superusuario
-python manage.py createsuperuser
+# Comandos de Django (siempre dentro del contenedor)
+docker compose exec web python manage.py makemigrations
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py check
 
 # Poblar base de datos con datos de prueba
-python manage.py populate_data                  # Crea datos de prueba
-python manage.py populate_data --clear          # Limpia y recrea todos los datos
-python manage.py populate_data --empresas 2     # Crea solo 2 empresas
+docker compose exec web python manage.py populate_data                  # Crea datos de prueba
+docker compose exec web python manage.py populate_data --clear          # Limpia y recrea todos los datos
+docker compose exec web python manage.py populate_data --empresas 2     # Crea solo 2 empresas
+
+# Exportar / importar la base del contenedor
+docker compose exec db mysqldump -uroot -pf4d3s2a1 inv_manaudi > docker/dumps/backup.sql
+docker compose exec -T db mysql -uroot -pf4d3s2a1 inv_manaudi < docker/dumps/backup.sql
 ```
 
 
@@ -486,8 +473,8 @@ TechCorp Ecuador:           Comercial Andina:           Distribuidora Nacional:
 
 ## 📌 TODOs y Mejoras Sugeridas
 
-1. **Seguridad**: Cambiar SECRET_KEY y desactivar DEBUG en producción
-2. **Variables de Entorno**: Mover credenciales a archivo .env
+1. **Seguridad**: definir SECRET_KEY, DEBUG=0 y credenciales por entorno en producción
+2. **Producción**: verificar la versión de Python de PythonAnywhere (Django 4.2 requiere 3.8+)
 3. **Tests**: Agregar pruebas unitarias y de integración
 4. **API REST**: Considerar agregar Django REST Framework
 5. **Documentación**: Agregar docstrings en vistas y modelos

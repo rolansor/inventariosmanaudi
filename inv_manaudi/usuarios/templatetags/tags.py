@@ -1,7 +1,7 @@
 from functools import wraps
 
 from django import template
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import render
 
 register = template.Library()
@@ -13,14 +13,17 @@ def pertenece_grupo(user, group_name):
 
 
 def control_acceso(grupo_requerido):
+    """
+    Permite el acceso solo a usuarios autenticados que pertenezcan al grupo indicado.
+    Los usuarios anónimos se envían al login (con ?next=), igual que @login_required.
+    """
     def decorador(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            # Asume que el perfil tiene un campo 'rol' o similar para verificar el rol
+            if not request.user.is_authenticated:
+                return redirect_to_login(request.get_full_path())
             if request.user.groups.filter(name=grupo_requerido).exists():
                 return view_func(request, *args, **kwargs)
-            else:
-                # Si no tiene el rol adecuado, redirigir a la plantilla de acceso denegado
-                return render(request, 'acceso_denegado.html')
+            return render(request, 'acceso_denegado.html', status=403)
         return _wrapped_view
     return decorador

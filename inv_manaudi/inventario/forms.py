@@ -3,6 +3,15 @@ from productos.models import Producto
 from usuarios.models import Sucursal
 from .models import MovimientoInventario, Traslado
 
+TAMANO_MAXIMO_DOCUMENTO = 5 * 1024 * 1024  # 5 MB
+
+
+def validar_tamano_documento(documento):
+    """Valida el tamaño máximo del documento de soporte adjunto."""
+    if documento and documento.size > TAMANO_MAXIMO_DOCUMENTO:
+        raise forms.ValidationError("El documento de soporte no puede exceder 5 MB.")
+    return documento
+
 
 class MovimientoInventarioForm(forms.ModelForm):
     class Meta:
@@ -41,15 +50,12 @@ class MovimientoInventarioForm(forms.ModelForm):
 
     def clean_cantidad(self):
         cantidad = self.cleaned_data.get('cantidad')
-        if cantidad <= 0:
+        if cantidad is None or cantidad <= 0:
             raise forms.ValidationError("La cantidad debe ser un número positivo.")
         return cantidad
 
-    def clean_documento_traslado(self):
-        documento_soporte = self.cleaned_data.get('documento_soporte')
-        if documento_soporte and documento_soporte.size > 5 * 1024 * 1024:  # Limitar a 5MB
-            raise forms.ValidationError("El documento de traslado no puede exceder 5 MB.")
-        return documento_soporte
+    def clean_documento_soporte(self):
+        return validar_tamano_documento(self.cleaned_data.get('documento_soporte'))
 
     # Validación del campo tipo_documento
     def clean_tipo_documento(self):
@@ -86,15 +92,18 @@ class TrasladoForm(forms.ModelForm):
         sucursal_destino = cleaned_data.get('sucursal_destino')
         cantidad_entregada = cleaned_data.get('cantidad_entregada')
 
-        if sucursal_origen == sucursal_destino:
+        if sucursal_origen is not None and sucursal_origen == sucursal_destino:
             raise forms.ValidationError("La sucursal de origen y destino no pueden ser la misma.")
 
-        if cantidad_entregada <= 0:
+        if cantidad_entregada is not None and cantidad_entregada <= 0:
             raise forms.ValidationError("La cantidad entregada debe ser un número positivo.")
 
         return cleaned_data
 
-        # Validación del campo tipo_documento
+    def clean_documento_soporte(self):
+        return validar_tamano_documento(self.cleaned_data.get('documento_soporte'))
+
+    # Validación del campo tipo_documento
     def clean_tipo_documento(self):
         tipo_documento = self.cleaned_data.get('tipo_documento')
         if not tipo_documento:
@@ -120,7 +129,7 @@ class ConfirmarRecepcionForm(forms.ModelForm):
     def clean_cantidad_recibida(self):
         cantidad_recibida = self.cleaned_data.get('cantidad_recibida')
 
-        if cantidad_recibida <= 0:
+        if cantidad_recibida is None or cantidad_recibida <= 0:
             raise forms.ValidationError("La cantidad recibida debe ser un número mayor a 0.")
 
         # No se valida si es mayor que la cantidad entregada, como se acordó

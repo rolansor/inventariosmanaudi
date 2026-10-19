@@ -28,12 +28,12 @@ class ProductoForm(forms.ModelForm):
         widgets = {
             'codigo': forms.TextInput(attrs={
                 'class': 'form-control',
-                'pattern': '[A-Za-z0-9\-]+',
+                'pattern': r'[A-Za-z0-9\-]+',
                 'title': 'Solo letras, números y guiones'
             }),
             'codigo_auxiliar': forms.TextInput(attrs={
                 'class': 'form-control',
-                'pattern': '[A-Za-z0-9\-]*',
+                'pattern': r'[A-Za-z0-9\-]*',
                 'title': 'Solo letras, números y guiones'
             }),
             'codigo_ean': forms.TextInput(attrs={

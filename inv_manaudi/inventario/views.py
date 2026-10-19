@@ -82,28 +82,48 @@ def iniciar_traslado(request):
     })
 
 
+def _sucursal_del_usuario(request):
+    """Sucursal asignada al usuario, o None si no tiene perfil o no tiene sucursal."""
+    perfil = getattr(request.user, 'perfil', None)
+    return perfil.sucursal if perfil else None
+
+
+def _puede_confirmar(sucursal_usuario, traslado):
+    """
+    Un usuario con sucursal asignada solo confirma traslados destinados a su sucursal.
+    Un usuario sin sucursal (Manaudi, supervisores generales, superusuario) puede
+    confirmar cualquier traslado de su empresa.
+    """
+    return sucursal_usuario is None or traslado.sucursal_destino_id == sucursal_usuario.id
+
+
 @control_acceso('Encargado')
 def traslados_pendientes(request):
     empresa_actual = obtener_empresa(request)
-    sucursal_usuario = request.user.perfil.sucursal
+    sucursal_usuario = _sucursal_del_usuario(request)
 
-    # Verificar si el usuario pertenece al grupo "Supervisor"
-    if request.user.groups.filter(name="Supervisor").exists():
-        # Si es supervisor, mostrar todos los traslados de la empresa actual
-        movimientos_pendientes = Traslado.objects.filter(producto__empresa=empresa_actual, estado='pendiente').order_by('-fecha_creacion')
-    else:
-        # Si no es supervisor, mostrar solo los traslados asociados al usuario actual
-        movimientos_pendientes = Traslado.objects.filter(producto__empresa=empresa_actual, sucursal_destino=sucursal_usuario, estado='pendiente').order_by('-fecha_creacion')
-    return render(request, 'traslados_pendientes.html', {'movimientos_pendientes': movimientos_pendientes})
+    pendientes = Traslado.objects.filter(
+        producto__empresa=empresa_actual, estado='pendiente'
+    ).select_related('producto', 'sucursal_origen', 'sucursal_destino').order_by('-fecha_creacion')
+
+    # Supervisores y usuarios sin sucursal ven todos los traslados de la empresa;
+    # el resto solo los destinados a su sucursal.
+    es_supervisor = request.user.groups.filter(name="Supervisor").exists()
+    if sucursal_usuario is not None and not es_supervisor:
+        pendientes = pendientes.filter(sucursal_destino=sucursal_usuario)
+
+    return render(request, 'traslados_pendientes.html', {
+        'movimientos_pendientes': pendientes,
+        'sucursal_usuario': sucursal_usuario,
+    })
 
 
 @control_acceso('Encargado')
 def confirmar_traslado(request, pk):
-    movimiento = get_object_or_404(Traslado, pk=pk, estado='pendiente')
-    # Obtener la sucursal del usuario logueado (suponiendo que el perfil del usuario tiene el campo sucursal)
-    sucursal_usuario = request.user.perfil.sucursal
-    # Validar si la sucursal de destino es la misma que la sucursal del usuario
-    if movimiento.sucursal_destino != sucursal_usuario:
+    empresa_actual = obtener_empresa(request)
+    movimiento = get_object_or_404(Traslado, pk=pk, estado='pendiente', producto__empresa=empresa_actual)
+    sucursal_usuario = _sucursal_del_usuario(request)
+    if not _puede_confirmar(sucursal_usuario, movimiento):
         messages.error(request, 'No tienes permiso para confirmar este traslado.')
         return redirect('traslados_pendientes')
 

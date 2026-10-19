@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from productos.models import Producto
 from usuarios.models import Empresa, Sucursal
@@ -55,8 +55,16 @@ class MovimientoInventario(models.Model):
         return f'{self.tipo_movimiento.capitalize()} de {self.cantidad} {self.producto.nombre} en {self.sucursal.nombre}'
 
     def save(self, *args, **kwargs):
-        if self.pk is None:  # Solo ejecutar si es un nuevo registro
-            inventario, created = Inventario.objects.get_or_create(sucursal=self.sucursal, producto=self.producto)
+        if self.pk is not None:
+            return super(MovimientoInventario, self).save(*args, **kwargs)
+
+        # Nuevo registro: actualizar el stock y guardar el movimiento en una sola
+        # transacción, bloqueando la fila de inventario para evitar que dos
+        # movimientos simultáneos sobre el mismo producto/sucursal se pisen.
+        with transaction.atomic():
+            inventario, created = Inventario.objects.select_for_update().get_or_create(
+                sucursal=self.sucursal, producto=self.producto
+            )
 
             if self.tipo_movimiento == 'entrada':
                 inventario.cantidad += self.cantidad
@@ -66,7 +74,7 @@ class MovimientoInventario(models.Model):
                 else:
                     raise ValueError('Stock insuficiente para la salida solicitada.')
             inventario.save()
-        super(MovimientoInventario, self).save(*args, **kwargs)
+            super(MovimientoInventario, self).save(*args, **kwargs)
 
 
 class Traslado(models.Model):
@@ -101,8 +109,13 @@ class Traslado(models.Model):
         if self.sucursal_origen == self.sucursal_destino:
             raise ValueError('La sucursal de origen y destino no pueden ser las mismas.')
 
-        # Crear movimiento de salida al crear el traslado si es un nuevo registro
-        if not self.pk:
+        if self.pk:
+            return super(Traslado, self).save(*args, **kwargs)
+
+        # Nuevo traslado: el movimiento de salida y el traslado se guardan en la
+        # misma transacción. Si falla el guardado del traslado, el stock no queda
+        # descontado sin respaldo.
+        with transaction.atomic():
             try:
                 movimiento_salida = MovimientoInventario.objects.create(
                     sucursal=self.sucursal_origen,
@@ -115,10 +128,10 @@ class Traslado(models.Model):
                     documento_respaldo=self.documento_respaldo,
                     usuario=self.usuario
                 )
-                self.movimiento_salida = movimiento_salida
             except ValueError as e:
                 raise ValueError(f'Error al crear movimiento de salida: {e}')
-        super(Traslado, self).save(*args, **kwargs)
+            self.movimiento_salida = movimiento_salida
+            super(Traslado, self).save(*args, **kwargs)
 
     def confirmar(self):
         if self.estado != 'pendiente':
@@ -128,22 +141,22 @@ class Traslado(models.Model):
         if self.cantidad_recibida is None or self.cantidad_recibida == 0:
             raise ValueError('Debe ingresar una cantidad recibida antes de confirmar la transferencia.')
 
-        # Verificar que no haya errores de stock en la sucursal destino
-        try:
-            movimiento_entrada = MovimientoInventario.objects.create(
-                sucursal=self.sucursal_destino,
-                producto=self.producto,
-                tipo_movimiento='entrada',
-                cantidad=self.cantidad_recibida,
-                comentario=f'Transferencia desde {self.sucursal_origen.nombre}',
-                tipo_documento=self.tipo_documento,
-                documento_soporte=self.documento_soporte,
-                documento_respaldo=self.documento_respaldo,
-                usuario=self.usuario
-            )
+        # Movimiento de entrada y cambio de estado en una sola transacción
+        with transaction.atomic():
+            try:
+                movimiento_entrada = MovimientoInventario.objects.create(
+                    sucursal=self.sucursal_destino,
+                    producto=self.producto,
+                    tipo_movimiento='entrada',
+                    cantidad=self.cantidad_recibida,
+                    comentario=f'Transferencia desde {self.sucursal_origen.nombre}',
+                    tipo_documento=self.tipo_documento,
+                    documento_soporte=self.documento_soporte,
+                    documento_respaldo=self.documento_respaldo,
+                    usuario=self.usuario
+                )
+            except ValueError as e:
+                raise ValueError(f'Error al crear movimiento de entrada: {e}')
             self.movimiento_entrada = movimiento_entrada
             self.estado = 'confirmado'
             self.save()
-
-        except ValueError as e:
-            raise ValueError(f'Error al crear movimiento de entrada: {e}')
