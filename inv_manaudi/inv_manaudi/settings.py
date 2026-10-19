@@ -11,12 +11,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mus*w*^jt@(xzz@_6crj=i=84#lic1b*u7h&-zv@@_@9_lh++k'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-mus*w*^jt@(xzz@_6crj=i=84#lic1b*u7h&-zv@@_@9_lh++k')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = ['sifcol.pythonanywhere.com', 'localhost']
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
+    'DJANGO_ALLOWED_HOSTS', 'sifcol.pythonanywhere.com,localhost,127.0.0.1'
+).split(',') if h.strip()]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -64,14 +66,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'inv_manaudi.wsgi.application'
 
 
+# Configuración de BD por variables de entorno (ver .env.example).
+# Los valores por defecto corresponden a la configuración local original.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inv_manaudi',
-        'USER': 'root',
-        'PASSWORD': 'f4d3s2a1',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME', 'inv_manaudi'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'f4d3s2a1'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 '''
@@ -120,7 +127,7 @@ DECIMAL_SEPARATOR = '.'
 
 STATIC_URL = '/static/'
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 

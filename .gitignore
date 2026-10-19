@@ -160,3 +160,9 @@ cython_debug/
 .idea/
 .migrations/
 /.run/
+
+# Docker / local
+docker/dumps/*.sql
+docker/dumps/*.sql.gz
+inv_manaudi/media/
+inv_manaudi/staticfiles/
