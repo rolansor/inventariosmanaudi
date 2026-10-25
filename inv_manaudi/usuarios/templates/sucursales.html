@@ -6,12 +6,13 @@
 {% block encabezado %}
     <!-- BEGIN breadcrumb -->
     <ol class="breadcrumb float-xl-end">
-        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
-        <li class="breadcrumb-item active">Manejo Sucursales</li>
+        <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'empresa_list' %}">Manejo Empresas</a></li>
+        <li class="breadcrumb-item active">Sucursales</li>
     </ol>
     <!-- END breadcrumb -->
     <!-- BEGIN page-header -->
-    <h1 class="page-header">Página para administrar las sucursales de {{ empresa.nombre }}.</h1>
+    <h1 class="page-header">Sucursales de {{ empresa.nombre }}</h1>
     <!-- END page-header -->
 {% endblock %}
 
@@ -25,20 +26,23 @@
             <form method="POST" id="sucursal-form">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="empresa">Empresa</label>
-                    <select class="form-control" id="empresa" name="empresa">
-                        <option value="{{ empresa.id }}">{{ empresa.nombre }}</option>
-                    </select>
-                </div>
-                <br>
-                <div class="form-group">
                     <label for="nombre">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" value="">
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="" required>
                 </div>
                 <br>
                 <div class="form-group">
-                    <label for="abreviatura">Abreviatura</label>
-                    <input type="text" class="form-control" id="abreviatura" maxlength="3" name="abreviatura" value="">
+                    <label for="abreviatura">Abreviatura (3 letras)</label>
+                    <input type="text" class="form-control" id="abreviatura" maxlength="3" name="abreviatura" value="" required
+                           style="text-transform: uppercase;">
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="tipo_sucursal">Tipo de Sucursal</label>
+                    <select class="form-control" id="tipo_sucursal" name="tipo_sucursal" required>
+                        <option value="bodega">Bodega</option>
+                        <option value="punto_venta">Punto de Venta</option>
+                        <option value="laboratorio">Laboratorio</option>
+                    </select>
                 </div>
                 <br>
                 <div class="form-group">
@@ -51,7 +55,9 @@
                     <input type="text" class="form-control" id="telefono" name="telefono" value="">
                 </div>
                 <br>
-                <button type="submit" class="btn btn-primary" id="submit-btn">Crear</button>
+                <button type="submit" class="btn btn-primary" id="submit-btn"
+                        data-url="{% url 'sucursal_list' empresa.pk %}">Crear</button>
+                <button type="button" class="btn btn-secondary d-none" id="cancel-btn">Cancelar edición</button>
             </form>
         </div>
     </div>
@@ -67,6 +73,7 @@
                     <th>#</th>
                     <th>Nombre</th>
                     <th>Abreviatura</th>
+                    <th>Tipo</th>
                     <th>Dirección</th>
                     <th>Teléfono</th>
                     <th>Empresa</th>
@@ -79,8 +86,9 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ sucursal.nombre }}</td>
                         <td>{{ sucursal.abreviatura }}</td>
-                        <td>{{ sucursal.direccion }}</td>
-                        <td>{{ sucursal.telefono }}</td>
+                        <td>{{ sucursal.get_tipo_sucursal_display|default:"-" }}</td>
+                        <td>{{ sucursal.direccion|default:"" }}</td>
+                        <td>{{ sucursal.telefono|default:"" }}</td>
                         <td>{{ sucursal.empresa.nombre }}</td>
                         <td>
                             <button class="btn btn-primary edit-sucursal" data-id="{{ sucursal.pk }}">Editar</button>
@@ -89,7 +97,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center">No hay sucursales registradas.</td>
+                        <td colspan="8" class="text-center">No hay sucursales registradas.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -101,7 +109,15 @@
 {% block extra_js %}
     <script>
         $(document).ready(function () {
-            // Crear o actualizar sucursal con Ajax
+            var urlCrear = $('#submit-btn').data('url');
+
+            function resetFormulario() {
+                $('#sucursal-form').trigger('reset');
+                $('#submit-btn').text('Crear').data('url', urlCrear);
+                $('#cancel-btn').addClass('d-none');
+            }
+
+            // Crear o actualizar sucursal con AJAX (la URL cambia al pulsar "Editar")
             $('#sucursal-form').on('submit', function (event) {
                 event.preventDefault();
                 var formData = $(this).serialize();
@@ -112,23 +128,24 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        // Verifica si la sucursal ya existe en la tabla
                         var row = $('#sucursal-' + response.id);
                         if (row.length) {
-                            // Si la sucursal ya existe, actualizamos los datos en la tabla
+                            // La sucursal ya existe: actualizar la fila
                             row.find('td:eq(1)').text(response.nombre);
                             row.find('td:eq(2)').text(response.abreviatura);
-                            row.find('td:eq(3)').text(response.direccion);
-                            row.find('td:eq(4)').text(response.telefono);
+                            row.find('td:eq(3)').text(response.tipo_sucursal_display);
+                            row.find('td:eq(4)').text(response.direccion || '');
+                            row.find('td:eq(5)').text(response.telefono || '');
                         } else {
-                            // Si es una nueva sucursal, la añadimos a la tabla
+                            // Sucursal nueva: agregar la fila
                             $('#sucursal-list tbody').append(`
                                 <tr id="sucursal-${response.id}">
                                     <td>${$('#sucursal-list tbody tr').length + 1}</td>
                                     <td>${response.nombre}</td>
                                     <td>${response.abreviatura}</td>
-                                    <td>${response.direccion}</td>
-                                    <td>${response.telefono}</td>
+                                    <td>${response.tipo_sucursal_display}</td>
+                                    <td>${response.direccion || ''}</td>
+                                    <td>${response.telefono || ''}</td>
                                     <td>${response.empresa}</td>
                                     <td>
                                         <button class="btn btn-primary edit-sucursal" data-id="${response.id}">Editar</button>
@@ -137,30 +154,32 @@
                                 </tr>
                             `);
                         }
-
-                        // Limpiar el formulario después de guardar
-                        $('#sucursal-form').trigger('reset');
-                        $('#submit-btn').text('Crear');
+                        resetFormulario();
                     },
-                    error: function (xhr, status, error) {
-                        alert('Error al procesar la solicitud: ' + error);
+                    error: function (xhr) {
+                        var detalle = '';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            detalle = '\n' + JSON.stringify(xhr.responseJSON.errors);
+                        }
+                        alert('Error al procesar la solicitud.' + detalle);
                     }
                 });
             });
 
-            // Manejar la edición de sucursal
+            // Cargar los datos de la sucursal en el formulario para editarla
             $('#sucursal-list').on('click', '.edit-sucursal', function () {
                 var sucursalId = $(this).data('id');
                 $.ajax({
                     url: '/usuarios/sucursales/editar/' + sucursalId + '/',
                     type: 'GET',
                     success: function (response) {
-                        // Precargar los datos en el formulario
                         $('#nombre').val(response.nombre);
                         $('#abreviatura').val(response.abreviatura);
+                        $('#tipo_sucursal').val(response.tipo_sucursal);
                         $('#direccion').val(response.direccion);
                         $('#telefono').val(response.telefono);
                         $('#submit-btn').text('Actualizar').data('url', '/usuarios/sucursales/editar/' + sucursalId + '/');
+                        $('#cancel-btn').removeClass('d-none');
                     },
                     error: function (xhr, status, error) {
                         alert('Error al cargar la sucursal: ' + error);
@@ -168,17 +187,19 @@
                 });
             });
 
-            // Manejar la eliminación
+            $('#cancel-btn').on('click', resetFormulario);
+
+            // Eliminar sucursal (POST con CSRF)
             $('#sucursal-list').on('click', '.delete-sucursal', function () {
                 var sucursalId = $(this).data('id');
-                if (confirm('¿Estás seguro de que deseas eliminar esta sucursal?')) {
+                if (confirm('¿Estás seguro de que deseas eliminar esta sucursal? Se borrará también su inventario y sus movimientos.')) {
                     $.ajax({
                         url: '/usuarios/sucursales/eliminar/' + sucursalId + '/',
                         type: 'POST',
                         data: {
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
                         },
-                        success: function (response) {
+                        success: function () {
                             $('#sucursal-' + sucursalId).remove();
                         },
                         error: function (xhr, status, error) {

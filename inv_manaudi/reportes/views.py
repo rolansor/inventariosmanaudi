@@ -1,3 +1,14 @@
+"""
+Vistas de la app ``reportes``.
+
+- ``reporte_movimientos_dia``       (Auditor) -> ``/reportes/reporte_diario/``
+- ``reporte_inventario_valorizado`` (Auditor) -> ``/reportes/inventario_valorizado/``
+- ``carga_masiva_productos``        (Manaudi) -> ``/reportes/carga_masiva/`` (importa un Excel)
+- ``descargar_plantilla_productos`` (Manaudi) -> ``/reportes/descargar_plantilla/``
+
+Los reportes son páginas HTML imprimibles (botón de impresión del navegador); no
+generan PDF ni Excel. La carga masiva usa ``openpyxl`` y por eso solo acepta ``.xlsx``.
+"""
 from django.db.models import Sum, F, Count, DecimalField, ExpressionWrapper
 from django.utils.timezone import now, localtime
 from django.shortcuts import render, redirect
@@ -12,6 +23,7 @@ from usuarios.templatetags.tags import control_acceso
 from decimal import Decimal
 import openpyxl
 from openpyxl import Workbook
+from openpyxl.comments import Comment
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from io import BytesIO
@@ -19,9 +31,14 @@ from io import BytesIO
 
 @control_acceso('Auditor')
 def reporte_movimientos_dia(request):
-    # Obtener empresa del usuario
+    """
+    Movimientos de hoy en la empresa activa, con resumen por usuario y por tipo.
+
+    Incluye también los movimientos generados por traslados (salida en origen y
+    entrada en destino). El "día" se calcula en la zona horaria del sistema.
+    """
     empresa_actual = obtener_empresa(request)
-    
+
     # Fecha de hoy en la zona horaria del sistema (America/Guayaquil), no en UTC,
     # para que el "día" coincida con el día real de operación.
     fecha = localtime(now())
@@ -62,8 +79,11 @@ def reporte_movimientos_dia(request):
 @control_acceso('Auditor')
 def reporte_inventario_valorizado(request):
     """
-    Reporte de inventario valorizado mostrando el valor total del inventario
-    por producto, sucursal y categoría.
+    Inventario valorizado de la empresa activa (cantidad x precio actual).
+
+    Pestañas: detalle por producto/sucursal, totales por sucursal, totales por
+    categoría, los 10 productos de mayor valor y alertas de stock bajo
+    (``cantidad <= stock_minimo``). Solo se valorizan filas con stock > 0.
     """
     empresa_actual = obtener_empresa(request)
     
@@ -161,7 +181,11 @@ def reporte_inventario_valorizado(request):
 @control_acceso('Manaudi')
 def descargar_plantilla_productos(request):
     """
-    Descarga la plantilla Excel para carga masiva de productos con datos reales de la empresa
+    Genera y descarga ``plantilla_productos.xlsx`` para la carga masiva.
+
+    La hoja principal trae filas de ejemplo construidas con la clasificación real de
+    la empresa; las hojas "Instrucciones", "Categorías", "Subcategorías", "Clases" y
+    "Sucursales" sirven de referencia para llenar los datos.
     """
     empresa_actual = obtener_empresa(request)
     
@@ -205,7 +229,6 @@ def descargar_plantilla_productos(request):
         cell.alignment = Alignment(horizontal='center', vertical='center')
         
         # Añadir comentario con descripción
-        from openpyxl.comments import Comment
         cell.comment = Comment(description, "Sistema")
         
         # Ajustar ancho de columna
@@ -408,7 +431,17 @@ def _generar_codigo(nombre, codigos_usados):
 @control_acceso('Manaudi')
 def carga_masiva_productos(request):
     """
-    Vista para cargar productos masivamente desde un archivo Excel
+    Importa productos desde un Excel (``.xlsx``) con las columnas de la plantilla.
+
+    Por cada fila con ``codigo`` y ``nombre``:
+
+    1. Busca por nombre (o crea) la categoría, subcategoría y clase; los códigos de
+       3 caracteres de los niveles nuevos se generan con ``_generar_codigo``.
+    2. Crea el producto o, si el código ya existe en la empresa, actualiza sus datos.
+    3. Si vienen ``sucursal`` y ``cantidad_inicial``, fija directamente el saldo de
+       ``Inventario`` en esa sucursal (sin generar movimiento).
+
+    Los errores se acumulan por fila y se muestran como avisos al terminar.
     """
     empresa_actual = obtener_empresa(request)
     
@@ -416,8 +449,8 @@ def carga_masiva_productos(request):
         archivo = request.FILES['archivo_excel']
         
         # Validar extensión
-        if not archivo.name.endswith(('.xlsx', '.xls')):
-            messages.error(request, 'Por favor suba un archivo Excel válido (.xlsx o .xls)')
+        if not archivo.name.lower().endswith('.xlsx'):
+            messages.error(request, 'Por favor suba un archivo Excel válido (.xlsx)')
             return redirect('carga_masiva_productos')
         
         try:
@@ -428,7 +461,7 @@ def carga_masiva_productos(request):
             # Obtener encabezados
             headers = []
             for cell in ws[1]:
-                headers.append(cell.value)
+                headers.append(str(cell.value).strip().lower() if cell.value is not None else None)
             
             # Validar encabezados requeridos
             required_headers = ['codigo', 'nombre', 'categoria', 'subcategoria', 'clase']
@@ -488,14 +521,15 @@ def carga_masiva_productos(request):
                         )
                     
                     # Preparar datos del producto
+                    # Las celdas vacías llegan como None: usar los valores por defecto
                     producto_data = {
-                        'nombre': data['nombre'],
-                        'modelo': data.get('modelo', ''),
+                        'nombre': str(data['nombre']).strip(),
+                        'modelo': data.get('modelo') or '',
                         'clase': clase,
                         'empresa': empresa_actual,
-                        'precio': Decimal(str(data.get('precio', 0))),
-                        'tipo_producto': data.get('tipo_producto', 'unidad').lower(),
-                        'descripcion': data.get('descripcion', ''),
+                        'precio': Decimal(str(data.get('precio') or 0)),
+                        'tipo_producto': str(data.get('tipo_producto') or 'unidad').lower(),
+                        'descripcion': data.get('descripcion') or '',
                         'estado': 'activo'
                     }
                     
@@ -505,7 +539,7 @@ def carga_masiva_productos(request):
                     
                     # Crear o actualizar producto
                     producto, created = Producto.objects.update_or_create(
-                        codigo=data['codigo'],
+                        codigo=str(data['codigo']).strip().upper(),
                         empresa=empresa_actual,
                         defaults=producto_data
                     )
@@ -528,7 +562,7 @@ def carga_masiva_productos(request):
                                 sucursal=sucursal,
                                 defaults={
                                     'cantidad': int(data['cantidad_inicial']),
-                                    'stock_minimo': int(data.get('stock_minimo', 0))
+                                    'stock_minimo': int(data.get('stock_minimo') or 0)
                                 }
                             )
                         except Sucursal.DoesNotExist:

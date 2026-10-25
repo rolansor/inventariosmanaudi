@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% block title %}Confirmar Recepción{% endblock %}
+{% block title %}Traslados Pendientes{% endblock %}
 
 {% block contenido %}
-<h1>Movimientos Pendientes de Confirmación</h1>
+<h1>Traslados Pendientes de Confirmación</h1>
 
 <!-- Mostrar mensajes de éxito o error -->
 {% if messages %}
@@ -35,7 +35,7 @@
                 <td>{{ movimiento.producto.nombre }}</td>
                 <td>{{ movimiento.sucursal_origen.nombre}}</td>
                 <td>{{ movimiento.sucursal_destino.nombre }}</td>
-                <td>{{ movimiento.cantidad }}</td>
+                <td>{{ movimiento.cantidad_entregada }}</td>
                 <td>{{ movimiento.documento_respaldo }}</td>
                 <td>{{ movimiento.fecha_creacion }}</td>
                 <td>

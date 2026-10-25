@@ -1,3 +1,20 @@
+"""
+Vistas de la app ``categorias``.
+
+Tres pantallas con el mismo patrón, una por nivel:
+
+- ``lista_categorias``   → ``/categorias/lista_categorias/``
+- ``lista_subcategorias`` → ``/categorias/<categoria>/lista_subcategorias/``
+- ``lista_clases``        → ``/categorias/subcategorias/<subcategoria>/lista_clases/``
+
+Cada listado tiene un modal para crear y botones para editar/eliminar que llaman por
+AJAX a las vistas ``nueva_*``, ``editar_*`` y ``eliminar_*``. Crear y editar requiere
+el grupo **Supervisor**; eliminar requiere **Manaudi** (borra en cascada los niveles
+inferiores; los productos de las clases borradas quedan sin clasificación).
+
+Todas las búsquedas por ``pk`` se acotan a la empresa activa: un ID de otra empresa
+devuelve 404.
+"""
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CategoriaForm, SubcategoriaForm, ClaseForm
@@ -13,14 +30,17 @@ from usuarios.views import obtener_empresa
 # ---------------------------------------------------------------------------
 
 def _categoria_de_empresa(request, pk):
+    """Categoría ``pk`` de la empresa activa, o 404."""
     return get_object_or_404(Categoria, pk=pk, empresa=obtener_empresa(request))
 
 
 def _subcategoria_de_empresa(request, pk):
+    """Subcategoría ``pk`` cuya categoría pertenece a la empresa activa, o 404."""
     return get_object_or_404(Subcategoria, pk=pk, categoria__empresa=obtener_empresa(request))
 
 
 def _clase_de_empresa(request, pk):
+    """Clase ``pk`` cuya categoría (dos niveles arriba) pertenece a la empresa activa, o 404."""
     return get_object_or_404(Clase, pk=pk, subcategoria__categoria__empresa=obtener_empresa(request))
 
 
@@ -30,6 +50,7 @@ def _clase_de_empresa(request, pk):
 
 @control_acceso('Supervisor')
 def nueva_categoria(request):
+    """Crea una categoría en la empresa activa (solo POST; GET redirige al listado)."""
     if request.method != 'POST':
         return redirect('lista_categorias')
 
@@ -57,12 +78,17 @@ def nueva_categoria(request):
 
 @control_acceso('Supervisor')
 def lista_categorias(request):
+    """Listado de categorías de la empresa activa."""
     categorias = Categoria.objects.filter(empresa=obtener_empresa(request))
     return render(request, 'lista_categorias.html', {'categorias': categorias})
 
 
 @control_acceso('Supervisor')
 def editar_categoria(request, pk):
+    """
+    Edita una categoría (AJAX). GET devuelve los datos actuales en JSON para
+    precargar el modal; POST guarda y devuelve la categoría actualizada.
+    """
     categoria = _categoria_de_empresa(request, pk)
 
     if request.method == 'POST':
@@ -86,6 +112,7 @@ def editar_categoria(request, pk):
 
 @control_acceso('Manaudi')
 def eliminar_categoria(request, pk):
+    """Elimina una categoría con sus subcategorías y clases (solo POST, AJAX)."""
     categoria = _categoria_de_empresa(request, pk)
     if request.method == 'POST':
         categoria.delete()
@@ -100,6 +127,7 @@ def eliminar_categoria(request, pk):
 
 @control_acceso('Supervisor')
 def nueva_subcategoria(request, pk):
+    """Crea una subcategoría dentro de la categoría ``pk`` (solo POST)."""
     categoria = _categoria_de_empresa(request, pk)
     if request.method != 'POST':
         return redirect('lista_subcategorias', pk=pk)
@@ -130,6 +158,7 @@ def nueva_subcategoria(request, pk):
 
 @control_acceso('Supervisor')
 def lista_subcategorias(request, pk):
+    """Listado de subcategorías de la categoría ``pk``."""
     categoria = _categoria_de_empresa(request, pk)
     subcategorias = Subcategoria.objects.filter(categoria=categoria)
     return render(request, 'lista_subcategorias.html', {'subcategorias': subcategorias, 'categoria': categoria})
@@ -137,6 +166,7 @@ def lista_subcategorias(request, pk):
 
 @control_acceso('Supervisor')
 def editar_subcategoria(request, pk):
+    """Edita una subcategoría (AJAX). GET precarga, POST guarda."""
     subcategoria = _subcategoria_de_empresa(request, pk)
 
     if request.method == 'POST':
@@ -161,6 +191,7 @@ def editar_subcategoria(request, pk):
 
 @control_acceso('Manaudi')
 def eliminar_subcategoria(request, pk):
+    """Elimina una subcategoría con sus clases (solo POST, AJAX)."""
     subcategoria = _subcategoria_de_empresa(request, pk)
     if request.method == 'POST':
         subcategoria.delete()
@@ -175,6 +206,7 @@ def eliminar_subcategoria(request, pk):
 
 @control_acceso('Supervisor')
 def nueva_clase(request, pk):
+    """Crea una clase dentro de la subcategoría ``pk`` (solo POST)."""
     subcategoria = _subcategoria_de_empresa(request, pk)
     if request.method != 'POST':
         return redirect('lista_clases', pk=pk)
@@ -207,6 +239,7 @@ def nueva_clase(request, pk):
 
 @control_acceso('Supervisor')
 def lista_clases(request, pk):
+    """Listado de clases de la subcategoría ``pk``."""
     subcategoria = _subcategoria_de_empresa(request, pk)
     clases = Clase.objects.filter(subcategoria=subcategoria)
     return render(request, 'lista_clases.html', {
@@ -218,6 +251,7 @@ def lista_clases(request, pk):
 
 @control_acceso('Supervisor')
 def editar_clase(request, pk):
+    """Edita una clase (AJAX). GET precarga, POST guarda."""
     clase = _clase_de_empresa(request, pk)
 
     if request.method == 'POST':
@@ -243,6 +277,10 @@ def editar_clase(request, pk):
 
 @control_acceso('Manaudi')
 def eliminar_clase(request, pk):
+    """
+    Elimina una clase (solo POST, AJAX). Los productos que la usaban quedan con
+    ``clase = NULL`` ("Sin clasificación").
+    """
     clase = _clase_de_empresa(request, pk)
     if request.method == 'POST':
         clase.delete()

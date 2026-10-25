@@ -1,8 +1,26 @@
-from django.db import models
+"""
+Vistas de la app ``inventario``.
+
+Operación (grupo **Encargado**):
+
+- ``movimiento_inventario`` → ``/inventario/movimiento_inventario/`` (entradas y salidas)
+- ``iniciar_traslado``      → ``/inventario/traslado/iniciar/``
+- ``traslados_pendientes``  → ``/inventario/traslados_pendientes/`` ("Acuse Recibo")
+- ``confirmar_traslado``    → ``/inventario/traslado/confirmar/<pk>/``
+- ``movimientos_por_producto`` → ``/inventario/producto_movimientos/``
+
+Consulta ampliada (grupo **Supervisor**):
+
+- ``movimientos_por_empresa``  → ``/inventario/empresa_movimientos/``
+- ``movimientos_por_sucursal`` → ``/inventario/sucursal_movimientos/``
+
+Todas filtran por la empresa activa (``obtener_empresa``). La lógica de stock vive en
+los modelos (``MovimientoInventario.save``, ``Traslado.save`` y ``Traslado.confirmar``);
+las vistas solo capturan el ``ValueError`` que estos lanzan y lo muestran al usuario.
+"""
+from django.db.models import Q, Sum
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from productos.models import Producto
-from usuarios.models import Sucursal
 from usuarios.views import obtener_empresa
 from usuarios.templatetags.tags import control_acceso
 from .models import MovimientoInventario, Traslado
@@ -10,77 +28,9 @@ from .forms import MovimientoInventarioForm, ProductoSelectForm, SucursalSelectF
     ConfirmarRecepcionForm
 
 
-@control_acceso('Encargado')
-def movimiento_inventario(request):
-    empresa_actual = obtener_empresa(request)
-
-    if request.method == 'POST':
-        # Inicializar el formulario con los datos del POST y los archivos
-        form = MovimientoInventarioForm(request.POST, request.FILES, user=request.user)
-        if form.is_valid():
-            try:
-                movimiento = form.save(commit=False)
-                movimiento.usuario = request.user
-                movimiento.save()
-                messages.success(request, 'Movimiento registrado exitosamente.')
-                return redirect('movimiento_inventario')
-            except ValueError as e:
-                form.add_error(None, str(e))
-        else:
-            messages.error(request, 'Por favor, corrige los errores indicados.')
-
-    else:
-        # Inicializar el formulario sin datos de POST
-        form = MovimientoInventarioForm(user=request.user)
-
-    # Mostrar solo los últimos 10 movimientos de la empresa del usuario logueado
-    movimientos = MovimientoInventario.objects.filter(producto__empresa=empresa_actual).order_by('-fecha')[:20]
-
-    return render(request, 'movimiento_inventario.html', {
-        'form': form,
-        'movimientos': movimientos,
-    })
-
-
-@control_acceso('Encargado')
-def iniciar_traslado(request):
-    empresa_actual = obtener_empresa(request)
-
-    if request.method == 'POST':
-        form = TrasladoForm(request.POST)
-        # Aplicar filtros de productos y sucursales según la empresa actual
-        form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_actual)
-        form.fields['sucursal_origen'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
-        form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
-
-        if form.is_valid():
-            traslado = form.save(commit=False)  # No se guarda aún en la base de datos
-            traslado.usuario = request.user  # Asignar el usuario que inicia el traslado
-
-            try:
-                traslado.save()  # Guardar el traslado
-                messages.success(request, 'Traslado iniciado exitosamente.')
-                return redirect('traslados_pendientes')  # Redireccionar después de guardar
-            except ValueError as e:
-                form.add_error(None, str(e))  # Manejar errores con un mensaje adecuado
-        else:
-            messages.error(request, 'Por favor, corrige los errores indicados.')
-
-    else:
-        form = TrasladoForm()
-        # Filtrar productos y sucursales por la empresa actual
-        form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_actual)
-        form.fields['sucursal_origen'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
-        form.fields['sucursal_destino'].queryset = Sucursal.objects.filter(empresa=empresa_actual)
-
-    # Obtener los últimos 10 traslados
-    traslados_recientes = Traslado.objects.filter(producto__empresa=empresa_actual).order_by('-fecha_creacion')[:10]
-
-    return render(request, 'iniciar_traslado.html', {
-        'form': form,
-        'traslados_recientes': traslados_recientes,  # Pasamos los traslados a la plantilla
-    })
-
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def _sucursal_del_usuario(request):
     """Sucursal asignada al usuario, o None si no tiene perfil o no tiene sucursal."""
@@ -97,8 +47,100 @@ def _puede_confirmar(sucursal_usuario, traslado):
     return sucursal_usuario is None or traslado.sucursal_destino_id == sucursal_usuario.id
 
 
+# ---------------------------------------------------------------------------
+# Entradas y salidas
+# ---------------------------------------------------------------------------
+
+@control_acceso('Encargado')
+def movimiento_inventario(request):
+    """
+    Registra una entrada o salida de stock y muestra los últimos 20 movimientos de
+    la empresa.
+
+    El stock se actualiza en ``MovimientoInventario.save()``; si una salida supera el
+    saldo, el ``ValueError`` se muestra como error general del formulario.
+    """
+    empresa_actual = obtener_empresa(request)
+    sucursal_usuario = _sucursal_del_usuario(request)
+
+    if request.method == 'POST':
+        form = MovimientoInventarioForm(request.POST, request.FILES,
+                                        empresa=empresa_actual, sucursal=sucursal_usuario)
+        if form.is_valid():
+            try:
+                movimiento = form.save(commit=False)
+                movimiento.usuario = request.user
+                movimiento.save()
+                messages.success(request, 'Movimiento registrado exitosamente.')
+                return redirect('movimiento_inventario')
+            except ValueError as e:
+                form.add_error(None, str(e))
+        else:
+            messages.error(request, 'Por favor, corrige los errores indicados.')
+    else:
+        form = MovimientoInventarioForm(empresa=empresa_actual, sucursal=sucursal_usuario)
+
+    movimientos = (MovimientoInventario.objects
+                   .filter(producto__empresa=empresa_actual)
+                   .select_related('producto', 'sucursal')
+                   .order_by('-fecha')[:20])
+
+    return render(request, 'movimiento_inventario.html', {
+        'form': form,
+        'movimientos': movimientos,
+    })
+
+
+# ---------------------------------------------------------------------------
+# Traslados
+# ---------------------------------------------------------------------------
+
+@control_acceso('Encargado')
+def iniciar_traslado(request):
+    """
+    Inicia un traslado entre dos sucursales de la empresa activa.
+
+    Al guardar, ``Traslado.save()`` descuenta el stock en origen (movimiento de
+    salida) y deja el traslado ``pendiente``. Muestra además los 10 últimos traslados.
+    """
+    empresa_actual = obtener_empresa(request)
+
+    if request.method == 'POST':
+        form = TrasladoForm(request.POST, request.FILES, empresa=empresa_actual)
+        if form.is_valid():
+            traslado = form.save(commit=False)
+            traslado.usuario = request.user
+            try:
+                traslado.save()
+                messages.success(request, 'Traslado iniciado exitosamente.')
+                return redirect('traslados_pendientes')
+            except ValueError as e:
+                form.add_error(None, str(e))
+        else:
+            messages.error(request, 'Por favor, corrige los errores indicados.')
+    else:
+        form = TrasladoForm(empresa=empresa_actual)
+
+    traslados_recientes = (Traslado.objects
+                           .filter(producto__empresa=empresa_actual)
+                           .select_related('producto', 'sucursal_origen', 'sucursal_destino', 'usuario')
+                           .order_by('-fecha_creacion')[:10])
+
+    return render(request, 'iniciar_traslado.html', {
+        'form': form,
+        'traslados_recientes': traslados_recientes,
+    })
+
+
 @control_acceso('Encargado')
 def traslados_pendientes(request):
+    """
+    Lista los traslados pendientes de confirmar ("Acuse Recibo").
+
+    Un usuario del grupo Supervisor o sin sucursal ve todos los pendientes de la
+    empresa; el resto solo los destinados a su sucursal. El botón "Confirmar" se
+    muestra solo para los que el usuario puede confirmar (ver ``_puede_confirmar``).
+    """
     empresa_actual = obtener_empresa(request)
     sucursal_usuario = _sucursal_del_usuario(request)
 
@@ -106,8 +148,6 @@ def traslados_pendientes(request):
         producto__empresa=empresa_actual, estado='pendiente'
     ).select_related('producto', 'sucursal_origen', 'sucursal_destino').order_by('-fecha_creacion')
 
-    # Supervisores y usuarios sin sucursal ven todos los traslados de la empresa;
-    # el resto solo los destinados a su sucursal.
     es_supervisor = request.user.groups.filter(name="Supervisor").exists()
     if sucursal_usuario is not None and not es_supervisor:
         pendientes = pendientes.filter(sucursal_destino=sucursal_usuario)
@@ -120,44 +160,51 @@ def traslados_pendientes(request):
 
 @control_acceso('Encargado')
 def confirmar_traslado(request, pk):
+    """
+    Confirma la recepción de un traslado pendiente indicando la cantidad recibida.
+
+    ``Traslado.confirmar()`` crea el movimiento de entrada en destino y cambia el
+    estado a ``confirmado``. Si el usuario no puede confirmar ese traslado se le
+    devuelve al listado con un mensaje de error.
+    """
     empresa_actual = obtener_empresa(request)
-    movimiento = get_object_or_404(Traslado, pk=pk, estado='pendiente', producto__empresa=empresa_actual)
+    traslado = get_object_or_404(Traslado, pk=pk, estado='pendiente', producto__empresa=empresa_actual)
     sucursal_usuario = _sucursal_del_usuario(request)
-    if not _puede_confirmar(sucursal_usuario, movimiento):
+    if not _puede_confirmar(sucursal_usuario, traslado):
         messages.error(request, 'No tienes permiso para confirmar este traslado.')
         return redirect('traslados_pendientes')
 
     if request.method == 'POST':
-        form = ConfirmarRecepcionForm(request.POST, instance=movimiento)
+        form = ConfirmarRecepcionForm(request.POST, instance=traslado)
         if form.is_valid():
             try:
-                movimiento.confirmar()
+                traslado.confirmar()
                 messages.success(request, 'Recepción confirmada exitosamente.')
                 return redirect('traslados_pendientes')
             except ValueError as e:
                 messages.error(request, str(e))
     else:
-        form = ConfirmarRecepcionForm(instance=movimiento)
+        form = ConfirmarRecepcionForm(instance=traslado)
 
     return render(request, 'confirmar_traslado.html', {
         'form': form,
-        'movimiento': movimiento,
+        'movimiento': traslado,
     })
 
 
-@control_acceso('Encargado')
+# ---------------------------------------------------------------------------
+# Consultas de movimientos
+# ---------------------------------------------------------------------------
+
+@control_acceso('Supervisor')
 def movimientos_por_empresa(request):
-    """
-    Vista para mostrar todos los movimientos y traslados de una empresa.
-    """
+    """Historial completo de movimientos y traslados de la empresa activa (dos tablas)."""
     empresa_actual = obtener_empresa(request)
 
-    # Movimientos de inventario (entradas y salidas) - filtrar por empresa del producto
     movimientos = MovimientoInventario.objects.filter(
         producto__empresa=empresa_actual
     ).select_related('producto', 'sucursal', 'usuario').order_by('-fecha')
 
-    # Traslados (todos los traslados de productos de la empresa)
     traslados = Traslado.objects.filter(
         producto__empresa=empresa_actual
     ).select_related('producto', 'sucursal_origen', 'sucursal_destino', 'usuario').order_by('-fecha_creacion')
@@ -169,15 +216,16 @@ def movimientos_por_empresa(request):
     })
 
 
-@control_acceso('Encargado')
+@control_acceso('Supervisor')
 def movimientos_por_sucursal(request):
     """
-    Vista que muestra los movimientos de inventario y traslados para una sucursal específica.
+    Movimientos y traslados de una sucursal elegida en un selector (POST).
+
+    En los traslados se incluyen tanto los que salen de la sucursal como los que
+    llegan a ella.
     """
-    # Obtener la empresa del usuario actual
     empresa_actual = obtener_empresa(request)
 
-    # Inicializar formulario para seleccionar sucursal
     form = SucursalSelectForm(empresa=empresa_actual)
     movimientos = None
     traslados = None
@@ -187,13 +235,10 @@ def movimientos_por_sucursal(request):
         if form.is_valid():
             sucursal = form.cleaned_data['sucursal']
 
-            # Filtrar solo los movimientos de la sucursal seleccionada
             movimientos = MovimientoInventario.objects.filter(
                 sucursal=sucursal
             ).select_related('producto', 'usuario').order_by('-fecha')
 
-            # Filtrar los traslados donde la sucursal seleccionada es la de origen O destino
-            from django.db.models import Q
             traslados = Traslado.objects.filter(
                 Q(sucursal_origen=sucursal) | Q(sucursal_destino=sucursal)
             ).select_related('producto', 'sucursal_origen', 'sucursal_destino', 'usuario').order_by('-fecha_creacion')
@@ -207,10 +252,21 @@ def movimientos_por_sucursal(request):
 
 @control_acceso('Encargado')
 def movimientos_por_producto(request):
-    # Obtener la empresa del usuario actual
+    """
+    Kardex de un producto elegido en un selector (POST).
+
+    Separa los movimientos "normales" de los generados por traslados y calcula un
+    resumen:
+
+    - ``entradas`` / ``salidas``: movimientos normales (sin traslados).
+    - ``traslados_salida`` / ``traslados_entrada``: cantidades reales movidas por traslados.
+    - ``traslados_pendientes``: unidades en tránsito (enviadas y aún no confirmadas).
+    - ``diferencia_traslados``: entregado − recibido en los traslados.
+    - ``total_fisico``: entradas + traslados recibidos − salidas − traslados enviados,
+      es decir, el stock del producto sumando todas las sucursales.
+    """
     empresa_actual = obtener_empresa(request)
 
-    # Inicializar el formulario con los productos filtrados por empresa
     form = ProductoSelectForm(empresa=empresa_actual)
 
     entradas = None
@@ -234,61 +290,42 @@ def movimientos_por_producto(request):
         if form.is_valid():
             producto = form.cleaned_data['producto']
 
-            # Filtrar los movimientos por tipo (entrada y salida) excluyendo aquellos relacionados a traslados
+            # Movimientos normales: se excluyen los que pertenecen a un traslado
             entradas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='entrada') \
                 .exclude(traslado_entrada__isnull=False).select_related('usuario', 'sucursal').order_by('-fecha')
             salidas = MovimientoInventario.objects.filter(producto=producto, tipo_movimiento='salida') \
                 .exclude(traslado_salida__isnull=False).select_related('usuario', 'sucursal').order_by('-fecha')
 
-            # Traslados del producto
             traslados = Traslado.objects.filter(producto=producto).select_related(
                 'usuario', 'sucursal_origen', 'sucursal_destino'
             ).order_by('-fecha_creacion')
-            
-            # Calcular totales de movimientos normales (sin traslados)
-            resumen['entradas'] = entradas.aggregate(total=models.Sum('cantidad'))['total'] or 0
-            resumen['salidas'] = salidas.aggregate(total=models.Sum('cantidad'))['total'] or 0
-            
-            # Traslados realizados (movimientos de salida por traslados)
-            resumen['traslados_salida'] = MovimientoInventario.objects.filter(
-                traslado_salida__producto=producto
-            ).aggregate(total=models.Sum('cantidad'))['total'] or 0
-            
-            # Traslados recibidos (movimientos de entrada por traslados confirmados)
-            resumen['traslados_entrada'] = MovimientoInventario.objects.filter(
-                traslado_entrada__producto=producto
-            ).aggregate(total=models.Sum('cantidad'))['total'] or 0
-            
-            # Cantidades teóricas de traslados (lo que se declaró enviar/recibir)
-            resumen['traslados_teoricos_salida'] = Traslado.objects.filter(
-                producto=producto
-            ).aggregate(total=models.Sum('cantidad_entregada'))['total'] or 0
-            
-            resumen['traslados_teoricos_entrada'] = Traslado.objects.filter(
-                producto=producto, estado='confirmado'
-            ).aggregate(total=models.Sum('cantidad_recibida'))['total'] or 0
-            
-            # Traslados pendientes de confirmar
-            resumen['traslados_pendientes'] = Traslado.objects.filter(
-                producto=producto, estado='pendiente'
-            ).aggregate(total=models.Sum('cantidad_entregada'))['total'] or 0
-            
-            resumen['traslados_confirmados'] = Traslado.objects.filter(
-                producto=producto, estado='confirmado'
-            ).aggregate(total=models.Sum('cantidad_recibida'))['total'] or 0
-            
-            # CÁLCULO CORRECTO DEL TOTAL FÍSICO:
-            # Total = Entradas normales + Traslados recibidos - Salidas normales - Traslados enviados
+
+            def _suma(queryset, campo='cantidad'):
+                return queryset.aggregate(total=Sum(campo))['total'] or 0
+
+            resumen['entradas'] = _suma(entradas)
+            resumen['salidas'] = _suma(salidas)
+
+            # Cantidades reales movidas por traslados (según los movimientos generados)
+            resumen['traslados_salida'] = _suma(MovimientoInventario.objects.filter(traslado_salida__producto=producto))
+            resumen['traslados_entrada'] = _suma(MovimientoInventario.objects.filter(traslado_entrada__producto=producto))
+
+            # Cantidades declaradas en los traslados
+            resumen['traslados_teoricos_salida'] = _suma(traslados, 'cantidad_entregada')
+            resumen['traslados_teoricos_entrada'] = _suma(traslados.filter(estado='confirmado'), 'cantidad_recibida')
+            resumen['traslados_pendientes'] = _suma(traslados.filter(estado='pendiente'), 'cantidad_entregada')
+            resumen['traslados_confirmados'] = resumen['traslados_teoricos_entrada']
+
+            # Stock físico total = entradas + recibido por traslados − salidas − enviado por traslados
             resumen['total_fisico'] = (
-                resumen['entradas'] + 
-                resumen['traslados_entrada'] - 
-                resumen['salidas'] - 
+                resumen['entradas'] +
+                resumen['traslados_entrada'] -
+                resumen['salidas'] -
                 resumen['traslados_salida']
             )
-            
-            # Diferencia entre lo enviado y lo recibido en traslados
+
             resumen['diferencia_traslados'] = (
-                resumen['traslados_teoricos_salida'] - 
+                resumen['traslados_teoricos_salida'] -
                 resumen['traslados_teoricos_entrada']
             )
 

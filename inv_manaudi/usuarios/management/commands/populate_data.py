@@ -1,11 +1,25 @@
+"""
+Comando ``populate_data``: crea la estructura base de datos de prueba.
+
+    docker compose exec web python manage.py populate_data
+    docker compose exec web python manage.py populate_data --clear      # borra y recrea
+    docker compose exec web python manage.py populate_data --empresas 1
+
+Crea los 4 grupos de permisos, 3 empresas con 3 sucursales cada una, 4 usuarios por
+empresa (manaudi, supervisor, encargado, auditor; contraseña ``1234``), la
+clasificación Categoría/Subcategoría/Clase, 10 productos por empresa, stock inicial
+aleatorio y unos pocos movimientos. Para un historial más rico (traslados, varias
+fechas, alertas de stock) ejecutar después ``populate_demo``.
+
+No está pensado para correrse dos veces sin ``--clear``: las empresas se duplicarían
+y los usuarios fallarían por nombre repetido.
+"""
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
-from datetime import datetime, timedelta
 from decimal import Decimal
 import random
-import os
 
 from usuarios.models import Usuario, Empresa, Sucursal, UsuarioPerfil
 from productos.models import Producto
@@ -14,7 +28,7 @@ from inventario.models import Inventario, MovimientoInventario, Traslado
 
 
 class Command(BaseCommand):
-    help = 'Popula la base de datos con datos de prueba para el sistema de inventarios'
+    help = 'Crea empresas, sucursales, usuarios (clave 1234), clasificación, productos y stock de prueba'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -55,7 +69,12 @@ class Command(BaseCommand):
         self.stdout.write(self.style.WARNING('\nIMPORTANTE: Todas las contraseñas son: 1234'))
 
     def limpiar_datos(self):
-        """Limpia todos los datos de prueba"""
+        """
+        Borra todos los datos de negocio y los usuarios no superusuarios.
+
+        Los superusuarios se conservan (``crear_usuarios`` les pone la clave 1234 y
+        les crea perfil). Los grupos no se borran.
+        """
         models_to_clear = [
             MovimientoInventario,
             Traslado,
@@ -79,7 +98,7 @@ class Command(BaseCommand):
             self.stdout.write(f'  [CLEAR] {model.__name__}')
 
     def crear_grupos(self):
-        """Crea los grupos de permisos si no existen"""
+        """Crea (si no existen) los grupos Manaudi, Supervisor, Encargado y Auditor."""
         self.stdout.write("Creando grupos...")
         
         grupos = ['Manaudi', 'Supervisor', 'Encargado', 'Auditor']
@@ -93,7 +112,7 @@ class Command(BaseCommand):
         return {g: Group.objects.get(name=g) for g in grupos}
 
     def crear_empresas_y_sucursales(self, num_empresas=3):
-        """Crea empresas con sus sucursales"""
+        """Crea hasta 3 empresas predefinidas, cada una con 3 sucursales."""
         self.stdout.write("\nCreando empresas y sucursales...")
         
         empresas_data = [
@@ -156,7 +175,16 @@ class Command(BaseCommand):
         return empresas
 
     def crear_usuarios(self, empresas, grupos):
-        """Crea usuarios para cada rol en cada empresa"""
+        """
+        Crea los usuarios de prueba.
+
+        - Mantiene el superusuario existente (o crea ``admin``), le asigna los 4 grupos
+          y un perfil en la primera empresa.
+        - Por empresa: ``<prefijo>_manaudi`` (4 grupos, sin sucursal),
+          ``<prefijo>_supervisor`` (Supervisor+Encargado+Auditor, primera sucursal),
+          ``<prefijo>_encargado`` (Encargado, segunda sucursal) y
+          ``<prefijo>_auditor`` (Auditor, sin sucursal). Contraseña: 1234.
+        """
         self.stdout.write("\nCreando usuarios...")
         
         password = make_password('1234')
@@ -304,7 +332,7 @@ class Command(BaseCommand):
         return usuarios_creados
 
     def crear_categorias_y_productos(self, empresas):
-        """Crea categorías, subcategorías, clases y productos de ejemplo para cada empresa"""
+        """Crea la clasificación de ejemplo y 10 productos por empresa (código ``<EMP>_<COD>``)."""
         self.stdout.write("\nCreando categorias, subcategorias, clases y productos...")
         
         categorias_base = [
@@ -404,7 +432,7 @@ class Command(BaseCommand):
             ))
 
     def crear_inventario_inicial(self, empresas):
-        """Crea inventario inicial para los productos"""
+        """Fija un saldo inicial aleatorio (10-100) y stock mínimo (5-20) por producto y sucursal."""
         self.stdout.write("\nCreando inventario inicial...")
         
         for empresa_nombre, empresa_info in empresas.items():
@@ -429,7 +457,7 @@ class Command(BaseCommand):
             ))
 
     def crear_movimientos_ejemplo(self, empresas):
-        """Crea algunos movimientos de ejemplo"""
+        """Registra una entrada y una salida por producto (5 productos) en la primera sucursal."""
         self.stdout.write("\nCreando movimientos de ejemplo...")
         
         for empresa_nombre, empresa_info in empresas.items():

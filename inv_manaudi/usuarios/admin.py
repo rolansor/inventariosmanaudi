@@ -1,45 +1,67 @@
+"""
+Admin de Django para la app ``usuarios``.
+
+La gestión de usuarios (alta, contraseña, grupos y perfil) se hace únicamente desde
+``/admin/``; la aplicación no tiene pantallas propias para ello. Flujo para dar de
+alta un usuario:
+
+1. ``Usuarios``: crear el usuario y asignarle grupos (Manaudi / Supervisor / Encargado / Auditor).
+2. ``Perfiles de usuario``: crear su ``UsuarioPerfil`` con la empresa y, si aplica, la sucursal.
+"""
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django import forms
 from .models import Usuario, UsuarioPerfil, Empresa, Sucursal
 
 
 @admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
+    """Listado de empresas."""
     list_display = ('nombre', 'direccion', 'telefono', 'email')
     search_fields = ('nombre', 'direccion', 'telefono', 'email')
-    ordering = ('nombre',)  # Ordenar por nombre por defecto
+    ordering = ('nombre',)
+
 
 @admin.register(Sucursal)
 class SucursalAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'empresa', 'direccion', 'abreviatura', 'telefono')
+    """Sucursales filtrables por empresa y tipo."""
+    list_display = ('nombre', 'empresa', 'tipo_sucursal', 'abreviatura', 'direccion', 'telefono')
     search_fields = ('nombre', 'empresa__nombre', 'direccion', 'abreviatura', 'telefono')
-    list_filter = ('empresa',)  # Filtro por empresa
-    ordering = ('empresa',)  # Ordenar por nombre de sucursal
-    autocomplete_fields = ('empresa',)  # Agregar autocompletado para empresas
+    list_filter = ('empresa', 'tipo_sucursal')
+    ordering = ('empresa',)
+    autocomplete_fields = ('empresa',)
+
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
+    """Usuario estándar de Django más los campos teléfono y dirección."""
     fieldsets = UserAdmin.fieldsets + (
         (None, {'fields': ('telefono', 'direccion')}),
     )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'telefono')  # Mostrar teléfono en lista
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'telefono')
     search_fields = ('username', 'email', 'telefono')
-    list_filter = ('is_active', 'is_staff', 'is_superuser')  # Filtros adicionales
-    ordering = ('username',)  # Ordenar por nombre de usuario
+    list_filter = ('is_active', 'is_staff', 'is_superuser')
+    ordering = ('username',)
+
 
 @admin.register(UsuarioPerfil)
 class UsuarioPerfilAdmin(admin.ModelAdmin):
+    """Perfiles: aquí se asigna empresa y sucursal a cada usuario."""
     list_display = ('usuario', 'empresa', 'sucursal')
     search_fields = ('usuario__username', 'empresa__nombre', 'sucursal__nombre')
-    list_filter = ('empresa', 'sucursal')  # Filtros de empresa y sucursal
-    autocomplete_fields = ('usuario', 'empresa', 'sucursal')  # Habilitar autocompletado para relaciones
-    ordering = ('empresa',)  # Ordenar por usuario
+    list_filter = ('empresa', 'sucursal')
+    autocomplete_fields = ('usuario', 'empresa', 'sucursal')
+    ordering = ('empresa',)
 
 
-# Formulario de administración de grupos con usuarios
 class GroupAdminForm(forms.ModelForm):
+    """
+    Formulario de grupo con un selector de usuarios.
+
+    Permite asignar varios usuarios a un rol desde la pantalla del grupo, en lugar de
+    entrar usuario por usuario.
+    """
     users = forms.ModelMultipleChoiceField(
         queryset=Usuario.objects.all(),
         required=False,
@@ -65,13 +87,12 @@ class GroupAdminForm(forms.ModelForm):
         return group
 
 
-# Configuración personalizada de GroupAdmin
 class CustomGroupAdmin(admin.ModelAdmin):
+    """Reemplaza el admin de grupos por defecto para incluir el selector de usuarios."""
     form = GroupAdminForm
     list_display = ['name']
     search_fields = ['name']
 
 
-# Registrar el Group con el GroupAdmin personalizado
 admin.site.unregister(Group)
 admin.site.register(Group, CustomGroupAdmin)

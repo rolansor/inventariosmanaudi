@@ -1,6 +1,16 @@
+"""
+Configuración de Django del Sistema de Inventarios Manaudi.
+
+Todos los valores sensibles se leen de variables de entorno (ver ``.env.example``);
+sin ellas se usan los valores de desarrollo local. En producción (PythonAnywhere)
+deben definirse ``DJANGO_SECRET_KEY``, ``DJANGO_DEBUG=0``, ``DJANGO_ALLOWED_HOSTS``,
+``DJANGO_CSRF_TRUSTED_ORIGINS`` y las variables ``DB_*``.
+"""
 import os
 from pathlib import Path
 import pymysql
+
+# PyMySQL se presenta como MySQLdb para el backend de MySQL de Django
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -8,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-mus*w*^jt@(xzz@_6crj=i=84#lic1b*u7h&-zv@@_@9_lh++k')
@@ -86,18 +96,8 @@ DATABASES = {
         },
     }
 }
-'''
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sifcol$inv_manaudi',
-        'USER': 'sifcol',
-        'PASSWORD': 'f4d3s2a1',
-        'HOST': 'sifcol.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
-    }
-}
-'''
+# Producción (PythonAnywhere): definir por entorno
+#   DB_NAME=sifcol$inv_manaudi  DB_USER=sifcol  DB_HOST=sifcol.mysql.pythonanywhere-services.com
 
 AUTH_PASSWORD_VALIDATORS = [
     {

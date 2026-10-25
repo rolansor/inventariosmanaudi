@@ -1,4 +1,4 @@
-# Imagen para el Sistema de Inventarios Manaudi (Django 3.2 + MySQL)
+# Imagen para el Sistema de Inventarios Manaudi (Django 4.2 + MySQL 8)
 FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

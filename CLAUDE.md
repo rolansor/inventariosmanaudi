@@ -1,5 +1,10 @@
 # Sistema de Inventarios Manaudi - Documentación para Claude
 
+Documentación para personas: `README.md` (arranque, usuarios de prueba, comandos),
+`docs/manual_usuario.md` (pantallas por rol), `docs/manual_tecnico.md` (arquitectura, modelos,
+permisos, despliegue) y `docs/guion_demo.md` (recorrido para video/capacitación).
+El código tiene docstrings en módulos, modelos, vistas, formularios y comandos.
+
 ## 🏗️ Arquitectura del Proyecto
 
 ### Stack Tecnológico
@@ -8,6 +13,8 @@
 - **Frontend**: Templates Django con Bootstrap 5 (tema Color Admin), DataTables, Select2
 - **Autenticación**: Sistema customizado con modelo Usuario personalizado
 - **Entorno de ejecución**: Docker (`docker compose up -d`). No se usa entorno virtual local.
+- **Sin pruebas automatizadas** (los `tests.py` están vacíos); verificar con `check`,
+  `makemigrations --check --dry-run` y recorriendo las pantallas con los usuarios de prueba.
 
 ## 📁 Estructura del Proyecto
 
@@ -17,15 +24,16 @@ inv_manaudi/
 ├── inventario/      # Control de inventarios y movimientos
 ├── productos/       # Administración de productos
 ├── categorias/      # Categorías y subcategorías
-├── reportes/        # Generación de reportes
+├── reportes/        # Generación de reportes y carga masiva Excel
 └── templates/       # Templates base
+docs/                # Manuales (usuario, técnico) y guion de demo
 ```
 
 ## 🗄️ Modelos de Datos Principales
 
 ### usuarios/models.py
 - **Empresa**: Entidad principal del sistema multi-empresa
-- **Sucursal**: Incluye tipos (bodega, punto_venta, laboratorio)
+- **Sucursal**: Incluye tipos (bodega, punto_venta, laboratorio); el formulario de sucursales pide el tipo
 - **Usuario**: Extiende AbstractUser con campos adicionales
 - **UsuarioPerfil**: Relaciona usuario con empresa y sucursal
 
@@ -49,6 +57,7 @@ inv_manaudi/
   - Documentos: nota_venta, factura, orden_trabajo, nota_pedido, otros
   - Auto-actualiza inventario al guardar (transacción + bloqueo de la fila de inventario)
   - Lanza `ValueError('Stock insuficiente...')` si la salida supera el stock
+  - Editar un movimiento existente NO recalcula stock: por eso no está en el admin ni se edita desde la UI
   
 - **Traslado**:
   - Estados: pendiente/confirmado
@@ -76,6 +85,7 @@ Los permisos se resuelven por pertenencia a grupo. Un usuario con varios grupos 
 - **Manaudi**: administración (empresas, sucursales, eliminar categorías/subcategorías/clases, activar/desactivar productos, carga masiva).
 - **Supervisor**: categorías/subcategorías/clases (crear, editar, listar), productos (crear, editar), movimientos por empresa y sucursal.
 - **Encargado**: movimientos de inventario, traslados (iniciar, pendientes, confirmar), búsqueda de productos, movimientos por producto.
+  Movimientos por empresa y por sucursal exigen **Supervisor** (igual que el menú).
 - **Auditor**: solo lectura: lista de productos, reportes.
 
 Reglas de `control_acceso`: usuario anónimo → redirige al login con `?next=`; usuario sin el grupo → `acceso_denegado.html` con HTTP 403.
@@ -94,9 +104,9 @@ La matriz detallada está más abajo en "Matriz de Permisos por Rol".
 - cambiar-empresa/<id>/ (solo superusuario: cambia la empresa activa en sesión)
 
 ### /inventario/
-- movimiento_inventario/
+- movimiento_inventario/ (el formulario recibe `empresa` y `sucursal`; la sucursal queda fija si el usuario tiene una)
 - traslado/iniciar/, traslados_pendientes/, traslado/confirmar/<pk>/
-- producto_movimientos/, empresa_movimientos/, sucursal_movimientos/
+- producto_movimientos/ (Encargado), empresa_movimientos/, sucursal_movimientos/ (Supervisor)
 
 ### /productos/
 - nuevo/, lista_productos/ (DataTables server-side), busqueda/, editar/<pk>/
@@ -111,7 +121,7 @@ La matriz detallada está más abajo en "Matriz de Permisos por Rol".
 
 ### /reportes/
 - reporte_diario/, inventario_valorizado/
-- carga_masiva/, descargar_plantilla/ (Excel; crea categorías/subcategorías/clases nuevas generando códigos de 3 caracteres)
+- carga_masiva/, descargar_plantilla/ (solo `.xlsx` con openpyxl; crea categorías/subcategorías/clases nuevas generando códigos de 3 caracteres; celdas vacías toman valores por defecto)
 
 ## ⚙️ Configuración Importante (settings.py)
 
@@ -227,6 +237,9 @@ docker compose exec web python manage.py check
 docker compose exec web python manage.py populate_data                  # Crea datos de prueba
 docker compose exec web python manage.py populate_data --clear          # Limpia y recrea todos los datos
 docker compose exec web python manage.py populate_data --empresas 2     # Crea solo 2 empresas
+docker compose exec web python manage.py populate_demo                  # Historial de demo: 30 días de movimientos,
+                                                                        # traslados pendientes/confirmados, alertas de stock
+docker compose exec web python manage.py populate_demo --force          # Agrega otra tanda de datos demo
 
 # Exportar / importar la base del contenedor
 docker compose exec db mysqldump -uroot -pf4d3s2a1 inv_manaudi > docker/dumps/backup.sql
@@ -287,7 +300,12 @@ El comando `docker compose exec web python manage.py populate_data` crea automá
 - **Tienda Loja** (Punto de Venta) - LOJ
 
 ### Datos de Prueba Incluidos
-El comando también crea:
+`populate_demo` (correr después de `populate_data`; no toca usuarios) agrega por empresa: códigos auxiliares/EAN,
+un producto inactivo, ~30 días de entradas/salidas repartidas entre sucursales y usuarios, traslados confirmados
+(uno con faltante) y pendientes hacia la sucursal del encargado, productos con stock bajo, uno agotado y
+movimientos de hoy. Sus documentos de respaldo empiezan con `DEMO-`.
+
+`populate_data` crea:
 - **Categorías**: Electrónica, Oficina
 - **Subcategorías**: Computadoras, Celulares, Papelería, Mobiliario
 - **Clases**: Laptops, Desktops, Tablets, Smartphones, etc.
@@ -307,6 +325,7 @@ docker compose exec web python manage.py populate_data --clear
 docker compose exec web python manage.py populate_data --empresas 1
 ```
 Nota: `--clear` borra y recrea los registros, por lo que los IDs cambian y las sesiones abiertas de usuarios no superusuarios quedan inválidas.
+No existe otro comando de población: `populate_pythonanywhere.py` (copia desactualizada con grupos distintos) fue eliminado el 24/10/2026.
 
 ## 🏢 Estructura Organizacional y Permisos
 
@@ -494,6 +513,6 @@ a mano con un solo grupo tendrá menos permisos que los de la tabla.
 2. **Producción**: desplegar Django 4.2 en PythonAnywhere (requiere Python 3.8+) e importar el dump real en Docker para desarrollo
 3. **Tests**: Agregar pruebas unitarias y de integración
 4. **API REST**: Considerar agregar Django REST Framework
-5. **Documentación**: Agregar docstrings en vistas y modelos
-6. **Logs**: Implementar sistema de logging
-7. **Backups**: Configurar respaldos automáticos de BD
+5. **Logs**: Implementar sistema de logging
+6. **Backups**: Configurar respaldos automáticos de BD
+7. Ver la lista completa de limitaciones conocidas en `docs/manual_tecnico.md` §9
