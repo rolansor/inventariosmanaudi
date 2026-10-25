@@ -166,7 +166,7 @@ contenedor `web` corre `migrate` al iniciar (`RUN_MIGRATIONS=1`).
 
 | Vista | Grupo |
 |---|---|
-| empresa_*, sucursal_* | Manaudi |
+| empresa_list, empresa_edit, empresa_delete, sucursal_list, sucursal_edit, sucursal_delete | Manaudi |
 | nueva/lista/editar categoría, subcategoría, clase | Supervisor |
 | eliminar categoría, subcategoría, clase | Manaudi |
 | crear_producto, editar_producto, obtener_modelos_unicos | Supervisor |
