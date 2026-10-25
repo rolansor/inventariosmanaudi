@@ -47,6 +47,10 @@ En la práctica, los usuarios creados por Manaudi tienen: *Manaudi* = los cuatro
 - Un usuario **sin sucursal** (Manaudi, Auditor, superusuario) ve toda la empresa y puede
   confirmar cualquier traslado de la empresa.
 
+![Dashboard de un encargado: solo su sucursal y menú reducido](capturas/28_dashboard_encargado.jpg)
+
+![Pantalla de acceso denegado](capturas/29_acceso_denegado.jpg)
+
 ---
 
 ## 3. Pantallas
@@ -58,6 +62,8 @@ URL: `/usuarios/login/`
 1. Escriba su **usuario** y **contraseña** y pulse **Ingresar**.
 2. Si los datos son incorrectos la página se recarga sin mensaje adicional; vuelva a intentarlo.
 3. Para salir: menú del usuario (arriba a la derecha) → **Salir Sistema**.
+
+![Pantalla de ingreso](capturas/01_login.jpg)
 
 > La casilla "Recuérdame" y el enlace "solicitar un usuario" son decorativos: no tienen
 > función. Los usuarios se crean desde el administrador del sistema.
@@ -74,6 +80,8 @@ Muestra, para la empresa (y sucursal, si el usuario tiene una):
 - **Productos Agotados**: filas de inventario con cantidad 0.
 - **Últimos 10 movimientos**: entradas (celeste) y salidas (rosado) con responsable y fecha.
 
+![Dashboard de un usuario sin sucursal (toda la empresa)](capturas/02_dashboard_manaudi.jpg)
+
 Barra superior: nombre de la **empresa** y **sucursal** del usuario. El superusuario ve
 en su lugar un desplegable para **cambiar de empresa**.
 
@@ -89,6 +97,8 @@ Menú: *Manejo Empresas → Lista Empresas* · URL: `/usuarios/empresas/`
   usuarios asociados, productos, inventario y movimientos.
 - **Sucursales**: abre la pantalla de sucursales de esa empresa.
 
+![Manejo de empresas](capturas/03_empresas.jpg)
+
 #### Sucursales
 
 URL: `/usuarios/empresas/<id>/sucursales`
@@ -96,6 +106,8 @@ URL: `/usuarios/empresas/<id>/sucursales`
 Misma mecánica que empresas. Campos: Nombre, **Abreviatura** (3 letras, ej. UIO),
 **Tipo** (Bodega / Punto de Venta / Laboratorio), Dirección y Teléfono.
 ⚠️ Eliminar una sucursal borra su inventario y sus movimientos.
+
+![Sucursales de una empresa con la nueva sucursal agregada](capturas/05_sucursales_lista.jpg)
 
 ### 3.4 Categorías (rol Supervisor; eliminar requiere Manaudi)
 
@@ -110,6 +122,12 @@ Menú: *Categorias → Lista Categorias* · URL: `/categorias/lista_categorias/`
 
 El código debe ser único dentro de su nivel (dos categorías de la misma empresa no pueden
 tener el mismo código; dos subcategorías de la misma categoría tampoco).
+
+![Lista de categorías](capturas/06_categorias.jpg)
+
+![Clases de una subcategoría](capturas/08_clases.jpg)
+
+![Ventana para crear una clase](capturas/09_clases_modal_crear.jpg)
 
 ### 3.5 Productos
 
@@ -131,11 +149,23 @@ Menú: *Productos*.
 
 Al guardar vuelve a la lista de productos. Si el código ya existe se muestra un aviso.
 
+Detalles del formulario:
+
+- El **código** admite solo letras, números y guiones; otros caracteres (como `_`) se eliminan al escribir.
+- El **precio** se escribe con sus decimales (por ejemplo `450.00`). Si se teclean solo dígitos, el campo
+  los interpreta como centavos: `450` se convierte en `4.50`.
+- El **código EAN-13** se valida con su dígito verificador; si no es válido aparece un aviso en rojo
+  (el sistema igual permite guardar, pero conviene corregirlo).
+
+![Formulario de nuevo producto completo](capturas/16_nuevo_producto_lleno.jpg)
+
 #### Lista Productos (Auditor, Supervisor, Manaudi) — `/productos/lista_productos/`
 
 Tabla completa de la empresa con búsqueda, ordenamiento y paginación. Botones para
 **copiar, exportar a CSV / Excel / PDF e imprimir**. Los supervisores ven además el botón
-de **editar** en cada fila.
+de **editar** en cada fila y el acceso a **Nuevo Producto**.
+
+![Lista de productos vista por un supervisor](capturas/17_lista_productos_supervisor.jpg)
 
 #### Búsqueda Productos (Encargado y superiores) — `/productos/busqueda/`
 
@@ -147,6 +177,8 @@ En cada resultado, según el rol:
 - 🚫 **Desactivar** / ✔️ **Activar** (Manaudi). Pide confirmación. Un producto inactivo
   se muestra en gris; sigue apareciendo en listas y selectores (con su estado), pero
   indica que ya no se comercializa.
+
+![Resultado de búsqueda con un producto inactivo y sus acciones (Manaudi)](capturas/13_busqueda_inactivo.jpg)
 
 #### Editar Producto (Supervisor) — `/productos/editar/<id>/`
 
@@ -175,6 +207,10 @@ Debajo del formulario se listan los 20 movimientos más recientes de la empresa.
 > Los movimientos no se editan ni se borran. Un error se corrige con un movimiento
 > contrario (por ejemplo una entrada con comentario *CORRECCIÓN DE STOCK*).
 
+![Registro de una entrada](capturas/19_movimiento_entrada.jpg)
+
+![Salida rechazada por stock insuficiente](capturas/21_movimiento_stock_insuficiente.jpg)
+
 #### Traslados — `/inventario/traslado/iniciar/`
 
 1. Elija **Sucursal Origen**, **Sucursal Destino** (distintas), **Producto** y
@@ -186,6 +222,10 @@ Debajo del formulario se listan los 20 movimientos más recientes de la empresa.
 En ese momento se descuenta el stock en origen (movimiento de salida automático) y el
 traslado queda **Pendiente**: la mercadería está "en tránsito". Si el origen no tiene
 stock suficiente, el traslado se rechaza. La tabla inferior muestra los 10 últimos traslados.
+
+![Formulario de traslado](capturas/22_traslado_formulario.jpg)
+
+![Traslados recientes con su estado](capturas/24_traslados_recientes.jpg)
 
 #### Acuse Recibo — `/inventario/traslados_pendientes/`
 
@@ -200,6 +240,10 @@ supervisor o un usuario sin sucursal ve todos los de la empresa.
 
 Si un traslado muestra *No Disponible* es porque no está dirigido a su sucursal.
 
+![Acuse Recibo visto por el encargado de la sucursal destino](capturas/30_acuse_recibo.jpg)
+
+![Confirmación de la cantidad recibida](capturas/31_confirmar_recepcion.jpg)
+
 #### Movimientos
 
 - **Producto** (`/inventario/producto_movimientos/`): elija un producto y pulse **Buscar
@@ -210,6 +254,10 @@ Si un traslado muestra *No Disponible* es porque no está dirigido a su sucursal
   movimientos y de traslados de la empresa.
 - **Sucursal** (Supervisor, `/inventario/sucursal_movimientos/`): elija una sucursal;
   muestra sus movimientos y los traslados en que participa como origen o destino.
+
+![Movimientos por producto (kardex)](capturas/25_movimientos_producto.jpg)
+
+![Movimientos por empresa](capturas/26_movimientos_empresa.jpg)
 
 ### 3.7 Reportes (rol Auditor y superiores)
 
@@ -222,6 +270,8 @@ Movimientos registrados **hoy** en la empresa: tarjetas con usuarios activos, to
 tipo y total de movimientos; pestañas con el detalle hora a hora, el resumen por usuario y
 el resumen por tipo. Incluye las salidas y entradas generadas por traslados.
 
+![Reporte de movimientos del día](capturas/39_reporte_diario.jpg)
+
 #### Inventario Valorizado — `/reportes/inventario_valorizado/`
 
 Valor del stock (cantidad × precio) de la empresa. Tarjetas con productos, unidades, valor
@@ -230,7 +280,11 @@ total y cantidad de alertas. Pestañas:
 - **Detalle**: cada producto en cada sucursal con su valor.
 - **Por Sucursal** y **Por Categoría**: totales agrupados.
 - **Top 10**: productos de mayor valor en inventario.
-- **Alertas**: productos con cantidad menor o igual al stock mínimo.
+- **Alertas**: productos con cantidad menor o igual al stock mínimo, con el déficit a reponer.
+
+![Inventario valorizado: detalle](capturas/41_valorizado_detalle.jpg)
+
+![Alertas de stock bajo y agotado](capturas/44_valorizado_alertas.jpg)
 
 #### Carga Masiva de Productos (Manaudi) — `/reportes/carga_masiva/`
 
@@ -253,6 +307,8 @@ Comportamiento:
   (reemplaza el saldo anterior; no genera movimiento).
 - Al terminar se informa cuántos se crearon/actualizaron y los errores por fila (máximo 10 en pantalla).
 
+![Carga masiva de productos](capturas/11_carga_masiva.jpg)
+
 ### 3.8 Administrador del sistema (superusuario)
 
 URL: `/admin/`. Aquí se gestionan los **usuarios**:
@@ -264,6 +320,12 @@ URL: `/admin/`. Aquí se gestionan los **usuarios**:
 
 También puede consultar y corregir desde el admin empresas, sucursales, clasificación,
 productos e inventario. ⚠️ No modifique movimientos ni traslados desde aquí.
+
+![Selector de empresa del superusuario](capturas/46_selector_empresa.jpg)
+
+![Perfiles de usuario en el administrador](capturas/50_admin_perfiles.jpg)
+
+![Usuarios de un grupo (rol)](capturas/51_admin_grupo.jpg)
 
 ---
 

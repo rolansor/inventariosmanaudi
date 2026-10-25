@@ -387,48 +387,46 @@ class Command(BaseCommand):
         
         for empresa_nombre, empresa_info in empresas.items():
             empresa = empresa_info['empresa']
-            producto_count = 0
-            
+            clases_por_codigo = {}
+
             for cat_data in categorias_base:
                 categoria = Categoria.objects.create(
                     codigo=cat_data['codigo'],
                     nombre=cat_data['nombre'],
                     empresa=empresa
                 )
-                
+
                 for subcat_data in cat_data['subcategorias']:
                     subcategoria = Subcategoria.objects.create(
                         codigo=subcat_data['codigo'],
                         nombre=subcat_data['nombre'],
                         categoria=categoria
                     )
-                    
+
                     for clase_data in subcat_data['clases']:
-                        clase = Clase.objects.create(
+                        clases_por_codigo[clase_data['codigo']] = Clase.objects.create(
                             codigo=clase_data['codigo'],
                             nombre=clase_data['nombre'],
                             subcategoria=subcategoria
                         )
-                        
-                        # Crear productos para esta clase
-                        for prod_data in productos_ejemplo:
-                            if producto_count < 10:  # Limitar productos por empresa
-                                codigo_unico = f"{empresa_nombre[:3].upper()}_{prod_data['codigo']}"
-                                Producto.objects.create(
-                                    codigo=codigo_unico,
-                                    nombre=prod_data['nombre'],
-                                    modelo=prod_data.get('modelo', ''),
-                                    precio=Decimal(str(prod_data['precio'])),
-                                    tipo_producto=prod_data['tipo'],
-                                    clase=clase,
-                                    empresa=empresa,
-                                    estado='activo',
-                                    descripcion=f"Producto de {clase.nombre}"
-                                )
-                                producto_count += 1
-            
+
+            # Cada producto va a la clase cuyo código coincide con el prefijo del suyo (LAP001 -> LAP)
+            for prod_data in productos_ejemplo:
+                clase = clases_por_codigo[prod_data['codigo'][:3]]
+                Producto.objects.create(
+                    codigo=f"{empresa_nombre[:3].upper()}_{prod_data['codigo']}",
+                    nombre=prod_data['nombre'],
+                    modelo=prod_data.get('modelo', ''),
+                    precio=Decimal(str(prod_data['precio'])),
+                    tipo_producto=prod_data['tipo'],
+                    clase=clase,
+                    empresa=empresa,
+                    estado='activo',
+                    descripcion=f"{prod_data['nombre']} - {clase.nombre}"
+                )
+
             self.stdout.write(self.style.SUCCESS(
-                f"  [OK] {producto_count} productos creados para {empresa_nombre}"
+                f"  [OK] {len(productos_ejemplo)} productos creados para {empresa_nombre}"
             ))
 
     def crear_inventario_inicial(self, empresas):

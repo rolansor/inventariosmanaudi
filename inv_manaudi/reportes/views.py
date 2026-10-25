@@ -152,7 +152,7 @@ def reporte_inventario_valorizado(request):
     productos_stock_bajo = Inventario.objects.filter(
         producto__empresa=empresa_actual,
         cantidad__lte=F('stock_minimo')
-    ).select_related('producto', 'sucursal').order_by('cantidad')
+    ).annotate(deficit=F('stock_minimo') - F('cantidad')).select_related('producto', 'sucursal').order_by('cantidad')
     
     # Calcular totales generales
     total_general = inventarios.aggregate(

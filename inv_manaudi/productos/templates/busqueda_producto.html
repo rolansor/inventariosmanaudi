@@ -61,7 +61,7 @@
             </thead>
             <tbody>
                 {% for producto in productos %}
-                    <tr {% if producto.estado == 'inactivo' %}class="table-secondary"{% endif %}>
+                    <tr {% if producto.estado == 'inactivo' %}class="text-muted" style="opacity: 0.6;"{% endif %}>
                         <td>{{ producto.codigo }}</td>
                         <td>{{ producto.codigo_auxiliar|default:"-" }}</td>
                         <td>{{ producto.codigo_ean|default:"-" }}</td>

@@ -322,6 +322,10 @@ Comportamientos actuales que conviene conocer (no son errores, son decisiones o 
    venir del entorno.
 10. **CDN**: las pantallas de alta/edición de producto cargan Select2 y jQuery Mask desde
     internet; sin conexión esos selectores pierden estilo.
+11. **Formulario de producto**: la máscara del precio interpreta dígitos sueltos como centavos
+    (`450` → `4.50`); el código elimina caracteres distintos de letras, números y guion; la
+    validación del dígito verificador EAN-13 es solo visual (el servidor no la exige). Los
+    códigos con `_` de los datos de prueba no pueden crearse desde la pantalla.
 
 Mejoras sugeridas: pruebas unitarias e integración; anulación controlada de movimientos;
 restringir el origen de traslados a la sucursal del usuario; exportar reportes; logging;
@@ -342,3 +346,9 @@ API REST (DRF) si se requiere integración con otros sistemas; respaldos automá
   menú), botón editar oculto para Auditor en la lista de productos, carga masiva tolera
   celdas vacías y solo acepta `.xlsx`; eliminados archivos huérfanos
   (`populate_pythonanywhere.py`, `productos_sucursal.html`, `inventario/signals.py`).
+- **25/10/2026**: recorrido completo en Chrome con capturas (`docs/capturas/`) y videos
+  (`docs/videos/`); documento Word/PDF con imágenes. Ajustes detectados en el recorrido: fila de
+  producto inactivo legible, botón "Nuevo Producto" solo para Supervisor, el comentario del
+  movimiento se conserva al reenviar el formulario, columna Déficit del reporte de alertas
+  calculada en la vista y sin botón "Reabastecer" (no tenía función); `populate_data` asigna cada
+  producto a la clase de su prefijo.

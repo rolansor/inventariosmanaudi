@@ -15,6 +15,10 @@ docker compose exec web python manage.py populate_demo
 
 Abrir <http://127.0.0.1:8012> en Chrome (ventana de 1366×768 o mayor, zoom 100 %).
 
+Material ya generado a partir de este guion (recorrido del 24/10/2026): capturas en `docs/capturas/`
+y videos por escena en `docs/videos/` (`escena_N_*.gif` y `recorrido_completo.mp4`, regenerables con
+`python docs/generar_videos.py`). Sirven de base para grabar la narración.
+
 > Los números exactos (stock, cantidades) pueden variar si se regeneran los datos; los
 > nombres de productos, sucursales y usuarios no cambian.
 
@@ -52,18 +56,20 @@ Abrir <http://127.0.0.1:8012> en Chrome (ventana de 1366×768 o mayor, zoom 100 
    muestra solo cifras de la Matriz.
 2. *Productos → Nuevo Producto*: crear
    - Clasificación: `ELE - ELECTRÓNICA / COM - COMPUTADORAS / TAB - TABLETS`
-   - Código `TEC_TAB002`, código EAN `7861234567890`, modelo `GALAXY-TAB-S9` (mostrar el
-     autocompletado de modelos), nombre `Tablet Samsung Galaxy Tab S9`, precio `450`.
+   - Código `TEC-TAB002` (el campo no admite `_`), código EAN `7861234567898` (dígito verificador
+     válido), modelo `GALAXY-TAB-S9` (mostrar el autocompletado de modelos), nombre
+     `Tablet Samsung Galaxy Tab S9`, precio `450.00` (escribir los decimales: si se teclea solo `450`
+     el campo lo interpreta como `4.50`).
    - Guardar → redirige a la lista. Mostrar que quedó en MAYÚSCULAS.
 3. *Lista Productos*: buscar "LAPTOP", ordenar por precio, exportar a Excel o PDF.
 4. *Mantenimiento Inventario → Entrada/Salida*: registrar una **entrada** del nuevo
-   producto `TEC_TAB002`, cantidad 20, comentario `COMPRA PRODUCTOS`, tipo Factura,
+   producto `TEC-TAB002`, cantidad 20, comentario `COMPRA PRODUCTOS`, tipo Factura,
    documento `001-001-000012345`, adjuntar un PDF cualquiera (opcional). La sucursal está
    fija en Matriz Quito. Verificar el movimiento en la tabla inferior.
 5. Intentar una **salida** de 999 unidades de `TEC_HOJ001 – RESMA PAPEL A4` → mensaje
    *Stock insuficiente*. Explicar la validación.
 6. *Mantenimiento Inventario → Traslados*: origen Matriz Quito, destino Sucursal
-   Guayaquil, producto `TEC_TAB002`, cantidad 5, Guía de Remisión `GR-0001`. Registrar →
+   Guayaquil, producto `TEC-TAB002`, cantidad 5, Guía de Remisión `GR-0001`. Registrar →
    redirige a **Acuse Recibo**: el traslado aparece como pendiente; como el supervisor está
    en la Matriz, el botón dice *No Disponible* para los destinados a GYE.
 7. *Movimientos → Producto*: elegir `TEC_LAP002 – LAPTOP HP PROBOOK`. Mostrar el resumen:
@@ -88,11 +94,11 @@ Abrir <http://127.0.0.1:8012> en Chrome (ventana de 1366×768 o mayor, zoom 100 
    - Confirmar la **Tablet**: cantidad recibida 5 → *Recepción confirmada*.
    - Confirmar el **iPhone 13** con cantidad recibida **6** (llegó uno menos): explicar que
      la diferencia queda registrada.
-4. *Entrada/Salida*: registrar una **salida** de 1 `TEC_TAB002`, Nota de Venta
+4. *Entrada/Salida*: registrar una **salida** de 1 `TEC-TAB002`, Nota de Venta
    `001-002-000000456`, comentario `VENTA AL CLIENTE`. La sucursal viene fija.
 5. *Busqueda Productos*: buscar `IPHONE`; mostrar que el encargado no tiene botones de
    editar/activar.
-6. *Movimientos → Producto*: `TEC_TAB002` → se ven la entrada en Matriz, el traslado
+6. *Movimientos → Producto*: `TEC-TAB002` → se ven la entrada en Matriz, el traslado
    confirmado y la salida en Guayaquil; stock total 19.
 7. Cerrar sesión.
 

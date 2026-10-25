@@ -356,12 +356,11 @@
                                 <th class="text-center">Stock Mínimo</th>
                                 <th class="text-center">Déficit</th>
                                 <th class="text-center">Estado</th>
-                                <th class="text-center">Acción Sugerida</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for inv in productos_stock_bajo %}
-                            <tr class="{% if inv.cantidad == 0 %}table-danger{% else %}table-warning{% endif %}">
+                            <tr style="background-color: {% if inv.cantidad == 0 %}#f8d7da{% else %}#fff3cd{% endif %};">
                                 <td><strong>{{ inv.producto.codigo }}</strong></td>
                                 <td>{{ inv.producto.nombre }}</td>
                                 <td>{{ inv.sucursal.nombre }}</td>
@@ -370,9 +369,7 @@
                                 </td>
                                 <td class="text-center">{{ inv.stock_minimo|floatformat:0 }}</td>
                                 <td class="text-center">
-                                    {% with deficit=inv.stock_minimo|add:"-"|add:inv.cantidad %}
-                                        <strong>{{ deficit|floatformat:0 }}</strong>
-                                    {% endwith %}
+                                    <strong>{{ inv.deficit|floatformat:0 }}</strong>
                                 </td>
                                 <td class="text-center">
                                     {% if inv.cantidad == 0 %}
@@ -384,11 +381,6 @@
                                             <i class="fa fa-exclamation"></i> STOCK BAJO
                                         </span>
                                     {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-primary">
-                                        <i class="fa fa-shopping-cart"></i> Reabastecer
-                                    </button>
                                 </td>
                             </tr>
                             {% empty %}

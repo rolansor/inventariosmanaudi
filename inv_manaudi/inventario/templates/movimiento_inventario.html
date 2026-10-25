@@ -87,7 +87,7 @@
     <!-- Campo Comentario -->
     <div class="form-group">
     <label for="id_comentario">Comentario:</label>
-    <input list="razones-sugeridas" class="form-control" name="comentario" id="id_comentario">
+    <input list="razones-sugeridas" class="form-control" name="comentario" id="id_comentario" value="{{ form.comentario.value|default_if_none:'' }}">
     <datalist id="razones-sugeridas">
         <option value="INVENTARIO INICIAL">
         <option value="COMPRA PRODUCTOS">
