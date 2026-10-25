@@ -15,20 +15,15 @@ entre sucursales y reportes.
 
 ## Documentación
 
+Los manuales (usuario y técnico), el guion de demostración, el documento Word/PDF, las capturas y
+los videos del recorrido se entregan por separado, fuera de este repositorio. En el código quedan:
+
 | Documento | Para quién | Contenido |
 |---|---|---|
-| [docs/manual_usuario.md](docs/manual_usuario.md) | Usuarios finales | Qué hace cada pantalla, paso a paso, por rol |
-| [docs/manual_tecnico.md](docs/manual_tecnico.md) | Desarrolladores / soporte | Arquitectura, modelos, permisos, reglas de negocio, despliegue, mantenimiento |
-| [docs/guion_demo.md](docs/guion_demo.md) | Quien grabe el video / capacite | Recorrido guiado con los datos de demostración |
-| [docs/Documentacion_Sistema_Inventarios_Manaudi.docx](docs/Documentacion_Sistema_Inventarios_Manaudi.docx) · [PDF](docs/Documentacion_Sistema_Inventarios_Manaudi.pdf) | Entrega formal | Los tres documentos anteriores en un solo archivo Word/PDF con portada e índice |
 | [docker/dumps/README.md](docker/dumps/README.md) | Desarrolladores | Importar/exportar la base de datos del contenedor |
 | [CLAUDE.md](CLAUDE.md) | Asistentes de IA | Resumen técnico para trabajar con el código |
 
 El código Python está documentado con docstrings en módulos, modelos, vistas y formularios.
-
-Para regenerar el Word/PDF tras editar los Markdown: `pip install python-docx` y luego
-`python docs/generar_docx.py` seguido de `powershell -File docs/actualizar_toc_y_pdf.ps1`
-(este último usa Microsoft Word para actualizar el índice y exportar el PDF).
 
 ## Puesta en marcha (desarrollo)
 
@@ -100,7 +95,6 @@ docker compose exec -T db mysql -uroot -pf4d3s2a1 inv_manaudi < docker/dumps/bac
 ├── docker-compose.yml, Dockerfile, docker/   # contenedores (entrypoint espera a MySQL y migra)
 ├── .env.example                              # variables de entorno
 ├── requirements.txt
-├── docs/                                     # manuales de usuario y técnico, guion de demo
 └── inv_manaudi/                              # proyecto Django (manage.py)
     ├── inv_manaudi/      settings.py, urls.py
     ├── usuarios/         empresas, sucursales, usuarios/perfiles, login, dashboard, permisos
@@ -137,4 +131,4 @@ La gestión de usuarios se hace desde el admin de Django.
 
 Definir en el entorno `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=0`, `DJANGO_ALLOWED_HOSTS`,
 `DJANGO_CSRF_TRUSTED_ORIGINS` y las variables `DB_*` (ver `.env.example`). Detalles de
-despliegue y mantenimiento en [docs/manual_tecnico.md](docs/manual_tecnico.md).
+despliegue y mantenimiento en el manual técnico (entregado por separado).

@@ -1,9 +1,9 @@
 # Sistema de Inventarios Manaudi - Documentación para Claude
 
-Documentación para personas: `README.md` (arranque, usuarios de prueba, comandos),
-`docs/manual_usuario.md` (pantallas por rol), `docs/manual_tecnico.md` (arquitectura, modelos,
-permisos, despliegue) y `docs/guion_demo.md` (recorrido para video/capacitación).
-El código tiene docstrings en módulos, modelos, vistas, formularios y comandos.
+Documentación para personas: `README.md` (arranque, usuarios de prueba, comandos). Los manuales de
+usuario y técnico, el guion de demo, el Word/PDF, las capturas y los videos del recorrido se
+entregan por separado (no están en el repositorio). El código tiene docstrings en módulos, modelos,
+vistas, formularios y comandos.
 
 ## 🏗️ Arquitectura del Proyecto
 
@@ -26,7 +26,6 @@ inv_manaudi/
 ├── categorias/      # Categorías y subcategorías
 ├── reportes/        # Generación de reportes y carga masiva Excel
 └── templates/       # Templates base
-docs/                # Manuales (usuario, técnico) y guion de demo
 ```
 
 ## 🗄️ Modelos de Datos Principales
@@ -515,4 +514,4 @@ a mano con un solo grupo tendrá menos permisos que los de la tabla.
 4. **API REST**: Considerar agregar Django REST Framework
 5. **Logs**: Implementar sistema de logging
 6. **Backups**: Configurar respaldos automáticos de BD
-7. Ver la lista completa de limitaciones conocidas en `docs/manual_tecnico.md` §9
+7. La lista completa de limitaciones conocidas está en el manual técnico (entregado por separado)
